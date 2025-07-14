@@ -126,49 +126,23 @@ function buscar(tipo) {
       markersPorTipo[tipo].forEach(m => map.removeLayer(m));
       markersPorTipo[tipo] = [];
 
-      data.elements.forEach(async e => {
+      data.elements.forEach(e => {
         const coords = e.type === "node" ? [e.lat, e.lon] : [e.center.lat, e.center.lon];
+        const name = e.tags.name || tipo;
         const marker = L.marker(coords, { icon: iconos[tipo] }).addTo(map);
-        marker.bindPopup("Cargando...");
         markersPorTipo[tipo].push(marker);
 
-        marker.on("click", async () => {
+        marker.on("click", () => {
           const userPos = userMarker.getLatLng();
+          const mapsLink = `https://www.google.com/maps/dir/?api=1&origin=${userPos.lat},${userPos.lng}&destination=${coords[0]},${coords[1]}&travelmode=driving&avoid=tolls`;
 
-          // DISTANCIA Y DURACIÓN
-          const directionsURL = `https://maps.googleapis.com/maps/api/directions/json?origin=${userPos.lat},${userPos.lng}&destination=${coords[0]},${coords[1]}&mode=driving&avoid=tolls&key=${GOOGLE_API_KEY}`;
-          const directionsResp = await fetch(`https://corsproxy.io/?${encodeURIComponent(directionsURL)}`);
-          const directionsData = await directionsResp.json();
-
-          const route = directionsData.routes?.[0]?.legs?.[0];
-          const distancia = route?.distance?.text || "–";
-          const duracion = route?.duration?.text || "–";
-
-          // INFO DEL LUGAR
-          const googleTipo = tipo === 'camp_site' ? 'rv_park' : tipo === 'fuel' ? 'gas_station' : 'parking';
-          const placesURL = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${coords[0]},${coords[1]}&radius=50&type=${googleTipo}&key=${GOOGLE_API_KEY}`;
-          const placesResp = await fetch(`https://corsproxy.io/?${encodeURIComponent(placesURL)}`);
-          const placesData = await placesResp.json();
-
-          const place = placesData.results?.[0];
-          const name = place?.name || tipo;
-          const rating = place?.rating ? `⭐ ${place.rating}` : "";
-          const mapsLink = place?.place_id
-            ? `<br>🌐 <a href="https://www.google.com/maps/place/?q=place_id=${place.place_id}" target="_blank">Ver en Google Maps</a>`
-            : "";
-
-          const comoLlegarURL = `https://www.google.com/maps/dir/?api=1&origin=${userPos.lat},${userPos.lng}&destination=${coords[0]},${coords[1]}&travelmode=driving&avoid=tolls`;
-
-          const contenidoPopup = `
+          const popupContent = `
             <b>${name}</b><br>
-            ${rating}<br>
-            📍 ${distancia} (${duracion})<br>
             💰 Precio estimado: ${tipo === 'fuel' ? '1.95 CHF/L' : tipo === 'camp_site' ? '20 CHF/noche' : 'Gratis'}<br>
-            ${mapsLink}
-            <br>🚗 <a href="${comoLlegarURL}" target="_blank">Cómo llegar</a>
+            🚗 <a href="${mapsLink}" target="_blank">Cómo llegar</a>
           `;
 
-          marker.setPopupContent(contenidoPopup);
+          marker.bindPopup(popupContent).openPopup();
         });
       });
 
@@ -180,6 +154,8 @@ function buscar(tipo) {
       document.getElementById("status").innerText = "Error de búsqueda";
     });
 }
+
+
 
 function clearAll() {
   Object.keys(markersPorTipo).forEach(tipo => {
