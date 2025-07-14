@@ -59,41 +59,38 @@ function getLocation() {
     alert("Tu navegador no permite geolocalización");
     return;
   }
+}
+  document.getElementById("status").innerText = "Obteniendo ubicación...";
+
+function getLocation() {
+  if (!navigator.geolocation) {
+    alert("Tu navegador no permite geolocalización");
+    return;
+  }
 
   document.getElementById("status").innerText = "Obteniendo ubicación...";
 
-  navigator.geolocation.getCurrentPosition(
+  navigator.geolocation.watchPosition(
     (pos) => {
       const lat = pos.coords.latitude;
       const lon = pos.coords.longitude;
 
-      if (firstTime) {
+      if (!map) {
         initMap(lat, lon);
-        firstTime = false;
       } else {
-        map.setView([lat, lon], 14);
-        if (userMarker) {
-  userMarker.setLatLng([lat, lon]);
-} else {
-  userMarker = L.marker([lat, lon], { icon: iconoUbicacion })
-    .addTo(map)
-    .bindPopup("📍 Aquí estás tú, piloto 🚌💨")
-    .openPopup();
-}
-
+        userMarker.setLatLng([lat, lon]);
+        map.setView([lat, lon]);
       }
+      document.getElementById("status").innerText = "Ubicación actualizada";
     },
     (err) => {
       console.error(err);
-      let msg = "Error al obtener ubicación.";
-      if (err.code === 1) msg += " El usuario denegó el permiso.";
-      else if (err.code === 2) msg += " Ubicación no disponible.";
-      else if (err.code === 3) msg += " Timeout.";
-      document.getElementById("status").innerText = msg;
-      alert(msg);
-    }
+      document.getElementById("status").innerText = "No se pudo obtener la ubicación";
+    },
+    { enableHighAccuracy: true, maximumAge: 1000 }
   );
 }
+
 
 function toggleTipo(tipo) {
   tipoActivo[tipo] = !tipoActivo[tipo];
