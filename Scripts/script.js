@@ -1,10 +1,6 @@
-// script.js COMPLETO Y ACTUALIZADO
-
 let map;
 let userMarker;
 let firstTime = true;
-
-const GOOGLE_API_KEY = ""; // No se usa, eliminamos dependencias
 
 const markersPorTipo = {
   camp_site: [],
@@ -16,24 +12,12 @@ const markersPorTipo = {
 };
 
 const iconos = {
-  camp_site: L.icon({
-    iconUrl: 'Recursos/img/camping.png', iconSize: [32, 32], iconAnchor: [14, 28], popupAnchor: [0, -30]
-  }),
-  fuel: L.icon({
-    iconUrl: 'Recursos/img/gasolinera.png', iconSize: [32, 32], iconAnchor: [14, 28], popupAnchor: [0, -30]
-  }),
-  parking: L.icon({
-    iconUrl: 'Recursos/img/parking.png', iconSize: [32, 32], iconAnchor: [14, 28], popupAnchor: [0, -30]
-  }),
-  hotel: L.icon({
-    iconUrl: 'Recursos/img/hotel.png', iconSize: [32, 32], iconAnchor: [14, 28], popupAnchor: [0, -30]
-  }),
-  airbnb: L.icon({
-    iconUrl: 'Recursos/img/airbnb.png', iconSize: [32, 32], iconAnchor: [14, 28], popupAnchor: [0, -30]
-  }),
-  luggage: L.icon({
-    iconUrl: 'Recursos/img/maleta.png', iconSize: [32, 32], iconAnchor: [14, 28], popupAnchor: [0, -30]
-  })
+  camp_site: L.icon({ iconUrl: 'Recursos/img/camping.png', iconSize: [32, 32], iconAnchor: [14, 28], popupAnchor: [0, -30] }),
+  fuel: L.icon({ iconUrl: 'Recursos/img/gasolinera.png', iconSize: [32, 32], iconAnchor: [14, 28], popupAnchor: [0, -30] }),
+  parking: L.icon({ iconUrl: 'Recursos/img/parking.png', iconSize: [32, 32], iconAnchor: [14, 28], popupAnchor: [0, -30] }),
+  hotel: L.icon({ iconUrl: 'Recursos/img/hotel.png', iconSize: [32, 32], iconAnchor: [14, 28], popupAnchor: [0, -30] }),
+  airbnb: L.icon({ iconUrl: 'Recursos/img/airbnb.png', iconSize: [32, 32], iconAnchor: [14, 28], popupAnchor: [0, -30] }),
+  luggage: L.icon({ iconUrl: 'Recursos/img/maleta.png', iconSize: [32, 32], iconAnchor: [14, 28], popupAnchor: [0, -30] })
 };
 
 const iconoUbicacion = L.icon({
@@ -111,21 +95,27 @@ function buscar(tipo) {
   const lat = map.getCenter().lat;
   const lon = map.getCenter().lng;
 
-  let overpassTag;
-  if (tipo === "hotel") overpassTag = 'tourism="hotel"';
-  else if (tipo === "airbnb") overpassTag = 'building="apartments"';
-  else if (tipo === "luggage") overpassTag = 'amenity="locker"';
-  else overpassTag = `amenity="${tipo}"`;
+  let filtro;
 
-  const query = `
-    [out:json];
-    (
-      node[${overpassTag}](around:5000,${lat},${lon});
-      way[${overpassTag}](around:5000,${lat},${lon});
-      relation[${overpassTag}](around:5000,${lat},${lon});
-    );
-    out center;
-  `;
+  if (tipo === "hotel") {
+    filtro = `node["tourism"="hotel"](around:5000,${lat},${lon});`;
+    filtro += `way["tourism"="hotel"](around:5000,${lat},${lon});`;
+  } else if (tipo === "airbnb") {
+    filtro = `
+      node["tourism"="guest_house"](around:5000,${lat},${lon});
+      node["tourism"="apartment"](around:5000,${lat},${lon});
+    `;
+  } else if (tipo === "luggage") {
+    filtro = `node["amenity"="locker"](around:5000,${lat},${lon});`;
+    filtro += `way["amenity"="locker"](around:5000,${lat},${lon});`;
+  } else {
+    filtro = `
+      node["amenity"="${tipo}"](around:5000,${lat},${lon});
+      way["amenity"="${tipo}"](around:5000,${lat},${lon});
+    `;
+  }
+
+  const query = `[out:json];(${filtro});out center;`;
 
   fetch("https://overpass-api.de/api/interpreter", {
     method: "POST",
@@ -136,9 +126,16 @@ function buscar(tipo) {
       markersPorTipo[tipo].forEach(m => map.removeLayer(m));
       markersPorTipo[tipo] = [];
 
+      if (!data.elements.length) {
+        const searchLink = `https://www.google.com/maps/search/${tipo}/@${lat},${lon},14z`;
+        document.getElementById("status").innerHTML =
+          `No se encontraron resultados para ${tipo}.<br><a href="${searchLink}" target="_blank">🔍 Buscar ${tipo} en Google Maps</a>`;
+        return;
+      }
+
       data.elements.forEach(e => {
         const coords = e.type === "node" ? [e.lat, e.lon] : [e.center.lat, e.center.lon];
-        const name = e.tags.name || tipo;
+        const name = e.tags?.name || tipo;
 
         const mapsLink = `https://www.google.com/maps/dir/?api=1&destination=${coords[0]},${coords[1]}&travelmode=driving&dir_action=navigate&avoid=tolls`;
         const searchLink = `https://www.google.com/maps/search/${tipo}/@${coords[0]},${coords[1]},14z`;
