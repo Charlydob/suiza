@@ -132,22 +132,55 @@ function buscar(tipo) {
   const [lat, lon] = currentCoords;
   const radius = parseInt(document.getElementById("radiusSlider").value);
 
-  let overpassTag;
-if (tipo === "hotel") overpassTag = 'tourism="hotel"';
-else if (tipo === "airbnb") overpassTag = 'building="apartments"';
-else if (tipo === "luggage") overpassTag = 'amenity="locker"';
-else overpassTag = `amenity="${tipo}"`;
+  let query = "";
 
-const query = `
-  [out:json];
-  (
-    node[${overpassTag}](around:${radius},${lat},${lon});
-    way[${overpassTag}](around:${radius},${lat},${lon});
-    relation[${overpassTag}](around:${radius},${lat},${lon});
-  );
-  out center;
-`;
-
+  if (tipo === "hotel") {
+    query = `
+      [out:json];
+      (
+        node["tourism"="hotel"](around:${radius},${lat},${lon});
+        way["tourism"="hotel"](around:${radius},${lat},${lon});
+      );
+      out center;
+    `;
+  } else if (tipo === "airbnb") {
+    query = `
+      [out:json];
+      (
+        node["building"="apartments"](around:${radius},${lat},${lon});
+        way["building"="apartments"](around:${radius},${lat},${lon});
+      );
+      out center;
+    `;
+  } else if (tipo === "luggage") {
+    query = `
+      [out:json];
+      (
+        node["amenity"="locker"](around:${radius},${lat},${lon});
+        way["amenity"="locker"](around:${radius},${lat},${lon});
+      );
+      out center;
+    `;
+  } else if (tipo === "parking") {
+    query = `
+      [out:json];
+      (
+        node["amenity"="parking"]["access"="public"]["parking"!="bicycle"](around:${radius},${lat},${lon});
+        way["amenity"="parking"]["access"="public"]["parking"!="bicycle"](around:${radius},${lat},${lon});
+      );
+      out center;
+    `;
+  } else {
+    query = `
+      [out:json];
+      (
+        node["amenity"="${tipo}"](around:${radius},${lat},${lon});
+        way["amenity"="${tipo}"](around:${radius},${lat},${lon});
+        relation["amenity"="${tipo}"](around:${radius},${lat},${lon});
+      );
+      out center;
+    `;
+  }
 
   fetch("https://overpass-api.de/api/interpreter", {
     method: "POST",
