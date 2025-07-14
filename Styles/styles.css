@@ -85,3 +85,19 @@ html, body {
   background-color: #73a5ff; /* azul claro */
   color: white;
 }
+.leaflet-popup-content-wrapper {
+  background: rgba(255, 255, 255, 0.7); /* blanco con transparencia */
+  backdrop-filter: blur(6px);           /* efecto cristal satinado */
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+}
+
+.leaflet-popup-tip {
+  background: rgba(255, 255, 255, 0.7); /* también la flechita */
+  backdrop-filter: blur(6px);
+}
+.leaflet-popup-content {
+  color: #333; /* texto oscuro para mejor contraste */
+  font-size: 14px;
+  line-height: 1.4;
+}
