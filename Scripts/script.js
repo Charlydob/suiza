@@ -1,46 +1,52 @@
+// script.js COMPLETO Y ACTUALIZADO
+
 let map;
 let userMarker;
+let firstTime = true;
 
-const GOOGLE_API_KEY = "AIzaSyA8KhfGc61uBT3DHS1hiCEl7HgnFYaWySI"; // <-- Pega aquí tu clave
+const GOOGLE_API_KEY = ""; // No se usa, eliminamos dependencias
 
 const markersPorTipo = {
   camp_site: [],
   fuel: [],
-  parking: []
+  parking: [],
+  hotel: [],
+  airbnb: [],
+  luggage: []
 };
 
 const iconos = {
   camp_site: L.icon({
-    iconUrl: 'Recursos/img/camping.png',
-    iconSize: [32, 32],
-    iconAnchor: [14, 28],
-    popupAnchor: [0, -30]
+    iconUrl: 'Recursos/img/camping.png', iconSize: [32, 32], iconAnchor: [14, 28], popupAnchor: [0, -30]
   }),
   fuel: L.icon({
-    iconUrl: 'Recursos/img/gasolinera.png',
-    iconSize: [32, 32],
-    iconAnchor: [14, 28],
-    popupAnchor: [0, -30]
+    iconUrl: 'Recursos/img/gasolinera.png', iconSize: [32, 32], iconAnchor: [14, 28], popupAnchor: [0, -30]
   }),
   parking: L.icon({
-    iconUrl: 'Recursos/img/parking.png',
-    iconSize: [32, 32],
-    iconAnchor: [14, 28],
-    popupAnchor: [0, -30]
+    iconUrl: 'Recursos/img/parking.png', iconSize: [32, 32], iconAnchor: [14, 28], popupAnchor: [0, -30]
+  }),
+  hotel: L.icon({
+    iconUrl: 'Recursos/img/hotel.png', iconSize: [32, 32], iconAnchor: [14, 28], popupAnchor: [0, -30]
+  }),
+  airbnb: L.icon({
+    iconUrl: 'Recursos/img/airbnb.png', iconSize: [32, 32], iconAnchor: [14, 28], popupAnchor: [0, -30]
+  }),
+  luggage: L.icon({
+    iconUrl: 'Recursos/img/maleta.png', iconSize: [32, 32], iconAnchor: [14, 28], popupAnchor: [0, -30]
   })
 };
 
 const iconoUbicacion = L.icon({
-  iconUrl: 'Recursos/img/yo.png',
-  iconSize: [32, 32],
-  iconAnchor: [14, 28],
-  popupAnchor: [0, -30]
+  iconUrl: 'Recursos/img/yo.png', iconSize: [32, 32], iconAnchor: [14, 28], popupAnchor: [0, -30]
 });
 
 const tipoActivo = {
   camp_site: false,
   fuel: false,
-  parking: false
+  parking: false,
+  hotel: false,
+  airbnb: false,
+  luggage: false
 };
 
 function initMap(lat, lon) {
@@ -53,7 +59,6 @@ function initMap(lat, lon) {
     .addTo(map)
     .bindPopup("📍 Aquí estás tú, piloto 🚌💨")
     .openPopup();
-
   document.getElementById("status").innerText = "Ubicación cargada";
 }
 
@@ -65,7 +70,7 @@ function getLocation() {
 
   document.getElementById("status").innerText = "Obteniendo ubicación...";
 
-  navigator.geolocation.getCurrentPosition(
+  navigator.geolocation.watchPosition(
     (pos) => {
       const lat = pos.coords.latitude;
       const lon = pos.coords.longitude;
@@ -74,15 +79,14 @@ function getLocation() {
         initMap(lat, lon);
       } else {
         userMarker.setLatLng([lat, lon]);
-        map.setView([lat, lon]);
-        document.getElementById("status").innerText = "Ubicación actualizada";
       }
+      document.getElementById("status").innerText = "Ubicación actualizada";
     },
     (err) => {
       console.error(err);
       document.getElementById("status").innerText = "No se pudo obtener la ubicación";
     },
-    { enableHighAccuracy: true }
+    { enableHighAccuracy: true, maximumAge: 1000 }
   );
 }
 
@@ -107,12 +111,18 @@ function buscar(tipo) {
   const lat = map.getCenter().lat;
   const lon = map.getCenter().lng;
 
+  let overpassTag;
+  if (tipo === "hotel") overpassTag = 'tourism="hotel"';
+  else if (tipo === "airbnb") overpassTag = 'building="apartments"';
+  else if (tipo === "luggage") overpassTag = 'amenity="locker"';
+  else overpassTag = `amenity="${tipo}"`;
+
   const query = `
     [out:json];
     (
-      node["amenity"="${tipo}"](around:5000,${lat},${lon});
-      way["amenity"="${tipo}"](around:5000,${lat},${lon});
-      relation["amenity"="${tipo}"](around:5000,${lat},${lon});
+      node[${overpassTag}](around:5000,${lat},${lon});
+      way[${overpassTag}](around:5000,${lat},${lon});
+      relation[${overpassTag}](around:5000,${lat},${lon});
     );
     out center;
   `;
@@ -129,20 +139,18 @@ function buscar(tipo) {
       data.elements.forEach(e => {
         const coords = e.type === "node" ? [e.lat, e.lon] : [e.center.lat, e.center.lon];
         const name = e.tags.name || tipo;
-        const marker = L.marker(coords, { icon: iconos[tipo] }).addTo(map);
+
+        const mapsLink = `https://www.google.com/maps/dir/?api=1&destination=${coords[0]},${coords[1]}&travelmode=driving&dir_action=navigate&avoid=tolls`;
+        const searchLink = `https://www.google.com/maps/search/${tipo}/@${coords[0]},${coords[1]},14z`;
+
+        const popupHTML = `
+          <b>${name}</b><br>
+          <a href='${mapsLink}' target='_blank'>🧭 Cómo llegar</a><br>
+          <a href='${searchLink}' target='_blank'>🔎 Buscar en Maps</a>
+        `;
+
+        const marker = L.marker(coords, { icon: iconos[tipo] }).addTo(map).bindPopup(popupHTML);
         markersPorTipo[tipo].push(marker);
-
-        marker.on("click", () => {
-          const userPos = userMarker.getLatLng();
-          const mapsLink = `https://www.google.com/maps/dir/?api=1&origin=${userPos.lat},${userPos.lng}&destination=${coords[0]},${coords[1]}&travelmode=driving&avoid=tolls`;
-
-          const popupContent = `
-            <b>${name}</b><br>
-            🚗 <a href="${mapsLink}" target="_blank">Cómo llegar</a>
-          `;
-
-          marker.bindPopup(popupContent).openPopup();
-        });
       });
 
       document.getElementById("status").innerText = `Mostrando ${data.elements.length} resultados para ${tipo}`;
@@ -154,19 +162,17 @@ function buscar(tipo) {
     });
 }
 
-
-
 function clearAll() {
   Object.keys(markersPorTipo).forEach(tipo => {
     markersPorTipo[tipo].forEach(m => map.removeLayer(m));
     markersPorTipo[tipo] = [];
     tipoActivo[tipo] = false;
-
     const boton = document.getElementById(`btn-${tipo}`);
-    boton.classList.remove("activo");
-    boton.classList.add("inactivo");
+    if (boton) {
+      boton.classList.remove("activo");
+      boton.classList.add("inactivo");
+    }
   });
-
   document.getElementById("status").innerText = "Mapa limpio";
 }
 
@@ -177,39 +183,14 @@ document.addEventListener("DOMContentLoaded", () => {
   toggleBtn.addEventListener("click", () => {
     sidebar.classList.toggle("open");
   });
+
+  sidebar.addEventListener("touchstart", function (e) {
+    if (e.touches.length > 1) return;
+    e.stopPropagation();
+  }, { passive: false });
+
+  sidebar.addEventListener("dblclick", function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+  });
 });
-
-// Evita zoom por doble tap en el sidebar
-const sidebar = document.getElementById("sidebar");
-
-sidebar.addEventListener("touchstart", function (e) {
-  if (e.touches.length > 1) return;
-  e.stopPropagation();
-}, { passive: false });
-
-sidebar.addEventListener("dblclick", function (e) {
-  e.preventDefault();
-  e.stopPropagation();
-});
-document.getElementById("btn-hoteles").addEventListener("click", () => {
-  abrirBusqueda("hoteles");
-});
-
-document.getElementById("btn-airbnb").addEventListener("click", () => {
-  abrirBusqueda("airbnb");
-});
-
-document.getElementById("btn-luggage").addEventListener("click", () => {
-  abrirBusqueda("consigna de equipaje");
-});
-
-function abrirBusqueda(query) {
-  if (!map) return alert("Mapa aún no cargado");
-
-  const center = map.getCenter();
-  const lat = center.lat.toFixed(6);
-  const lon = center.lng.toFixed(6);
-
-  const url = `https://www.google.com/maps/search/${encodeURIComponent(query)}/@${lat},${lon},14z`;
-  window.open(url, "_blank");
-}
