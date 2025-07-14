@@ -83,5 +83,15 @@ function buscar(tipo) {
     });
 }
 
-// Lanza automáticamente la ubicación al abrir
-window.onload = getLocation;
+(err) => {
+  console.error(err);
+  let msg = "Error al obtener ubicación.";
+
+  if (err.code === 1) msg += " El usuario denegó el permiso.";
+  else if (err.code === 2) msg += " Ubicación no disponible.";
+  else if (err.code === 3) msg += " Timeout al intentar obtener ubicación.";
+
+  document.getElementById("status").innerText = msg;
+  alert(msg);
+}
+
