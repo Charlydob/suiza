@@ -1,8 +1,7 @@
 let map;
 let userMarker;
-let firstTime = true;
 
-const GOOGLE_API_KEY = "AIzaSyA8KhfGc61uBT3DHS1hiCEl7HgnFYaWySI";
+const GOOGLE_API_KEY = "AIzaSyA8KhfGc61uBT3DHS1hiCEl7HgnFYaWySI"; // <-- Pega aquí tu clave
 
 const markersPorTipo = {
   camp_site: [],
@@ -30,8 +29,9 @@ const iconos = {
     popupAnchor: [0, -30]
   })
 };
+
 const iconoUbicacion = L.icon({
-  iconUrl: 'Recursos/img/yo.png', // reemplaza con tu icono
+  iconUrl: 'Recursos/img/yo.png',
   iconSize: [32, 32],
   iconAnchor: [14, 28],
   popupAnchor: [0, -30]
@@ -49,10 +49,11 @@ function initMap(lat, lon) {
     attribution: "© OpenStreetMap"
   }).addTo(map);
 
-userMarker = L.marker([lat, lon], { icon: iconoUbicacion })
-  .addTo(map)
-  .bindPopup("📍 Aquí estás tú, piloto 🚌💨")
-  .openPopup();
+  userMarker = L.marker([lat, lon], { icon: iconoUbicacion })
+    .addTo(map)
+    .bindPopup("📍 Aquí estás tú, piloto 🚌💨")
+    .openPopup();
+
   document.getElementById("status").innerText = "Ubicación cargada";
 }
 
@@ -61,18 +62,10 @@ function getLocation() {
     alert("Tu navegador no permite geolocalización");
     return;
   }
-}
-  document.getElementById("status").innerText = "Obteniendo ubicación...";
-
-function getLocation() {
-  if (!navigator.geolocation) {
-    alert("Tu navegador no permite geolocalización");
-    return;
-  }
 
   document.getElementById("status").innerText = "Obteniendo ubicación...";
 
-  navigator.geolocation.watchPosition(
+  navigator.geolocation.getCurrentPosition(
     (pos) => {
       const lat = pos.coords.latitude;
       const lon = pos.coords.longitude;
@@ -82,17 +75,16 @@ function getLocation() {
       } else {
         userMarker.setLatLng([lat, lon]);
         map.setView([lat, lon]);
+        document.getElementById("status").innerText = "Ubicación actualizada";
       }
-      document.getElementById("status").innerText = "Ubicación actualizada";
     },
     (err) => {
       console.error(err);
       document.getElementById("status").innerText = "No se pudo obtener la ubicación";
     },
-    { enableHighAccuracy: true, maximumAge: 1000 }
+    { enableHighAccuracy: true }
   );
 }
-
 
 function toggleTipo(tipo) {
   tipoActivo[tipo] = !tipoActivo[tipo];
@@ -110,7 +102,6 @@ function toggleTipo(tipo) {
     document.getElementById("status").innerText = `Ocultando ${tipo}`;
   }
 }
-
 
 function buscar(tipo) {
   const lat = map.getCenter().lat;
@@ -132,58 +123,62 @@ function buscar(tipo) {
   })
     .then(r => r.json())
     .then(data => {
-  markersPorTipo[tipo].forEach(m => map.removeLayer(m));
-  markersPorTipo[tipo] = [];
+      markersPorTipo[tipo].forEach(m => map.removeLayer(m));
+      markersPorTipo[tipo] = [];
 
-  data.elements.forEach(async e => {
-    const coords = e.type === "node" ? [e.lat, e.lon] : [e.center.lat, e.center.lon];
+      data.elements.forEach(async e => {
+        const coords = e.type === "node" ? [e.lat, e.lon] : [e.center.lat, e.center.lon];
+        const marker = L.marker(coords, { icon: iconos[tipo] }).addTo(map);
+        marker.bindPopup("Cargando...");
+        markersPorTipo[tipo].push(marker);
 
-    const marker = L.marker(coords, { icon: iconos[tipo] }).addTo(map);
-    markersPorTipo[tipo].push(marker);
+        marker.on("click", async () => {
+          const userPos = userMarker.getLatLng();
 
-    marker.on("click", async () => {
-      const userPos = userMarker.getLatLng();
+          // DISTANCIA Y DURACIÓN
+          const directionsURL = `https://maps.googleapis.com/maps/api/directions/json?origin=${userPos.lat},${userPos.lng}&destination=${coords[0]},${coords[1]}&mode=driving&avoid=tolls&key=${GOOGLE_API_KEY}`;
+          const directionsResp = await fetch(`https://corsproxy.io/?${encodeURIComponent(directionsURL)}`);
+          const directionsData = await directionsResp.json();
 
-      // 1. DISTANCIA Y DURACIÓN
-      const directionsURL = `https://cors-anywhere.herokuapp.com/https://maps.googleapis.com/maps/api/directions/json?origin=${userPos.lat},${userPos.lng}&destination=${coords[0]},${coords[1]}&mode=driving&avoid=tolls&key=${GOOGLE_API_KEY}`;
-      const directionsResp = await fetch(directionsURL);
-      const directionsData = await directionsResp.json();
+          const route = directionsData.routes?.[0]?.legs?.[0];
+          const distancia = route?.distance?.text || "–";
+          const duracion = route?.duration?.text || "–";
 
-      const route = directionsData.routes?.[0]?.legs?.[0];
-      const distancia = route?.distance?.text || "–";
-      const duracion = route?.duration?.text || "–";
+          // INFO DEL LUGAR
+          const googleTipo = tipo === 'camp_site' ? 'rv_park' : tipo === 'fuel' ? 'gas_station' : 'parking';
+          const placesURL = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${coords[0]},${coords[1]}&radius=50&type=${googleTipo}&key=${GOOGLE_API_KEY}`;
+          const placesResp = await fetch(`https://corsproxy.io/?${encodeURIComponent(placesURL)}`);
+          const placesData = await placesResp.json();
 
-      // 2. DETALLES DEL LUGAR
-      const googleTipo = tipo === 'camp_site' ? 'rv_park' : tipo === 'fuel' ? 'gas_station' : 'parking';
-      const placesURL = `https://cors-anywhere.herokuapp.com/https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${coords[0]},${coords[1]}&radius=50&type=${googleTipo}&key=${GOOGLE_API_KEY}`;
-      const placesResp = await fetch(placesURL);
-      const placesData = await placesResp.json();
+          const place = placesData.results?.[0];
+          const name = place?.name || tipo;
+          const rating = place?.rating ? `⭐ ${place.rating}` : "";
+          const mapsLink = place?.place_id
+            ? `<br>🌐 <a href="https://www.google.com/maps/place/?q=place_id=${place.place_id}" target="_blank">Ver en Google Maps</a>`
+            : "";
 
-      const place = placesData.results?.[0];
-      const name = place?.name || tipo;
-      const website = place?.website || "";
-      const rating = place?.rating ? `⭐ ${place.rating}` : "";
-      const webLink = place?.place_id ? `<br>🌐 <a href="https://www.google.com/maps/place/?q=place_id=${place.place_id}" target="_blank">Web</a>` : "";
+          const comoLlegarURL = `https://www.google.com/maps/dir/?api=1&origin=${userPos.lat},${userPos.lng}&destination=${coords[0]},${coords[1]}&travelmode=driving&avoid=tolls`;
 
-      // 3. LINK "CÓMO LLEGAR"
-      const comoLlegarURL = `https://www.google.com/maps/dir/?api=1&origin=${userPos.lat},${userPos.lng}&destination=${coords[0]},${coords[1]}&travelmode=driving&avoid=tolls`;
+          const contenidoPopup = `
+            <b>${name}</b><br>
+            ${rating}<br>
+            📍 ${distancia} (${duracion})<br>
+            💰 Precio estimado: ${tipo === 'fuel' ? '1.95 CHF/L' : tipo === 'camp_site' ? '20 CHF/noche' : 'Gratis'}<br>
+            ${mapsLink}
+            <br>🚗 <a href="${comoLlegarURL}" target="_blank">Cómo llegar</a>
+          `;
 
-      const contenidoPopup = `
-        <b>${name}</b><br>
-        ${rating}<br>
-        📍 ${distancia} (${duracion})<br>
-        💰 Precio estimado: ${tipo === 'fuel' ? '1.95 CHF/L' : tipo === 'camp_site' ? '20 CHF/noche' : 'Gratis'}<br>
-        ${webLink}
-        <br>🚗 <a href="${comoLlegarURL}" target="_blank">Cómo llegar</a>
-      `;
+          marker.setPopupContent(contenidoPopup);
+        });
+      });
 
-      marker.bindPopup(contenidoPopup).openPopup();
+      document.getElementById("status").innerText = `Mostrando ${data.elements.length} resultados para ${tipo}`;
+    })
+    .catch(err => {
+      console.error(err);
+      alert("Error buscando " + tipo);
+      document.getElementById("status").innerText = "Error de búsqueda";
     });
-  });
-
-  document.getElementById("status").innerText = `Mostrando ${data.elements.length} resultados para ${tipo}`;
-})
-
 }
 
 function clearAll() {
@@ -208,16 +203,16 @@ document.addEventListener("DOMContentLoaded", () => {
     sidebar.classList.toggle("open");
   });
 });
+
 // Evita zoom por doble tap en el sidebar
-// Bloquea zoom en el sidebar específicamente
 const sidebar = document.getElementById("sidebar");
 
 sidebar.addEventListener("touchstart", function (e) {
-  if (e.touches.length > 1) return; // solo si es un solo dedo
-  e.stopPropagation(); // ¡clave para que Leaflet no lo capture!
+  if (e.touches.length > 1) return;
+  e.stopPropagation();
 }, { passive: false });
 
 sidebar.addEventListener("dblclick", function (e) {
   e.preventDefault();
-  e.stopPropagation(); // previene doble click interpretado por el mapa
+  e.stopPropagation();
 });
