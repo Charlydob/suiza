@@ -97,14 +97,21 @@ function getLocation() {
 
 function toggleTipo(tipo) {
   tipoActivo[tipo] = !tipoActivo[tipo];
+  const boton = document.getElementById(`btn-${tipo}`);
+
   if (tipoActivo[tipo]) {
+    boton.classList.add("activo");
+    boton.classList.remove("inactivo");
     buscar(tipo);
   } else {
+    boton.classList.remove("activo");
+    boton.classList.add("inactivo");
     markersPorTipo[tipo].forEach(m => map.removeLayer(m));
     markersPorTipo[tipo] = [];
     document.getElementById("status").innerText = `Ocultando ${tipo}`;
   }
 }
+
 
 function buscar(tipo) {
   const lat = map.getCenter().lat;
@@ -151,6 +158,12 @@ function clearAll() {
     markersPorTipo[tipo].forEach(m => map.removeLayer(m));
     markersPorTipo[tipo] = [];
     tipoActivo[tipo] = false;
+
+    const boton = document.getElementById(`btn-${tipo}`);
+    boton.classList.remove("activo");
+    boton.classList.add("inactivo");
   });
+
   document.getElementById("status").innerText = "Mapa limpio";
 }
+

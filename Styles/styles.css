@@ -76,3 +76,12 @@ html, body {
     margin: 6px 0;
   }
 }
+/* ESTADO ACTIVO / INACTIVO */
+#controls button.activo {
+  background-color: #8B0000; /* rojo oscuro */
+}
+
+#controls button.inactivo {
+  background-color: #73a5ff; /* azul claro */
+  color: white;
+}
