@@ -178,3 +178,25 @@ html, body {
   background-color: #73a5ff !important;
   color: white !important;
 }
+#search-container {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+#location-input {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+  width: 100%;
+  box-sizing: border-box;
+}
+/* Si luego usas un círculo con estilo propio */
+.search-radius {
+  stroke: #007BFF;
+  stroke-opacity: 0.8;
+  stroke-width: 2;
+  fill: #007bff33;
+}

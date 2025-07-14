@@ -2,21 +2,28 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Mi Ruta en Caravana</title>
   <link rel="stylesheet" href="Styles/styles.css" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
-
-  <link
-    rel="stylesheet"
-    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-  />
-    <link rel="apple-touch-icon" href="Recursos/icono.png" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="apple-touch-icon" href="Recursos/icono.png" />
 </head>
 <body>
   <div id="sidebar">
     <button id="toggleMenu">☰</button>
     <h2>Mi ruta en caravana</h2>
+
+    <!-- Nueva sección: Buscador de lugar -->
+    <label for="locationSearch"><b>Buscar lugar:</b></label>
+    <input type="text" id="locationSearch" placeholder="Ej: Zurich, Suiza" />
+    <button onclick="buscarLugar()">🔍 Buscar lugar</button>
+
+    <!-- Nueva sección: Ajuste del radio -->
+    <label for="radiusSlider"><b>Radio de búsqueda:</b> <span id="radiusValue">2000</span>m</label>
+    <input type="range" id="radiusSlider" min="500" max="10000" step="100" value="2000" />
+
+    <!-- Botones existentes -->
     <button onclick="getLocation()">📍 Ver mi ubicación</button>
     <button id="btn-camp_site" onclick="toggleTipo('camp_site')">⛺ Campings</button>
     <button id="btn-fuel" onclick="toggleTipo('fuel')">⛽ Gasolineras</button>
@@ -24,7 +31,6 @@
     <button class="inactivo" id="btn-hotel" onclick="toggleTipo('hotel')">🏨 Hoteles</button>
     <button class="inactivo" id="btn-airbnb" onclick="toggleTipo('airbnb')">🏠 Airbnb</button>
     <button class="inactivo" id="btn-luggage" onclick="toggleTipo('luggage')">🎒 Consigna</button>
-
 
     <button onclick="clearAll()">🧹 Limpiar</button>
     <div id="status">Esperando ubicación...</div>
@@ -35,5 +41,4 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="Scripts/script.js"></script>
 </body>
-
 </html>

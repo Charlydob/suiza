@@ -1,6 +1,7 @@
 let map;
 let userMarker;
-let firstTime = true;
+let searchCircle;
+let currentCoords = null;
 
 const markersPorTipo = {
   camp_site: [],
@@ -12,12 +13,24 @@ const markersPorTipo = {
 };
 
 const iconos = {
-  camp_site: L.icon({ iconUrl: 'Recursos/img/camping.png', iconSize: [32, 32], iconAnchor: [14, 28], popupAnchor: [0, -30] }),
-  fuel: L.icon({ iconUrl: 'Recursos/img/gasolinera.png', iconSize: [32, 32], iconAnchor: [14, 28], popupAnchor: [0, -30] }),
-  parking: L.icon({ iconUrl: 'Recursos/img/parking.png', iconSize: [32, 32], iconAnchor: [14, 28], popupAnchor: [0, -30] }),
-  hotel: L.icon({ iconUrl: 'Recursos/img/hotel.png', iconSize: [32, 32], iconAnchor: [14, 28], popupAnchor: [0, -30] }),
-  airbnb: L.icon({ iconUrl: 'Recursos/img/airbnb.png', iconSize: [32, 32], iconAnchor: [14, 28], popupAnchor: [0, -30] }),
-  luggage: L.icon({ iconUrl: 'Recursos/img/maleta.png', iconSize: [32, 32], iconAnchor: [14, 28], popupAnchor: [0, -30] })
+  camp_site: L.icon({
+    iconUrl: 'Recursos/img/camping.png', iconSize: [32, 32], iconAnchor: [14, 28], popupAnchor: [0, -30]
+  }),
+  fuel: L.icon({
+    iconUrl: 'Recursos/img/gasolinera.png', iconSize: [32, 32], iconAnchor: [14, 28], popupAnchor: [0, -30]
+  }),
+  parking: L.icon({
+    iconUrl: 'Recursos/img/parking.png', iconSize: [32, 32], iconAnchor: [14, 28], popupAnchor: [0, -30]
+  }),
+  hotel: L.icon({
+    iconUrl: 'Recursos/img/hotel.png', iconSize: [32, 32], iconAnchor: [14, 28], popupAnchor: [0, -30]
+  }),
+  airbnb: L.icon({
+    iconUrl: 'Recursos/img/airbnb.png', iconSize: [32, 32], iconAnchor: [14, 28], popupAnchor: [0, -30]
+  }),
+  luggage: L.icon({
+    iconUrl: 'Recursos/img/maleta.png', iconSize: [32, 32], iconAnchor: [14, 28], popupAnchor: [0, -30]
+  })
 };
 
 const iconoUbicacion = L.icon({
@@ -39,11 +52,48 @@ function initMap(lat, lon) {
     attribution: "© OpenStreetMap"
   }).addTo(map);
 
-  userMarker = L.marker([lat, lon], { icon: iconoUbicacion })
-    .addTo(map)
+  currentCoords = [lat, lon];
+
+  userMarker = L.marker(currentCoords, {
+    icon: iconoUbicacion,
+    draggable: true
+  }).addTo(map)
     .bindPopup("📍 Aquí estás tú, piloto 🚌💨")
     .openPopup();
+
+  crearCirculo();
+
+  userMarker.on("dragend", () => {
+    const pos = userMarker.getLatLng();
+    currentCoords = [pos.lat, pos.lng];
+    actualizarCirculo();
+    actualizarBusquedaActiva();
+  });
+
   document.getElementById("status").innerText = "Ubicación cargada";
+}
+
+function crearCirculo() {
+  const radius = parseInt(document.getElementById("radiusSlider").value);
+  if (searchCircle) map.removeLayer(searchCircle);
+  searchCircle = L.circle(currentCoords, {
+    radius,
+    color: "blue",
+    fillColor: "#5fa",
+    fillOpacity: 0.2
+  }).addTo(map);
+}
+
+function actualizarCirculo() {
+  const radius = parseInt(document.getElementById("radiusSlider").value);
+  searchCircle.setLatLng(currentCoords);
+  searchCircle.setRadius(radius);
+}
+
+function actualizarBusquedaActiva() {
+  Object.keys(tipoActivo).forEach(tipo => {
+    if (tipoActivo[tipo]) buscar(tipo);
+  });
 }
 
 function getLocation() {
@@ -54,17 +104,19 @@ function getLocation() {
 
   document.getElementById("status").innerText = "Obteniendo ubicación...";
 
-  navigator.geolocation.watchPosition(
+  navigator.geolocation.getCurrentPosition(
     (pos) => {
       const lat = pos.coords.latitude;
       const lon = pos.coords.longitude;
-
       if (!map) {
         initMap(lat, lon);
       } else {
         userMarker.setLatLng([lat, lon]);
+        map.setView([lat, lon], 14);
+        currentCoords = [lat, lon];
+        actualizarCirculo();
+        actualizarBusquedaActiva();
       }
-      document.getElementById("status").innerText = "Ubicación actualizada";
     },
     (err) => {
       console.error(err);
@@ -74,48 +126,28 @@ function getLocation() {
   );
 }
 
-function toggleTipo(tipo) {
-  tipoActivo[tipo] = !tipoActivo[tipo];
-  const boton = document.getElementById(`btn-${tipo}`);
-
-  if (tipoActivo[tipo]) {
-    boton.classList.add("activo");
-    boton.classList.remove("inactivo");
-    buscar(tipo);
-  } else {
-    boton.classList.remove("activo");
-    boton.classList.add("inactivo");
-    markersPorTipo[tipo].forEach(m => map.removeLayer(m));
-    markersPorTipo[tipo] = [];
-    document.getElementById("status").innerText = `Ocultando ${tipo}`;
-  }
-}
-
 function buscar(tipo) {
-  const lat = map.getCenter().lat;
-  const lon = map.getCenter().lng;
+  if (!currentCoords) return;
 
-  let filtro;
+  const [lat, lon] = currentCoords;
+  const radius = parseInt(document.getElementById("radiusSlider").value);
 
-  if (tipo === "hotel") {
-    filtro = `node["tourism"="hotel"](around:5000,${lat},${lon});`;
-    filtro += `way["tourism"="hotel"](around:5000,${lat},${lon});`;
-  } else if (tipo === "airbnb") {
-    filtro = `
-      node["tourism"="guest_house"](around:5000,${lat},${lon});
-      node["tourism"="apartment"](around:5000,${lat},${lon});
-    `;
-  } else if (tipo === "luggage") {
-    filtro = `node["amenity"="locker"](around:5000,${lat},${lon});`;
-    filtro += `way["amenity"="locker"](around:5000,${lat},${lon});`;
-  } else {
-    filtro = `
-      node["amenity"="${tipo}"](around:5000,${lat},${lon});
-      way["amenity"="${tipo}"](around:5000,${lat},${lon});
-    `;
-  }
+  let overpassTag;
+if (tipo === "hotel") overpassTag = 'tourism="hotel"';
+else if (tipo === "airbnb") overpassTag = 'building="apartments"';
+else if (tipo === "luggage") overpassTag = 'amenity="locker"';
+else overpassTag = `amenity="${tipo}"`;
 
-  const query = `[out:json];(${filtro});out center;`;
+const query = `
+  [out:json];
+  (
+    node[${overpassTag}](around:${radius},${lat},${lon});
+    way[${overpassTag}](around:${radius},${lat},${lon});
+    relation[${overpassTag}](around:${radius},${lat},${lon});
+  );
+  out center;
+`;
+
 
   fetch("https://overpass-api.de/api/interpreter", {
     method: "POST",
@@ -126,16 +158,16 @@ function buscar(tipo) {
       markersPorTipo[tipo].forEach(m => map.removeLayer(m));
       markersPorTipo[tipo] = [];
 
-      if (!data.elements.length) {
-        const searchLink = `https://www.google.com/maps/search/${tipo}/@${lat},${lon},14z`;
-        document.getElementById("status").innerHTML =
-          `No se encontraron resultados para ${tipo}.<br><a href="${searchLink}" target="_blank">🔍 Buscar ${tipo} en Google Maps</a>`;
+      if (data.elements.length === 0 && tipo === "luggage") {
+        const [lat, lon] = currentCoords;
+        const link = `https://www.google.com/maps/search/consigna+equipaje/@${lat},${lon},14z`;
+        document.getElementById("status").innerHTML = `No se encontraron consignas. <a href="${link}" target="_blank">Buscar en Google Maps</a>`;
         return;
       }
 
       data.elements.forEach(e => {
         const coords = e.type === "node" ? [e.lat, e.lon] : [e.center.lat, e.center.lon];
-        const name = e.tags?.name || tipo;
+        const name = e.tags.name || tipo;
 
         const mapsLink = `https://www.google.com/maps/dir/?api=1&destination=${coords[0]},${coords[1]}&travelmode=driving&dir_action=navigate&avoid=tolls`;
         const searchLink = `https://www.google.com/maps/search/${tipo}/@${coords[0]},${coords[1]},14z`;
@@ -159,6 +191,23 @@ function buscar(tipo) {
     });
 }
 
+function toggleTipo(tipo) {
+  tipoActivo[tipo] = !tipoActivo[tipo];
+  const boton = document.getElementById(`btn-${tipo}`);
+
+  if (tipoActivo[tipo]) {
+    boton.classList.add("activo");
+    boton.classList.remove("inactivo");
+    buscar(tipo);
+  } else {
+    boton.classList.remove("activo");
+    boton.classList.add("inactivo");
+    markersPorTipo[tipo].forEach(m => map.removeLayer(m));
+    markersPorTipo[tipo] = [];
+    document.getElementById("status").innerText = `Ocultando ${tipo}`;
+  }
+}
+
 function clearAll() {
   Object.keys(markersPorTipo).forEach(tipo => {
     markersPorTipo[tipo].forEach(m => map.removeLayer(m));
@@ -173,12 +222,43 @@ function clearAll() {
   document.getElementById("status").innerText = "Mapa limpio";
 }
 
+function buscarLugar() {
+  const lugar = document.getElementById("locationSearch").value;
+  if (!lugar) return;
+
+  fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(lugar)}`)
+    .then(res => res.json())
+    .then(data => {
+      if (data.length === 0) {
+        alert("Lugar no encontrado");
+        return;
+      }
+      const lat = parseFloat(data[0].lat);
+      const lon = parseFloat(data[0].lon);
+      currentCoords = [lat, lon];
+      userMarker.setLatLng(currentCoords);
+      map.setView(currentCoords, 14);
+      actualizarCirculo();
+      actualizarBusquedaActiva();
+    })
+    .catch(err => {
+      console.error(err);
+      alert("Error al buscar el lugar");
+    });
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   const toggleBtn = document.getElementById("toggleMenu");
   const sidebar = document.getElementById("sidebar");
 
   toggleBtn.addEventListener("click", () => {
     sidebar.classList.toggle("open");
+  });
+
+  document.getElementById("radiusSlider").addEventListener("input", () => {
+    document.getElementById("radiusValue").innerText = document.getElementById("radiusSlider").value;
+    actualizarCirculo();
+    actualizarBusquedaActiva();
   });
 
   sidebar.addEventListener("touchstart", function (e) {
@@ -190,4 +270,6 @@ document.addEventListener("DOMContentLoaded", () => {
     e.preventDefault();
     e.stopPropagation();
   });
+
+  getLocation();
 });
