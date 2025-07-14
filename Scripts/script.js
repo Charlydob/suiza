@@ -11,26 +11,26 @@ const markersPorTipo = {
 const iconos = {
   camp_site: L.icon({
     iconUrl: 'Recursos/img/camping.png',
-    iconSize: [28, 28],
+    iconSize: [32, 32],
     iconAnchor: [14, 28],
     popupAnchor: [0, -30]
   }),
   fuel: L.icon({
     iconUrl: 'Recursos/img/gasolinera.png',
-    iconSize: [28, 28],
+    iconSize: [32, 32],
     iconAnchor: [14, 28],
     popupAnchor: [0, -30]
   }),
   parking: L.icon({
     iconUrl: 'Recursos/img/parking.png',
-    iconSize: [28, 28],
+    iconSize: [32, 32],
     iconAnchor: [14, 28],
     popupAnchor: [0, -30]
   })
 };
 const iconoUbicacion = L.icon({
   iconUrl: 'Recursos/img/yo.png', // reemplaza con tu icono
-  iconSize: [28, 28],
+  iconSize: [32, 32],
   iconAnchor: [14, 28],
   popupAnchor: [0, -30]
 });
