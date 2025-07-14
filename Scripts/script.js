@@ -138,7 +138,6 @@ function buscar(tipo) {
 
           const popupContent = `
             <b>${name}</b><br>
-            💰 Precio estimado: ${tipo === 'fuel' ? '1.95 CHF/L' : tipo === 'camp_site' ? '20 CHF/noche' : 'Gratis'}<br>
             🚗 <a href="${mapsLink}" target="_blank">Cómo llegar</a>
           `;
 
@@ -192,3 +191,25 @@ sidebar.addEventListener("dblclick", function (e) {
   e.preventDefault();
   e.stopPropagation();
 });
+document.getElementById("btn-hoteles").addEventListener("click", () => {
+  abrirBusqueda("hoteles");
+});
+
+document.getElementById("btn-airbnb").addEventListener("click", () => {
+  abrirBusqueda("airbnb");
+});
+
+document.getElementById("btn-luggage").addEventListener("click", () => {
+  abrirBusqueda("consigna de equipaje");
+});
+
+function abrirBusqueda(query) {
+  if (!map) return alert("Mapa aún no cargado");
+
+  const center = map.getCenter();
+  const lat = center.lat.toFixed(6);
+  const lon = center.lng.toFixed(6);
+
+  const url = `https://www.google.com/maps/search/${encodeURIComponent(query)}/@${lat},${lon},14z`;
+  window.open(url, "_blank");
+}
