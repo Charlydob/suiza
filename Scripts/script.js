@@ -167,3 +167,24 @@ function clearAll() {
   document.getElementById("status").innerText = "Mapa limpio";
 }
 
+document.addEventListener("DOMContentLoaded", () => {
+  const toggleBtn = document.getElementById("toggleMenu");
+  const sidebar = document.getElementById("sidebar");
+
+  toggleBtn.addEventListener("click", () => {
+    sidebar.classList.toggle("open");
+  });
+});
+// Evita zoom por doble tap en el sidebar
+// Bloquea zoom en el sidebar específicamente
+const sidebar = document.getElementById("sidebar");
+
+sidebar.addEventListener("touchstart", function (e) {
+  if (e.touches.length > 1) return; // solo si es un solo dedo
+  e.stopPropagation(); // ¡clave para que Leaflet no lo capture!
+}, { passive: false });
+
+sidebar.addEventListener("dblclick", function (e) {
+  e.preventDefault();
+  e.stopPropagation(); // previene doble click interpretado por el mapa
+});

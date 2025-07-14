@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Mi Ruta en Caravana</title>
   <link rel="stylesheet" href="Styles/styles.css" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
@@ -14,22 +14,21 @@
     <link rel="apple-touch-icon" href="Recursos/icono.png" />
 </head>
 <body>
-  <div id="controls">
+  <div id="sidebar">
+    <button id="toggleMenu">☰</button>
     <h2>Mi ruta en caravana</h2>
-    <button id="btn-ubi" onclick="getLocation()">📍 Ver mi ubicación</button>
+    <button onclick="getLocation()">📍 Ver mi ubicación</button>
     <button id="btn-camp_site" onclick="toggleTipo('camp_site')">⛺ Campings</button>
     <button id="btn-fuel" onclick="toggleTipo('fuel')">⛽ Gasolineras</button>
     <button id="btn-parking" onclick="toggleTipo('parking')">🅿️ Parkings</button>
-    <button id="btn-clear" onclick="clearAll()">🧹 Limpiar</button>
-
-
+    <button onclick="clearAll()">🧹 Limpiar</button>
     <div id="status">Esperando ubicación...</div>
   </div>
+
   <div id="map"></div>
 
-  <script
-    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-  ></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="Scripts/script.js"></script>
 </body>
+
 </html>

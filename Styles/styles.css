@@ -76,15 +76,8 @@ html, body {
     margin: 6px 0;
   }
 }
-/* ESTADO ACTIVO / INACTIVO */
-#controls button.activo {
-  background-color: #8B0000; /* rojo oscuro */
-}
 
-#controls button.inactivo {
-  background-color: #73a5ff; /* azul claro */
-  color: white;
-}
+
 .leaflet-popup-content-wrapper {
   background: rgba(255, 255, 255, 0.7); /* blanco con transparencia */
   backdrop-filter: blur(6px);           /* efecto cristal satinado */
@@ -100,4 +93,88 @@ html, body {
   color: #333; /* texto oscuro para mejor contraste */
   font-size: 14px;
   line-height: 1.4;
+}
+#sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 240px;
+  max-width: 80%;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 10px;
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
+  transform: translateX(-100%);
+  transition: transform 0.3s ease;
+  z-index: 1001;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+#sidebar.open {
+  transform: translateX(0);
+}
+
+#toggleMenu {
+  position: absolute;
+  top: 10px;
+  right: -40px;
+  width: 36px;
+  height: 36px;
+  background-color: #007BFF;
+  color: white;
+  font-size: 22px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  z-index: 1002;
+}
+
+#sidebar h2 {
+  margin: 50px 0 10px;
+  font-size: 16px;
+  color: #007BFF;
+  text-align: center;
+}
+
+#sidebar button:not(#toggleMenu) {
+  margin: 5px 0;
+  padding: 8px 10px;
+  font-size: 14px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+#sidebar button:not(#toggleMenu):not(.activo):not(.inactivo) {
+  background-color: #85c0ff;
+  color: white;
+}
+
+#sidebar button:hover:not(#toggleMenu) {
+  background-color: #0056b3;
+}
+
+#status {
+  margin-top: 8px;
+  font-size: 13px;
+  color: #555;
+  text-align: center;
+}
+#controls button.activo,
+#sidebar button.activo {
+  background-color: #8B0000 !important;
+  color: white !important;
+}
+
+#controls button.inactivo,
+#sidebar button.inactivo {
+  background-color: #73a5ff !important;
+  color: white !important;
 }
