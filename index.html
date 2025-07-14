@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mi Ruta en Caravana</title>
+  <link rel="stylesheet" href="Styles/styles.css" />
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-sA+e2Yt1dUoBaOEK1q8Z0zvmI6Qf4UMS3Dd5n1yS5Ks="
+    crossorigin=""
+  />
+</head>
+<body>
+  <div id="controls">
+    <h2>Mi ruta en caravana</h2>
+    <button onclick="getLocation()">📍 Ver mi ubicación</button>
+    <button onclick="buscar('camp_site')">⛺ Campings</button>
+    <button onclick="buscar('fuel')">⛽ Gasolineras</button>
+    <button onclick="buscar('parking')">🅿️ Parkings</button>
+    <div id="status">Esperando ubicación...</div>
+  </div>
+  <div id="map"></div>
+
+  <script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-o9N1j7k9eR5Whl0RCPldBx6tmaPp+g3zYyhjC2d3b+E="
+    crossorigin=""
+  ></script>
+  <script src="Scripts/script.js"></script>
+</body>
+</html>

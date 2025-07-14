@@ -1,0 +1,54 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: sans-serif;
+}
+
+#map {
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+}
+
+#controls {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.95);
+  padding: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  z-index: 1000;
+  text-align: center;
+}
+
+#controls h2 {
+  margin: 0 0 10px;
+  font-size: 18px;
+}
+
+#controls button {
+  display: inline-block;
+  margin: 5px;
+  padding: 10px 15px;
+  font-size: 14px;
+  border: none;
+  background-color: #007bff;
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+#controls button:hover {
+  background-color: #0056b3;
+}
+
+#status {
+  margin-top: 8px;
+  font-size: 14px;
+  color: #333;
+}
