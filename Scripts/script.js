@@ -2,6 +2,8 @@ let map;
 let userMarker;
 let firstTime = true;
 
+const GOOGLE_API_KEY = "AIzaSyA8KhfGc61uBT3DHS1hiCEl7HgnFYaWySI";
+
 const markersPorTipo = {
   camp_site: [],
   fuel: [],
@@ -130,24 +132,58 @@ function buscar(tipo) {
   })
     .then(r => r.json())
     .then(data => {
-      markersPorTipo[tipo].forEach(m => map.removeLayer(m));
-      markersPorTipo[tipo] = [];
+  markersPorTipo[tipo].forEach(m => map.removeLayer(m));
+  markersPorTipo[tipo] = [];
 
-      data.elements.forEach(e => {
-        const coords = e.type === "node" ? [e.lat, e.lon] : [e.center.lat, e.center.lon];
-        const name = e.tags.name || tipo;
+  data.elements.forEach(async e => {
+    const coords = e.type === "node" ? [e.lat, e.lon] : [e.center.lat, e.center.lon];
 
-        const marker = L.marker(coords, { icon: iconos[tipo] }).addTo(map).bindPopup(name);
-        markersPorTipo[tipo].push(marker);
-      });
+    const marker = L.marker(coords, { icon: iconos[tipo] }).addTo(map);
+    markersPorTipo[tipo].push(marker);
 
-      document.getElementById("status").innerText = `Mostrando ${data.elements.length} resultados para ${tipo}`;
-    })
-    .catch(err => {
-      console.error(err);
-      alert("Error buscando " + tipo);
-      document.getElementById("status").innerText = "Error de búsqueda";
+    marker.on("click", async () => {
+      const userPos = userMarker.getLatLng();
+
+      // 1. DISTANCIA Y DURACIÓN
+      const directionsURL = `https://cors-anywhere.herokuapp.com/https://maps.googleapis.com/maps/api/directions/json?origin=${userPos.lat},${userPos.lng}&destination=${coords[0]},${coords[1]}&mode=driving&avoid=tolls&key=${GOOGLE_API_KEY}`;
+      const directionsResp = await fetch(directionsURL);
+      const directionsData = await directionsResp.json();
+
+      const route = directionsData.routes?.[0]?.legs?.[0];
+      const distancia = route?.distance?.text || "–";
+      const duracion = route?.duration?.text || "–";
+
+      // 2. DETALLES DEL LUGAR
+      const googleTipo = tipo === 'camp_site' ? 'rv_park' : tipo === 'fuel' ? 'gas_station' : 'parking';
+      const placesURL = `https://cors-anywhere.herokuapp.com/https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${coords[0]},${coords[1]}&radius=50&type=${googleTipo}&key=${GOOGLE_API_KEY}`;
+      const placesResp = await fetch(placesURL);
+      const placesData = await placesResp.json();
+
+      const place = placesData.results?.[0];
+      const name = place?.name || tipo;
+      const website = place?.website || "";
+      const rating = place?.rating ? `⭐ ${place.rating}` : "";
+      const webLink = place?.place_id ? `<br>🌐 <a href="https://www.google.com/maps/place/?q=place_id=${place.place_id}" target="_blank">Web</a>` : "";
+
+      // 3. LINK "CÓMO LLEGAR"
+      const comoLlegarURL = `https://www.google.com/maps/dir/?api=1&origin=${userPos.lat},${userPos.lng}&destination=${coords[0]},${coords[1]}&travelmode=driving&avoid=tolls`;
+
+      const contenidoPopup = `
+        <b>${name}</b><br>
+        ${rating}<br>
+        📍 ${distancia} (${duracion})<br>
+        💰 Precio estimado: ${tipo === 'fuel' ? '1.95 CHF/L' : tipo === 'camp_site' ? '20 CHF/noche' : 'Gratis'}<br>
+        ${webLink}
+        <br>🚗 <a href="${comoLlegarURL}" target="_blank">Cómo llegar</a>
+      `;
+
+      marker.bindPopup(contenidoPopup).openPopup();
     });
+  });
+
+  document.getElementById("status").innerText = `Mostrando ${data.elements.length} resultados para ${tipo}`;
+})
+
 }
 
 function clearAll() {
