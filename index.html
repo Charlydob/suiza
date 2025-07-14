@@ -17,9 +17,11 @@
   <div id="controls">
     <h2>Mi ruta en caravana</h2>
     <button onclick="getLocation()">📍 Ver mi ubicación</button>
-    <button onclick="buscar('camp_site')">⛺ Campings</button>
-    <button onclick="buscar('fuel')">⛽ Gasolineras</button>
-    <button onclick="buscar('parking')">🅿️ Parkings</button>
+    <button onclick="toggleTipo('camp_site')">⛺ Campings</button>
+    <button onclick="toggleTipo('fuel')">⛽ Gasolineras</button>
+    <button onclick="toggleTipo('parking')">🅿️ Parkings</button>
+    <button onclick="clearAll()">🧹 Limpiar</button>
+
     <div id="status">Esperando ubicación...</div>
   </div>
   <div id="map"></div>

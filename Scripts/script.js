@@ -2,13 +2,55 @@ let map;
 let userMarker;
 let firstTime = true;
 
+const markersPorTipo = {
+  camp_site: [],
+  fuel: [],
+  parking: []
+};
+
+const iconos = {
+  camp_site: L.icon({
+    iconUrl: '../Recursos/img/camping.png',
+    iconSize: [28, 28],
+    iconAnchor: [14, 28],
+    popupAnchor: [0, -30]
+  }),
+  fuel: L.icon({
+    iconUrl: '../Recursos/img/gasolinera.png',
+    iconSize: [28, 28],
+    iconAnchor: [14, 28],
+    popupAnchor: [0, -30]
+  }),
+  parking: L.icon({
+    iconUrl: '../Recursos/img/parking.png',
+    iconSize: [28, 28],
+    iconAnchor: [14, 28],
+    popupAnchor: [0, -30]
+  })
+};
+const iconoUbicacion = L.icon({
+  iconUrl: '../Recursos/img/yo.png', // reemplaza con tu icono
+  iconSize: [28, 28],
+  iconAnchor: [14, 28],
+  popupAnchor: [0, -30]
+});
+
+const tipoActivo = {
+  camp_site: false,
+  fuel: false,
+  parking: false
+};
+
 function initMap(lat, lon) {
   map = L.map("map").setView([lat, lon], 14);
   L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
     attribution: "© OpenStreetMap"
   }).addTo(map);
 
-  userMarker = L.marker([lat, lon]).addTo(map).bindPopup("Estás aquí").openPopup();
+userMarker = L.marker([lat, lon], { icon: iconoUbicacion })
+  .addTo(map)
+  .bindPopup("📍 Aquí estás tú, piloto 🚌💨")
+  .openPopup();
   document.getElementById("status").innerText = "Ubicación cargada";
 }
 
@@ -30,24 +72,41 @@ function getLocation() {
         firstTime = false;
       } else {
         map.setView([lat, lon], 14);
-        if (userMarker) userMarker.setLatLng([lat, lon]);
-        else userMarker = L.marker([lat, lon]).addTo(map);
+        if (userMarker) {
+  userMarker.setLatLng([lat, lon]);
+} else {
+  userMarker = L.marker([lat, lon], { icon: iconoUbicacion })
+    .addTo(map)
+    .bindPopup("📍 Aquí estás tú, piloto 🚌💨")
+    .openPopup();
+}
+
       }
     },
     (err) => {
       console.error(err);
-      document.getElementById("status").innerText = "Error al obtener ubicación";
-      alert("No se pudo obtener tu ubicación. ¿Diste permiso?");
+      let msg = "Error al obtener ubicación.";
+      if (err.code === 1) msg += " El usuario denegó el permiso.";
+      else if (err.code === 2) msg += " Ubicación no disponible.";
+      else if (err.code === 3) msg += " Timeout.";
+      document.getElementById("status").innerText = msg;
+      alert(msg);
     }
   );
 }
 
-function buscar(tipo) {
-  if (!map) {
-    alert("Primero necesitas obtener tu ubicación");
-    return;
+function toggleTipo(tipo) {
+  tipoActivo[tipo] = !tipoActivo[tipo];
+  if (tipoActivo[tipo]) {
+    buscar(tipo);
+  } else {
+    markersPorTipo[tipo].forEach(m => map.removeLayer(m));
+    markersPorTipo[tipo] = [];
+    document.getElementById("status").innerText = `Ocultando ${tipo}`;
   }
+}
 
+function buscar(tipo) {
   const lat = map.getCenter().lat;
   const lon = map.getCenter().lng;
 
@@ -65,33 +124,33 @@ function buscar(tipo) {
     method: "POST",
     body: query
   })
-    .then((r) => r.json())
-    .then((data) => {
-      data.elements.forEach((e) => {
+    .then(r => r.json())
+    .then(data => {
+      markersPorTipo[tipo].forEach(m => map.removeLayer(m));
+      markersPorTipo[tipo] = [];
+
+      data.elements.forEach(e => {
         const coords = e.type === "node" ? [e.lat, e.lon] : [e.center.lat, e.center.lon];
         const name = e.tags.name || tipo;
 
-        L.marker(coords).addTo(map).bindPopup(name);
+        const marker = L.marker(coords, { icon: iconos[tipo] }).addTo(map).bindPopup(name);
+        markersPorTipo[tipo].push(marker);
       });
 
-      document.getElementById("status").innerText = `Se encontraron ${data.elements.length} resultados`;
+      document.getElementById("status").innerText = `Mostrando ${data.elements.length} resultados para ${tipo}`;
     })
-    .catch((err) => {
+    .catch(err => {
       console.error(err);
-      alert("Error al buscar en el mapa");
-      document.getElementById("status").innerText = "Error en la búsqueda";
+      alert("Error buscando " + tipo);
+      document.getElementById("status").innerText = "Error de búsqueda";
     });
 }
 
-(err) => {
-  console.error(err);
-  let msg = "Error al obtener ubicación.";
-
-  if (err.code === 1) msg += " El usuario denegó el permiso.";
-  else if (err.code === 2) msg += " Ubicación no disponible.";
-  else if (err.code === 3) msg += " Timeout al intentar obtener ubicación.";
-
-  document.getElementById("status").innerText = msg;
-  alert(msg);
+function clearAll() {
+  Object.keys(markersPorTipo).forEach(tipo => {
+    markersPorTipo[tipo].forEach(m => map.removeLayer(m));
+    markersPorTipo[tipo] = [];
+    tipoActivo[tipo] = false;
+  });
+  document.getElementById("status").innerText = "Mapa limpio";
 }
-
