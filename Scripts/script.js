@@ -387,16 +387,18 @@ const distanciaKm = calcularDistancia(lat1, lon1, coords[0], coords[1]);
     : `${tiempoPieMin} min a pie`;
 
   const popupHTML = `
-    <b>${name}</b><br>
-    Distancia: ${distanciaKm.toFixed(1)} km<br>
-    ${tiempoCoche} | ${tiempoPie}<br>
-    <a href='${mapsLink}' target='_blank' style="text-decoration: none">🧭 Cómo llegar</a><br>
-    <a href='${searchLink}' target='_blank' style="text-decoration: none">🔎 Buscar en Maps</a><br>
-    <button onclick="toggleFavorito('${idUnico}', '${tipo}', [${coords}], '${name.replace(/'/g, "\\'")}', this)">
-      ${yaEsFavorito ? "⭐" : "☆"} Favorito
-    </button>
-    <button onclick="ignorarLugar('${idUnico}')">🗑️ Ignorar</button>
-  `;
+  <b>${name}</b><br>
+  Distancia: ${distanciaKm.toFixed(1)} km<br>
+  ${tiempoCoche} | ${tiempoPie}<br>
+  <button onclick="window.open('${mapsLink}', '_blank')">🧭 Cómo llegar</button>
+  <button onclick="window.open('${searchLink}', '_blank')">🔎 Buscar lugares similares</button>
+  <button onclick="window.open('${exactSearchLink}', '_blank')">🔍 Buscar este sitio</button><br>
+  <button onclick="toggleFavorito('${idUnico}', '${tipo}', [${coords}], '${name.replace(/'/g, "\\'")}', this)">
+    ${yaEsFavorito ? "⭐" : "☆"} Favorito
+  </button>
+  <button onclick="ignorarLugar('${idUnico}')">🗑️ Ignorar</button>
+`;
+
 
 
   const marker = L.marker(coords, { icon: iconos[tipo] }).addTo(map).bindPopup(popupHTML);
