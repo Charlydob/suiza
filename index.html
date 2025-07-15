@@ -114,14 +114,32 @@
 <!-- para pruebas de estetica en lan
   <div id="map"><img src="Recursos/img/fondoprueba.jpg"></div>
 -->
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  
-  <!-- Script modular ES6 
-    <script type="module" src="Scripts/main.js"></script>
-    -->
-  <!-- Script normal    -->
-  <script src="Scripts/script.js"></script>
+  <!-- 1. Leaflet -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
+<!-- 2. Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database-compat.js"></script>
+
+<!-- 3. Configuración Firebase + Inicialización -->
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyAIRkX0m-qORww2kcYl_mbXm6IKh7j02dc",
+    authDomain: "suizaapp.firebaseapp.com",
+    databaseURL: "https://suizaapp-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "suizaapp",
+    storageBucket: "suizaapp.firebasestorage.app",
+    messagingSenderId: "780629642721",
+    appId: "1:780629642721:web:f8d2c33e1766b293ab96a0"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+  const rutaFavoritos = "favoritos/charlyylaura";
+</script>
+
+<!-- 4. Tu script principal (donde usas Leaflet y Firebase) -->
+<script src="Scripts/script.js"></script>
 
 </body>
 </html>

@@ -378,3 +378,86 @@ html, body {
   color: gold;
   text-shadow: 1px 1px 3px black;
 }
+
+
+/* Estilo para el popup personalizado */
+
+b {
+  font-size: 18px;
+  color: hsl(0, 0%, 100%);
+  text-shadow: #333 1px 1px 2px;
+  margin-left: 0%;
+  width: 80%;
+  
+}
+
+.popup-personalizado .grupo-botones-arriba {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* dos columnas iguales */
+  gap: 6px;
+  width: 100%;
+  padding: 0px;
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+.popup-personalizado .grupo-botones-abajo {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* dos columnas iguales */
+  gap: 6px;
+  width: 100%;
+  padding: 0px;
+  margin-top: 5px;
+}
+.grupo-botones button {
+  padding: 6px;
+  font-size: 13px;
+  background-color: #f0f0f0;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  text-align: center;
+  width: 100%;
+}
+.popup-personalizado button {
+  flex: auto;
+  padding: 6px;
+  font-size: 13px;
+  background-color: #fefeff4f;
+  color: #333;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  text-align: center;
+  width: 100%;
+}
+.leaflet-popup-content {
+  margin: 0 !important;
+  padding: 10px !important;
+  width: auto !important;
+  max-width: none !important;
+  color: white;
+  text-shadow: #000000 1px 1px 2px;
+
+}
+
+
+
+.popup-personalizado button:hover {
+  background-color: #ddd;
+}
+.leaflet-popup-content-wrapper {
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  background-color: rgba(255, 0, 242, 0.089) !important;
+  backdrop-filter: blur(6px);
+  padding: 10px;
+  border: 1px solid #ccc;
+  width: 230px;
+}
+
+.leaflet-popup-tip {
+  background-color: rgba(255, 0, 242, 0.089) !important;
+  backdrop-filter: blur(6px);
+  width: 12px;
+  height: 6px;
+}

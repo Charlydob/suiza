@@ -86,15 +86,29 @@ const tipoActivo = {
 };
 // ⭐ Favoritos y 🛇 Ignorados guardados en localStorage
 // 🟡 Estructura: { id, tipo, lat, lon, datosPersonalizados: {nombre, precio, horario, notas} }
-let favoritos = JSON.parse(localStorage.getItem("favoritos")) || [];
+let favoritos = [];
+
+// 🔄 Carga en tiempo real desde Firebase
+db.ref(rutaFavoritos).on("value", snapshot => {
+const data = snapshot.val();
+favoritos = data || JSON.parse(localStorage.getItem("favoritos")) || [];
+if (data) localStorage.setItem("favoritos", JSON.stringify(data));
+  renderizarFavoritos();
+  mostrarMarcadoresFavoritos();
+});
 const ignorados = JSON.parse(localStorage.getItem("ignorados")) || [];
 let marcadoresFavoritos = [];
 
 
 function guardarListas() {
-  localStorage.setItem("favoritos", JSON.stringify(favoritos));
+  // Guardar favoritos en Firebase
+  db.ref(rutaFavoritos).set(favoritos);
+
+  // Guardar ignorados en localStorage
   localStorage.setItem("ignorados", JSON.stringify(ignorados));
 }
+
+
 //✅================= VARIABLES GLOBALES 👆 ================= //
 //✅======== INICIALIZACIÓN DEL MAPA Y MARCADOR DEL USUARIO 👇 ======== //
 // 🚀 Inicializa el mapa con la ubicación dada
@@ -121,6 +135,7 @@ function initMap(lat, lon) {
     currentCoords = [pos.lat, pos.lng];
     actualizarCirculo();
     actualizarBusquedaActiva();
+    
   });
 
 
@@ -389,16 +404,24 @@ const distanciaKm = calcularDistancia(lat1, lon1, coords[0], coords[1]);
     : `${tiempoPieMin} min a pie`;
 
   const popupHTML = `
+  <div class="popup-personalizado">
   <b>${name}</b><br>
   Distancia: ${distanciaKm.toFixed(1)} km<br>
   ${tiempoCoche} | ${tiempoPie}<br>
-  <button onclick="window.open('${mapsLink}', '_blank')">🧭 Cómo llegar</button>
-  <button onclick="window.open('${searchLink}', '_blank')">🔎 Buscar lugares similares</button>
-  <button onclick="window.open('${exactSearchLink}', '_blank')">🔍 Buscar este sitio</button><br>
-  <button onclick="toggleFavorito('${idUnico}', '${tipo}', [${coords}], '${name.replace(/'/g, "\\'")}', this)">
-    ${yaEsFavorito ? "⭐" : "☆"} Favorito
-  </button>
-  <button onclick="ignorarLugar('${idUnico}')">🗑️ Ignorar</button>
+  <div class="grupo-botones-arriba">
+    <button onclick="window.open('${mapsLink}', '_blank')">🧭 Cómo llegar</button>
+    <button onclick="window.open('${searchLink}', '_blank')">🔎 Similares</button>
+    </div>
+      <div class="boton-medio">
+    <button onclick="window.open('${exactSearchLink}', '_blank')">🔍 Ver este sitio</button><br>
+    </div>
+    <div class="grupo-botones-abajo">
+    <button onclick="toggleFavorito('${idUnico}', '${tipo}', [${coords}], '${name.replace(/'/g, "\\'")}', this)">
+      ${yaEsFavorito ? "⭐" : "☆"} Favorito
+    </button>
+    <button onclick="ignorarLugar('${idUnico}')">🗑️ Ignorar</button>
+    </div>
+  </div>
 `;
 
 
@@ -495,8 +518,9 @@ function buscarLugar() {
 //❌======== GESTIÓN DE FAVORITOS 👇 ======== //
 // RENDERIZA FAVORITOS EN MAPA
       function renderizarFavoritos() {
-        const contenedor = document.getElementById("contenedorFavoritos");
         const listaDiv = document.getElementById("listaFavoritos");
+        const contenedor = document.getElementById("contenedorFavoritos");
+
 
         contenedor.innerHTML = ""; // Limpia antes de renderizar
 
@@ -543,7 +567,10 @@ const distanciaKm = calcularDistancia(lat1, lon1, f.lat, f.lon);
               <strong>${nombre}</strong><br>
               Distancia: ${distanciaKm.toFixed(1)} km<br>
               ${tiempoCoche} | ${tiempoPie}<br>
-              <a href="https://www.google.com/maps/dir/?api=1&destination=${f.lat},${f.lon}&travelmode=driving" target="_blank" style="text-decoration: none">🧭 Cómo llegar</a>
+              <button onclick="window.open('https://www.google.com/maps/dir/?api=1&destination=${f.lat},${f.lon}&travelmode=driving', '_blank')">
+  🧭 Cómo llegar
+</button>
+
             `;
 
 
@@ -641,58 +668,83 @@ function mostrarMarcadoresFavoritos() {
   marcadoresFavoritos.forEach(m => map.removeLayer(m));
   marcadoresFavoritos = [];
 
-  favoritos.forEach(f => {
-    const nombre = f.datosPersonalizados?.nombre || f.id;
+favoritos.forEach(f => {
+  const nombre = f.datosPersonalizados?.nombre || f.id;
+  const tipo = f.tipo;
+  const coords = [f.lat, f.lon];
+  const idUnico = f.id;
 
-    // Distancia desde la ubicación real
-    const userPos = ubicacionReal || currentCoords;
+  const userPos = ubicacionReal || currentCoords;
+  const lat1 = Array.isArray(userPos) ? userPos[0] : userPos.lat;
+  const lon1 = Array.isArray(userPos) ? userPos[1] : userPos.lng;
+  const distanciaKm = calcularDistancia(lat1, lon1, f.lat, f.lon);
 
-    const lat1 = Array.isArray(userPos) ? userPos[0] : userPos.lat;
-const lon1 = Array.isArray(userPos) ? userPos[1] : userPos.lng;
-const distanciaKm = calcularDistancia(lat1, lon1, f.lat, f.lon);
-    // Estimaciones de tiempo
-    const velCoche = 60; // km/h
-    const velPie = 5;    // km/h
+  const tiempoCocheMin = Math.round((distanciaKm / 60) * 60);
+  const tiempoPieMin = Math.round((distanciaKm / 5) * 60);
 
-    const tiempoCocheMin = Math.round((distanciaKm / velCoche) * 60);
-    const tiempoPieMin = Math.round((distanciaKm / velPie) * 60);
+  const tiempoCoche = tiempoCocheMin >= 60
+    ? `${(tiempoCocheMin / 60).toFixed(1)} h en coche`
+    : `${tiempoCocheMin} min en coche`;
 
-    const tiempoCoche = tiempoCocheMin >= 60
-      ? `${(tiempoCocheMin / 60).toFixed(1)} h en coche`
-      : `${tiempoCocheMin} min en coche`;
+  const tiempoPie = tiempoPieMin >= 60
+    ? `${(tiempoPieMin / 60).toFixed(1)} h a pie`
+    : `${tiempoPieMin} min a pie`;
 
-    const tiempoPie = tiempoPieMin >= 60
-      ? `${(tiempoPieMin / 60).toFixed(1)} h a pie`
-      : `${tiempoPieMin} min a pie`;
+  const exactSearchLink = `https://www.google.com/maps/search/${encodeURIComponent(nombre)}+@${f.lat},${f.lon},18z`;
 
-    // HTML del popup
-    const popupHTML = `
-      <b>${nombre}</b><br>
-      Distancia: ${distanciaKm.toFixed(1)} km<br>
-      ${tiempoCoche} | ${tiempoPie}<br>
-      <a href="https://www.google.com/maps/dir/?api=1&destination=${f.lat},${f.lon}&travelmode=driving" target="_blank"style="text-decoration: none" >🧭 Cómo llegar</a><br>
-      ${f.datosPersonalizados?.precio ? `<span>💰 ${f.datosPersonalizados.precio}</span><br>` : ""}
-      ${f.datosPersonalizados?.horario ? `<span>🕒 ${f.datosPersonalizados.horario}</span><br>` : ""}
-      ${f.datosPersonalizados?.notas ? `<small>📝 ${f.datosPersonalizados.notas}</small>` : ""}
-    `;
+  const popupHTML = `
+  <div class="popup-personalizado">
+    <b>${nombre}</b><br>
+    Distancia: ${distanciaKm.toFixed(1)} km<br>
+    ${tiempoCoche} | ${tiempoPie}<br>
 
-    // Icono personalizado de estrella
-    const iconoEstrella = L.divIcon({
-      className: 'icono-favorito',
-      html: '⭐',
-      iconSize: [30, 30],
-      iconAnchor: [15, 30]
-    });
+    <div class="grupo-botones-arriba">
+      <button onclick="window.open('https://www.google.com/maps/dir/?api=1&destination=${f.lat},${f.lon}&travelmode=driving', '_blank')">🧭 Cómo llegar</button>
+      <button onclick="window.open('${exactSearchLink}', '_blank')">🔍 Ver este sitio</button>
+    </div>
 
-    // Crear marcador y guardar referencia
-    const marcador = L.marker([f.lat, f.lon], { icon: iconoEstrella })
-      .addTo(map)
-      .bindPopup(popupHTML);
+    <div class="boton-medio">
+      ${f.datosPersonalizados?.precio ? `💰 ${f.datosPersonalizados.precio}<br>` : ""}
+      ${f.datosPersonalizados?.horario ? `🕒 ${f.datosPersonalizados.horario}<br>` : ""}
+      ${f.datosPersonalizados?.notas ? `📝 <small>${f.datosPersonalizados.notas}</small><br>` : ""}
+    </div>
 
-    marcadoresFavoritos.push(marcador);
+    <div class="grupo-botones-abajo">
+      <button onclick="editarFavoritoDesdeMapa('${idUnico}')">✏️ Editar favorito</button>
+      <button onclick="toggleFavorito('${idUnico}', '${tipo}', [${coords}], '${nombre.replace(/'/g, "\\'")}', this)">🗑️ Eliminar</button>
+    </div>
+  </div>
+`;
+
+
+  const iconoEstrella = L.divIcon({
+    className: 'icono-favorito',
+    html: '⭐',
+    iconSize: [30, 30],
+    iconAnchor: [15, 30]
   });
+
+  const marcador = L.marker([f.lat, f.lon], { icon: iconoEstrella })
+    .addTo(map)
+    .bindPopup(popupHTML);
+
+  marcadoresFavoritos.push(marcador);
+});
+
 }
 
+function editarFavoritoDesdeMapa(id) {
+  const favorito = favoritos.find(f => f.id === id);
+  if (!favorito) return;
+
+  // Abre el sidebar si está cerrado
+  const sidebar = document.getElementById("sidebar");
+  sidebar.classList.add("open");
+  document.getElementById("toggleMenu").style.display = "none";
+
+  // Abre el editor del favorito
+  mostrarEditorFavorito(id); // asegúrate de tener esta función
+}
 
 
 //❌======== GESTION DE FAVORITOS 👆 ======== //
@@ -733,7 +785,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const toggleBtn = document.getElementById("toggleMenu");
   const sidebar = document.getElementById("sidebar");
 
-  // ⬇️ AÑADE ESTAS DOS LÍNEAS JUSTO AQUÍ
   const closeBtn = document.getElementById("closeSidebar");
   closeBtn.addEventListener("click", () => {
     sidebar.classList.remove("open");
@@ -762,5 +813,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   getLocation();
+  renderizarFavoritos();
+
 });
 //✅======== EVENTOS DE CARGA Y MANEJO DE SIDEBAR 👆 ======== // 
