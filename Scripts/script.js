@@ -1,8 +1,10 @@
+//================= VARIABLES GLOBALES 👇 ================= //
+// 🌍 Variables principales del mapa
 let map;
 let userMarker;
 let searchCircle;
 let currentCoords = null;
-
+// 📍 Marcadores agrupados por tipo de lugar (para borrarlos fácilmente luego)
 const markersPorTipo = {
   camp_site: [],
   fuel: [],
@@ -17,7 +19,7 @@ const markersPorTipo = {
   hospital: [],
 
 };
-
+// 🖼️ Iconos personalizados por tipo de lugar (para mostrar en el mapa)
 const iconos = {
   camp_site: L.icon({
     iconUrl: 'Recursos/img/campingmapa.png', iconSize: [32, 32], iconAnchor: [14, 28], popupAnchor: [0, -30]
@@ -56,11 +58,11 @@ const iconos = {
   
 
 };
-
+// 🧭 Icono de la ubicación del usuario
 const iconoUbicacion = L.icon({
   iconUrl: 'Recursos/img/yo.png', iconSize: [32, 32], iconAnchor: [14, 28], popupAnchor: [0, -30]
 });
-
+// ✅ Estado de activación de cada tipo de marcador
 const tipoActivo = {
   camp_site: false,
   fuel: false,
@@ -74,7 +76,9 @@ const tipoActivo = {
   cafe: false,
   hospital: false
 };
-
+//================= VARIABLES GLOBALES 👆 ================= //✅
+//======== INICIALIZACIÓN DEL MAPA Y MARCADOR DEL USUARIO 👇 ======== //
+// 🚀 Inicializa el mapa con la ubicación dada
 function initMap(lat, lon) {
   map = L.map("map").setView([lat, lon], 14);
   L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -101,7 +105,10 @@ function initMap(lat, lon) {
 
   document.getElementById("status").innerText = "Ubicación cargada";
 }
+//======== INICIALIZACIÓN DEL MAPA Y MARCADOR DEL USUARIO 👆 ======== //✅
 
+//======== GESTIÓN DEL CÍRCULO DE BÚSQUEDA 👇 ======== //
+// 🔵 Crea el círculo de búsqueda alrededor del usuario
 function crearCirculo() {
   const radius = parseInt(document.getElementById("radiusSlider").value);
   if (searchCircle) map.removeLayer(searchCircle);
@@ -112,19 +119,15 @@ function crearCirculo() {
     fillOpacity: 0.2
   }).addTo(map);
 }
-
+// 🔁 Actualiza el círculo cuando cambia la ubicación o el radio
 function actualizarCirculo() {
   const radius = parseInt(document.getElementById("radiusSlider").value);
   searchCircle.setLatLng(currentCoords);
   searchCircle.setRadius(radius);
 }
-
-function actualizarBusquedaActiva() {
-  Object.keys(tipoActivo).forEach(tipo => {
-    if (tipoActivo[tipo]) buscar(tipo);
-  });
-}
-
+//======== GESTIÓN DEL CÍRCULO DE BÚSQUEDA  👆 ======== // ✅
+//======== ACTUALIZACIÓN EN TIEMPO REAL Y OBTENCIÓN DE UBICACIÓN 👇 ======== //
+// 📍 Usa la geolocalización del navegador para obtener la ubicación actual
 function getLocation() {
   if (!navigator.geolocation) {
     alert("Tu navegador no permite geolocalización");
@@ -154,7 +157,15 @@ function getLocation() {
     { enableHighAccuracy: true, maximumAge: 1000 }
   );
 }
-
+// 🔁 Re-busca automáticamente lugares activos si cambia la ubicación
+function actualizarBusquedaActiva() {
+  Object.keys(tipoActivo).forEach(tipo => {
+    if (tipoActivo[tipo]) buscar(tipo);
+  });
+}
+//======== ACTUALIZACIÓN EN TIEMPO REAL Y OBTENCIÓN DE UBICACIÓN 👆 ======== //
+//======== CONSULTA A OVERPASS API (OpenStreetMap) 👇 ======== //✅
+// 🔎 Busca lugares de un tipo concreto cerca del usuario usando Overpass API
 function buscar(tipo) {
   if (!currentCoords) return;
 
@@ -299,7 +310,9 @@ function buscar(tipo) {
       document.getElementById("status").innerText = "Error de búsqueda";
     });
 }
-
+//======== CONSULTA A OVERPASS API (OpenStreetMap) 👆 ======== //✅
+//======== INTERFAZ: BOTONES DE FILTRADO 👇 ======== //
+// 🎚️ Activa o desactiva un tipo de lugar (botones de filtros)
 function toggleTipo(tipo) {
   tipoActivo[tipo] = !tipoActivo[tipo];
   const boton = document.getElementById(`btn-${tipo}`);
@@ -316,7 +329,9 @@ function toggleTipo(tipo) {
     document.getElementById("status").innerText = `Ocultando ${tipo}`;
   }
 }
-
+//======== INTERFAZ: BOTONES DE FILTRADO 👆 ======== //✅
+//======== LIMPIEZA DEL MAPA 👇 ======== //
+// 🧼 Limpia todos los marcadores y resetea el estado
 function clearAll() {
   Object.keys(markersPorTipo).forEach(tipo => {
     markersPorTipo[tipo].forEach(m => map.removeLayer(m));
@@ -330,7 +345,9 @@ function clearAll() {
   });
   document.getElementById("status").innerText = "Mapa limpio";
 }
-
+//======== LIMPIEZA DEL MAPA  👆 ======== //✅
+//======== BUSCAR UN LUGAR POR NOMBRE (input de texto) 👇 ======== //
+// 🧭 Busca una ciudad o dirección por nombre (con Nominatim)
 function buscarLugar() {
   const lugar = document.getElementById("locationSearch").value;
   if (!lugar) return;
@@ -355,7 +372,9 @@ function buscarLugar() {
       alert("Error al buscar el lugar");
     });
 }
-
+//======== BUSCAR UN LUGAR POR NOMBRE (input de texto) 👆 ======== //✅
+//======== EVENTOS DE CARGA Y MANEJO DE SIDEBAR 👇 ======== //
+// 📲 Manejo de eventos una vez el DOM esté cargado
 document.addEventListener("DOMContentLoaded", () => {
   const toggleBtn = document.getElementById("toggleMenu");
   const sidebar = document.getElementById("sidebar");
@@ -390,4 +409,4 @@ document.addEventListener("DOMContentLoaded", () => {
 
   getLocation();
 });
-
+//======== EVENTOS DE CARGA Y MANEJO DE SIDEBAR 👆 ======== //
