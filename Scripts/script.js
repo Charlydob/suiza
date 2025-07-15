@@ -909,8 +909,8 @@ function ignorarLugar(id) {
 //❌======== GESTION DE IGNORADOS 👆 ======== //
 function getLocation() {
   if (!navigator.geolocation) {
-    alert("Tu navegador no permite geolocalización");
-    initMap(40.4168, -3.7038); // 🧭 Coordenadas por defecto: Madrid
+    alert("Tu navegador no permite geolocalización.");
+    initMap(40.4168, -3.7038); // 🧭 Madrid como fallback
     return;
   }
 
@@ -921,12 +921,18 @@ function getLocation() {
       initMap(lat, lon);
     },
     (err) => {
-      console.warn("No se pudo obtener la ubicación. Usando ubicación por defecto.");
-      initMap(40.4168, -3.7038); // 🧭 Madrid como fallback
+      console.warn("No se pudo obtener la ubicación: ", err);
+      alert("No se pudo obtener tu ubicación. Asegúrate de permitirla o prueba en otro navegador.");
+      initMap(40.4168, -3.7038); // fallback
     },
-    { enableHighAccuracy: true }
+    {
+      enableHighAccuracy: true,
+      timeout: 10000,
+      maximumAge: 0
+    }
   );
 }
+
 function establecerCentroDesdeFavorito(lat, lon) {
   const nuevaPosicion = [lat, lon];
 
