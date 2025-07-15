@@ -11,7 +11,11 @@ const markersPorTipo = {
   airbnb: [],
   luggage: [],
   airport: [],
-  tourism: []
+  tourism: [],
+  restaurant: [],
+  cafe: [],
+  hospital: [],
+
 };
 
 const iconos = {
@@ -39,7 +43,17 @@ const iconos = {
   }),
   tourism: L.icon({
     iconUrl: 'Recursos/img/turismomapa.png', iconSize: [32, 32], iconAnchor: [14, 28], popupAnchor: [0, -30]
-})
+  }),
+  restaurant: L.icon({
+    iconUrl: 'Recursos/img/restaurantemapa.png', iconSize: [32, 32], iconAnchor: [14, 28], popupAnchor: [0, -30]
+  }),
+  cafe: L.icon({
+    iconUrl: 'Recursos/img/cafeteriamapa.png', iconSize: [32, 32], iconAnchor: [14, 28], popupAnchor: [0, -30]
+  }),
+  hospital: L.icon({
+    iconUrl: 'Recursos/img/hospitalmapa.png', iconSize: [32, 32], iconAnchor: [14, 28], popupAnchor: [0, -30]
+  }),
+  
 
 };
 
@@ -55,7 +69,10 @@ const tipoActivo = {
   airbnb: false,
   luggage: false,
   airport: false,
-  ourism: false
+  tourism: false,
+  restaurant: false,
+  cafe: false,
+  hospital: false
 };
 
 function initMap(lat, lon) {
@@ -177,8 +194,8 @@ function buscar(tipo) {
     query = `
       [out:json];
       (
-        node["amenity"="parking"]["access"="public"]["parking"!="bicycle"](around:${radius},${lat},${lon});
-        way["amenity"="parking"]["access"="public"]["parking"!="bicycle"](around:${radius},${lat},${lon});
+        node["amenity"="parking"]["access"~"yes|public"]["parking"!="bicycle"](around:${radius},${lat},${lon});
+        way["amenity"="parking"]["access"~"yes|public"]["parking"!="bicycle"](around:${radius},${lat},${lon});
       );
       out center;
     `;
@@ -202,6 +219,33 @@ function buscar(tipo) {
       );
       out center;
     `;
+  }else if (tipo === "restaurant") {
+    query = `
+      [out:json];
+      (
+        node["amenity"="restaurant"](around:${radius},${lat},${lon});
+        way["amenity"="restaurant"](around:${radius},${lat},${lon});
+      );
+      out center;
+    `;
+  }else if (tipo === "cafe") {
+  query = `
+    [out:json];
+    (
+      node["amenity"="cafe"](around:${radius},${lat},${lon});
+      way["amenity"="cafe"](around:${radius},${lat},${lon});
+    );
+    out center;
+  `;
+  }else if (tipo === "hospital") {
+  query = `
+    [out:json];
+    (
+      node["amenity"="hospital"](around:${radius},${lat},${lon});
+      way["amenity"="hospital"](around:${radius},${lat},${lon});
+    );
+    out center;
+  `;
   }else {
     query = `
       [out:json];

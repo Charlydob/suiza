@@ -75,6 +75,16 @@ html, body {
     width: 100%;
     margin: 6px 0;
   }
+    .filter-card {
+    padding: 8px;
+  }
+  .filter-card span {
+    font-size: 12px;
+  }
+  .filter-card img {
+    width: 32px;
+    height: 32px;
+  }
 }
 
 /* POPUPS estilo cristal satinado */
@@ -112,6 +122,8 @@ html, body {
   display: flex;
   flex-direction: column;
   gap: 20px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 #sidebar.open {
@@ -181,8 +193,8 @@ html, body {
 /* GRID DE FILTROS */
 .filter-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 15px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
 }
 
 .filter-card {

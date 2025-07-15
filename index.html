@@ -21,7 +21,7 @@
       <button onclick="buscarLugar()">🔍</button>
     </div>
     <label for="radiusSlider" class="slider-label">Radio búsqueda: <span id="radiusValue">5000</span>m</label>
-    <input type="range" id="radiusSlider" min="1000" max="10000" value="5000" step="500">
+    <input type="range" id="radiusSlider" min="0" max="10000" value="5000" step="100">
   </div>
 
   <div class="filter-grid">
@@ -56,9 +56,19 @@
     <div class="filter-card inactivo" id="btn-tourism" onclick="toggleTipo('tourism')">
       <img src="Recursos/img/turismo.png" alt="punto turístico">
   <span>Turismo</span>
-</div>
-
-      
+  </div>
+    <div class="filter-card inactivo" id="btn-restaurant" onclick="toggleTipo('restaurant')">
+      <img src="Recursos/img/restaurante.png" alt="restaurante">
+      <span>Restaurantes</span>
+    </div>
+    <div class="filter-card inactivo" id="btn-cafe" onclick="toggleTipo('cafe')">
+      <img src="Recursos/img/cafeteria.png" alt="cafetería">
+      <span>Cafeterías</span>
+    </div>
+    <div class="filter-card inactivo" id="btn-hospital" onclick="toggleTipo('hospital')">
+  <img src="Recursos/img/hospital.png" alt="hospital">
+  <span>Hospitales</span>
+    </div>
 
   </div>
 
