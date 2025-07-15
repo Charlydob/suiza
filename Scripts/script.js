@@ -408,52 +408,69 @@ function calcularDistancia(lat1, lon1, lat2, lon2) {
 //❌======== CALCULAR DISTANCIAS 👆 ======== //
 //❌======== GESTIÓN DE FAVORITOS 👇 ======== //
 // RENDERIZA FAVORITOS EN MAPA
-function renderizarFavoritos() {
-  const contenedor = document.getElementById("contenedorFavoritos");
-  const listaDiv = document.getElementById("listaFavoritos");
+      function renderizarFavoritos() {
+        const contenedor = document.getElementById("contenedorFavoritos");
+        const listaDiv = document.getElementById("listaFavoritos");
 
-  contenedor.innerHTML = ""; // Limpia antes de renderizar
+        contenedor.innerHTML = ""; // Limpia antes de renderizar
 
-  if (favoritos.length === 0) {
-    listaDiv.style.display = "none";
-    return;
-  }
+        if (favoritos.length === 0) {
+          listaDiv.style.display = "none";
+          return;
+        }
 
-  listaDiv.style.display = "block";
+        listaDiv.style.display = "block";
 
-  favoritos.forEach(f => {
-    const div = document.createElement("div");
-    div.className = "favorito-item";
-    div.style.marginBottom = "10px";
-    div.style.borderBottom = "1px solid #ccc";
-    div.style.paddingBottom = "5px";
-    div.style.cursor = "pointer";
+        favoritos.forEach(f => {
+          const div = document.createElement("div");
+          div.className = "favorito-item";
+          div.style.marginBottom = "10px";
+          div.style.borderBottom = "1px solid #ccc";
+          div.style.paddingBottom = "5px";
+          div.style.cursor = "pointer";
 
-    // Distancia y duración con API de rutas (simple con Haversine como placeholder)
-    const distancia = calcularDistancia(currentCoords[0], currentCoords[1], f.lat, f.lon);
-    const tiempoEstimado = Math.round(distancia / 60 * 100) / 100; // ~60km/h estimado
+          // Distancia y duración con API de rutas (simple con Haversine como placeholder)
+              const userPos = userMarker ? userMarker.getLatLng() : currentCoords;
+              const distanciaKm = calcularDistancia(userPos.lat, userPos.lng, f.lat, f.lon);
 
-    const nombre = f.datosPersonalizados?.nombre || f.id;
+              // Velocidades estimadas
+              const velCoche = 60; // km/h
+              const velPie = 5;    // km/h
 
-    div.innerHTML = `
-      <strong>${nombre}</strong><br>
-      Distancia: ${distancia.toFixed(1)} km<br>
-      Tiempo estimado: ${tiempoEstimado.toFixed(1)} h<br>
-      <a href="https://www.google.com/maps/dir/?api=1&destination=${f.lat},${f.lon}&travelmode=driving" target="_blank">🧭 Cómo llegar</a>
-    `;
+              const tiempoCocheMin = Math.round((distanciaKm / velCoche) * 60);
+              const tiempoPieMin = Math.round((distanciaKm / velPie) * 60);
 
-    // Al hacer clic, abre el editor y centra el mapa
-    div.onclick = () => {
-      setTimeout(() => {
-      map.setView([f.lat, f.lon], 16);
-    }, 100);
+              const tiempoCoche = tiempoCocheMin >= 60
+                ? `${(tiempoCocheMin / 60).toFixed(1)} h en coche`
+                : `${tiempoCocheMin} min en coche`;
 
-mostrarEditorFavorito(f.id);
-    };
+              const tiempoPie = tiempoPieMin >= 60
+                ? `${(tiempoPieMin / 60).toFixed(1)} h a pie`
+                : `${tiempoPieMin} min a pie`;
+              const nombre = f.datosPersonalizados?.nombre || f.id;
 
-    contenedor.appendChild(div);
-  });
-}
+
+
+          div.innerHTML = `
+              <strong>${nombre}</strong><br>
+              Distancia: ${distanciaKm.toFixed(1)} km<br>
+              ${tiempoCoche} | ${tiempoPie}<br>
+              <a href="https://www.google.com/maps/dir/?api=1&destination=${f.lat},${f.lon}&travelmode=driving" target="_blank">🧭 Cómo llegar</a>
+            `;
+
+
+          // Al hacer clic, abre el editor y centra el mapa
+          div.onclick = () => {
+            setTimeout(() => {
+            map.setView([f.lat, f.lon], 16);
+          }, 100);
+
+      mostrarEditorFavorito(f.id);
+          };
+
+          contenedor.appendChild(div);
+        });
+      }
 
 // ⭐ Alterna entre marcar o desmarcar un lugar como favorito
 function toggleFavorito(id, tipo, coords, name, btn) {
@@ -482,6 +499,7 @@ function toggleFavorito(id, tipo, coords, name, btn) {
    // Guarda la lista actualizada en localStorage
   guardarListas();
   renderizarFavoritos();
+  mostrarMarcadoresFavoritos();
 }
 let favoritoEditandoId = null;
 
@@ -511,7 +529,18 @@ function guardarEdicionFavorito() {
 
   guardarListas();
   renderizarFavoritos();
+  mostrarMarcadoresFavoritos();
   cerrarEditorFavorito();
+}
+function borrarFavorito() {
+  const index = favoritos.findIndex(f => f.id === favoritoEditandoId);
+  if (index !== -1) {
+    favoritos.splice(index, 1);
+    guardarListas();
+    renderizarFavoritos();
+    mostrarMarcadoresFavoritos();
+    cerrarEditorFavorito();
+  }
 }
 
 function cerrarEditorFavorito() {
@@ -519,6 +548,31 @@ function cerrarEditorFavorito() {
   document.getElementById("editorFavorito").style.display = "none";
   document.getElementById("sidebarContenido").style.display = "block";
 }
+function mostrarMarcadoresFavoritos() {
+  // Opcional: podrías limpiar antes si ya los hubieras pintado antes
+  favoritos.forEach(f => {
+    const nombre = f.datosPersonalizados?.nombre || f.id;
+    const popupHTML = `
+      <b>${nombre}</b><br>
+      <a href="https://www.google.com/maps/dir/?api=1&destination=${f.lat},${f.lon}&travelmode=driving" target="_blank">🧭 Cómo llegar</a><br>
+      <span>${f.datosPersonalizados?.precio || ''}</span><br>
+      <span>${f.datosPersonalizados?.horario || ''}</span><br>
+      <small>${f.datosPersonalizados?.notas || ''}</small>
+    `;
+
+    const iconoEstrella = L.divIcon({
+      className: 'icono-favorito',
+      html: '⭐',
+      iconSize: [30, 30],
+      iconAnchor: [15, 30]
+    });
+
+    L.marker([f.lat, f.lon], { icon: iconoEstrella })
+      .addTo(map)
+      .bindPopup(popupHTML);
+  });
+}
+
 
 //❌======== GESTION DE FAVORITOS 👆 ======== //
 //❌======== GESTION DE IGNORADOS 👇 ======== //

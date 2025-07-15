@@ -73,8 +73,6 @@
           <span>Hospitales</span>
             </div>
       </div>
-      <button id="closeSidebar">‹</button>
-
             <button onclick="clearAll()" class="clear-button">🧹 Limpiar</button>
             <div id="status">Esperando ubicación...</div>
   <!-- ⭐ Lista de Favoritos en el Sidebar -->
@@ -95,11 +93,12 @@
   <label>Observaciones:</label>
   <textarea id="editNotas" rows="3"></textarea><br><br>
   <button onclick="guardarEdicionFavorito()">💾 Guardar</button>
+  <button onclick="borrarFavorito()">🗑️ Eliminar</button>
   <button onclick="cerrarEditorFavorito()">❌ Cancelar</button>
 </div>
+  <button id="closeSidebar">‹</button>
 
 </div>
-
   <button id="toggleMenu">›</button>
 
   <div id="map"></div>

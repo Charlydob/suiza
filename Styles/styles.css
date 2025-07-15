@@ -358,3 +358,9 @@ html, body {
   background-color: #eee;
   color: #333;
 }
+/* Estilo para marcador de favorito */
+.icono-favorito {
+  font-size: 22px;
+  color: gold;
+  text-shadow: 1px 1px 3px black;
+}
