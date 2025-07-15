@@ -8,6 +8,8 @@ let watchId = null;
 let seguimientoActivo = false;
 let centrarMapaActivo = false;
 let marcadorUbicacion = null;
+let ubicacionReal = null;         // Última ubicación real detectada
+let marcadorUbicacionReal = null; // Marcador azul real
 
 // 📍 Marcadores agrupados por tipo de lugar (para borrarlos fácilmente luego)
 const markersPorTipo = {
@@ -119,6 +121,7 @@ function initMap(lat, lon) {
     actualizarBusquedaActiva();
   });
 
+
   document.getElementById("status").innerText = "Ubicación cargada";
 }
 //✅======== INICIALIZACIÓN DEL MAPA Y MARCADOR DEL USUARIO 👆 ======== //
@@ -142,23 +145,23 @@ function actualizarCirculo() {
   searchCircle.setRadius(radius);
 }
 //✅======== GESTIÓN DEL CÍRCULO DE BÚSQUEDA  👆 ======== // 
-//❌======== ACTUALIZACIÓN EN TIEMPO REAL Y OBTENCIÓN DE UBICACIÓN 👇 ======== //
+// ❌======== ACTUALIZACIÓN EN TIEMPO REAL Y OBTENCIÓN DE UBICACIÓN 👇 ======== //
+
 // 🔁 Re-busca automáticamente lugares activos si cambia la ubicación
-// 🔁 Actualiza resultados activos en el mapa
 function actualizarBusquedaActiva() {
   Object.keys(tipoActivo).forEach(tipo => {
     if (tipoActivo[tipo]) buscar(tipo);
   });
 }
 
-// 📍 Obtiene una única vez la ubicación actual y actualiza elementos
-function actualizarUbicacionUnaVez() {
+// ✅ Obtiene la ubicación GPS real, actualiza currentCoords y muestra marcador azul (no arrastrable)
+function actualizarUbicacionReal() {
   if (!navigator.geolocation) {
     alert("Tu navegador no permite geolocalización");
     return;
   }
 
-  document.getElementById("status").innerText = "Obteniendo ubicación...";
+  document.getElementById("status").innerText = "Obteniendo ubicación real...";
 
   navigator.geolocation.getCurrentPosition(
     (pos) => {
@@ -167,29 +170,18 @@ function actualizarUbicacionUnaVez() {
 
       currentCoords = [lat, lon];
 
-      if (!map) {
-        initMap(lat, lon);
-      }
-
-      if (!marcadorUbicacion) {
-        marcadorUbicacion = L.marker([lat, lon], {
-          draggable: true,
+      // Crea o actualiza el marcador de la ubicación real
+      if (!marcadorUbicacionReal) {
+        marcadorUbicacionReal = L.marker([lat, lon], {
           icon: L.divIcon({
-            className: "marcador-usuario",
-            html: "📍",
-            iconSize: [30, 30],
-            iconAnchor: [15, 30]
+            className: "marcador-real",
+            html: "🔵",
+            iconSize: [20, 20],
+            iconAnchor: [10, 10]
           })
         }).addTo(map);
-
-        marcadorUbicacion.on("dragend", function () {
-          currentCoords = [this.getLatLng().lat, this.getLatLng().lng];
-          actualizarCirculo();
-          actualizarBusquedaActiva();
-          renderizarFavoritos();
-        });
       } else {
-        marcadorUbicacion.setLatLng([lat, lon]);
+        marcadorUbicacionReal.setLatLng([lat, lon]);
       }
 
       map.setView([lat, lon], 16);
@@ -209,25 +201,23 @@ function actualizarUbicacionUnaVez() {
     { enableHighAccuracy: true }
   );
 }
-// Añade un botón al mapa para actualizar la ubicación una vez
-const botonActualizarUbicacion = L.control({ position: 'topright' });
-botonActualizarUbicacion.onAdd = function () {
+
+// 🔘 Botón en la esquina superior derecha para obtener la ubicación GPS real
+const botonUbicacion = L.control({ position: 'topright' });
+botonUbicacion.onAdd = function () {
   const div = L.DomUtil.create('div', 'leaflet-bar leaflet-control');
-  div.innerHTML = '<a href="#" title="Actualizar ubicación">📍</a>';
+  div.innerHTML = '<a href="#" title="Obtener ubicación real">📍</a>';
   div.style.backgroundColor = 'white';
   div.style.padding = '5px';
 
   div.onclick = function (e) {
     e.preventDefault();
-    actualizarUbicacionUnaVez();
+    actualizarUbicacionReal();
   };
 
   return div;
 };
-botonActualizarUbicacion.addTo(map);
-
-
-
+botonUbicacion.addTo(map);
 
 //❌======== ACTUALIZACIÓN EN TIEMPO REAL Y OBTENCIÓN DE UBICACIÓN 👆 ======== //
 //✅======== CONSULTA A OVERPASS API (OpenStreetMap) 👇 ======== //
@@ -362,7 +352,8 @@ function buscar(tipo) {
   const searchLink = `https://www.google.com/maps/search/${tipo}/@${coords[0]},${coords[1]},14z`;
 
   const yaEsFavorito = favoritos.includes(idUnico);
-  const userPos = userMarker ? userMarker.getLatLng() : currentCoords;
+  const userPos = ubicacionReal || currentCoords;
+
   const distanciaKm = calcularDistancia(userPos.lat, userPos.lng, coords[0], coords[1]);
 
   const tiempoCocheMin = Math.round((distanciaKm / 60) * 60);
@@ -501,7 +492,8 @@ function calcularDistancia(lat1, lon1, lat2, lon2) {
           div.style.cursor = "pointer";
 
           // Distancia y duración con API de rutas (simple con Haversine como placeholder)
-              const userPos = userMarker ? userMarker.getLatLng() : currentCoords;
+              const userPos = ubicacionReal || currentCoords;
+
               const distanciaKm = calcularDistancia(userPos.lat, userPos.lng, f.lat, f.lon);
 
               // Velocidades estimadas
@@ -628,7 +620,8 @@ function mostrarMarcadoresFavoritos() {
     const nombre = f.datosPersonalizados?.nombre || f.id;
 
     // Distancia desde la ubicación real
-    const userPos = userMarker ? userMarker.getLatLng() : currentCoords;
+    const userPos = ubicacionReal || currentCoords;
+
     const distanciaKm = calcularDistancia(userPos.lat, userPos.lng, f.lat, f.lon);
 
     // Estimaciones de tiempo
