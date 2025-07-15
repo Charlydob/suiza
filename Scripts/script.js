@@ -366,7 +366,10 @@ function buscar(tipo) {
   const yaEsFavorito = favoritos.includes(idUnico);
   const userPos = ubicacionReal || currentCoords;
 
-  const distanciaKm = calcularDistancia(userPos.lat, userPos.lng, coords[0], coords[1]);
+const lat1 = Array.isArray(userPos) ? userPos[0] : userPos.lat;
+const lon1 = Array.isArray(userPos) ? userPos[1] : userPos.lng;
+const distanciaKm = calcularDistancia(lat1, lon1, coords[0], coords[1]);
+
 
   const tiempoCocheMin = Math.round((distanciaKm / 60) * 60);
   const tiempoPieMin = Math.round((distanciaKm / 5) * 60);
@@ -494,8 +497,9 @@ function buscarLugar() {
           // Distancia y duración con API de rutas (simple con Haversine como placeholder)
               const userPos = ubicacionReal || currentCoords;
 
-              const distanciaKm = calcularDistancia(userPos.lat, userPos.lng, f.lat, f.lon);
-
+              const lat1 = Array.isArray(userPos) ? userPos[0] : userPos.lat;
+const lon1 = Array.isArray(userPos) ? userPos[1] : userPos.lng;
+const distanciaKm = calcularDistancia(lat1, lon1, f.lat, f.lon);
               // Velocidades estimadas
               const velCoche = 60; // km/h
               const velPie = 5;    // km/h
@@ -622,8 +626,9 @@ function mostrarMarcadoresFavoritos() {
     // Distancia desde la ubicación real
     const userPos = ubicacionReal || currentCoords;
 
-    const distanciaKm = calcularDistancia(userPos.lat, userPos.lng, f.lat, f.lon);
-
+    const lat1 = Array.isArray(userPos) ? userPos[0] : userPos.lat;
+const lon1 = Array.isArray(userPos) ? userPos[1] : userPos.lng;
+const distanciaKm = calcularDistancia(lat1, lon1, f.lat, f.lon);
     // Estimaciones de tiempo
     const velCoche = 60; // km/h
     const velPie = 5;    // km/h
