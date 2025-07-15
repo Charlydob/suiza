@@ -27,44 +27,7 @@ const markersPorTipo = {
   favoritos: []
 };
 // 🖼️ Iconos personalizados por tipo de lugar (para mostrar en el mapa)
-const iconos = {
-  camping: L.icon({
-    iconUrl: 'Recursos/img/campingmapa.png', iconSize: [32, 32], iconAnchor: [14, 28], popupAnchor: [0, -30]
-  }),
-  fuel: L.icon({
-    iconUrl: 'Recursos/img/gasolineramapa.png', iconSize: [32, 32], iconAnchor: [14, 28], popupAnchor: [0, -30]
-  }),
-  parking: L.icon({
-    iconUrl: 'Recursos/img/parkingmapa.png', iconSize: [32, 32], iconAnchor: [14, 28], popupAnchor: [0, -30]
-  }),
-  hotel: L.icon({
-    iconUrl: 'Recursos/img/hotelmapa.png', iconSize: [32, 32], iconAnchor: [14, 28], popupAnchor: [0, -30]
-  }),
-  airbnb: L.icon({
-    iconUrl: 'Recursos/img/airbnbmapa.png', iconSize: [32, 32], iconAnchor: [14, 28], popupAnchor: [0, -30]
-  }),
-  luggage: L.icon({
-    iconUrl: 'Recursos/img/maletamapa.png', iconSize: [32, 32], iconAnchor: [14, 28], popupAnchor: [0, -30]
-  }),
-  // En iconos:
-  airport: L.icon({
-    iconUrl: 'Recursos/img/aeropuertomapa.png', iconSize: [32, 32], iconAnchor: [14, 28], popupAnchor: [0, -30]
-  }),
-  tourism: L.icon({
-    iconUrl: 'Recursos/img/turismomapa.png', iconSize: [32, 32], iconAnchor: [14, 28], popupAnchor: [0, -30]
-  }),
-  restaurant: L.icon({
-    iconUrl: 'Recursos/img/restaurantemapa.png', iconSize: [32, 32], iconAnchor: [14, 28], popupAnchor: [0, -30]
-  }),
-  cafe: L.icon({
-    iconUrl: 'Recursos/img/cafeteriamapa.png', iconSize: [32, 32], iconAnchor: [14, 28], popupAnchor: [0, -30]
-  }),
-  hospital: L.icon({
-    iconUrl: 'Recursos/img/hospitalmapa.png', iconSize: [32, 32], iconAnchor: [14, 28], popupAnchor: [0, -30]
-  }),
-  
 
-};
 // 🧭 Icono de la ubicación del usuario
 const iconoUbicacion = L.icon({
   iconUrl: 'Recursos/img/yo.png', iconSize: [32, 32], iconAnchor: [14, 28], popupAnchor: [0, -30]
@@ -112,55 +75,68 @@ function guardarListas() {
 //✅================= VARIABLES GLOBALES 👆 ================= //
 //✅======== INICIALIZACIÓN DEL MAPA Y MARCADOR DEL USUARIO 👇 ======== //
 // 🚀 Inicializa el mapa con la ubicación dada
-function initMap(lat, lon) {
-  map = L.map("map").setView([lat, lon], 14);
-  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-    attribution: "© OpenStreetMap"
-  }).addTo(map);
-  botonUbicacion.addTo(map);
+function initMap(lat = 40.4168, lon = -3.7038) {
+  currentCoords = { lat, lng: lon };
 
-  currentCoords = [lat, lon];
-
-  userMarker = L.marker(currentCoords, {
-    icon: iconoUbicacion,
-    draggable: true
-  }).addTo(map)
-    .bindPopup("📍 Aquí estás tú, piloto 🚌💨")
-    .openPopup();
-
-  crearCirculo();
-
-  userMarker.on("dragend", () => {
-    const pos = userMarker.getLatLng();
-    currentCoords = [pos.lat, pos.lng];
-    actualizarCirculo();
-    actualizarBusquedaActiva();
-    
+  map = new google.maps.Map(document.getElementById("map"), {
+    center: currentCoords,
+    zoom: 14,
+    mapTypeControl: false,
+    fullscreenControl: false,
+    streetViewControl: false,
   });
 
+  userMarker = new google.maps.Marker({
+    position: currentCoords,
+    map,
+    draggable: true,
+    icon: "Recursos/img/yo.png",
+    title: "📍 Aquí estás tú, piloto 🚌💨"
+  });
 
+  userMarker.addListener("dragend", (e) => {
+    currentCoords = {
+      lat: e.latLng.lat(),
+      lng: e.latLng.lng()
+    };
+    actualizarBusquedaActiva();
+    actualizarCirculo();
+  });
+
+  crearCirculo();
   document.getElementById("status").innerText = "Ubicación cargada";
 }
+
 //✅======== INICIALIZACIÓN DEL MAPA Y MARCADOR DEL USUARIO 👆 ======== //
 
 //✅======== GESTIÓN DEL CÍRCULO DE BÚSQUEDA 👇 ======== //
 // 🔵 Crea el círculo de búsqueda alrededor del usuario
 function crearCirculo() {
   const radius = parseInt(document.getElementById("radiusSlider").value);
-  if (searchCircle) map.removeLayer(searchCircle);
-  searchCircle = L.circle(currentCoords, {
-    radius,
-    color: "blue",
+
+  if (searchCircle) searchCircle.setMap(null);
+
+  searchCircle = new google.maps.Circle({
+    strokeColor: "#0000ff",
+    strokeOpacity: 0.5,
+    strokeWeight: 1,
     fillColor: "#5fa",
-    fillOpacity: 0.2
-  }).addTo(map);
+    fillOpacity: 0.2,
+    map,
+    center: currentCoords,
+    radius: radius,
+  });
 }
+
 // 🔁 Actualiza el círculo cuando cambia la ubicación o el radio
 function actualizarCirculo() {
   const radius = parseInt(document.getElementById("radiusSlider").value);
-  searchCircle.setLatLng(currentCoords);
-  searchCircle.setRadius(radius);
+  if (searchCircle) {
+    searchCircle.setCenter(currentCoords);
+    searchCircle.setRadius(radius);
+  }
 }
+
 //✅======== GESTIÓN DEL CÍRCULO DE BÚSQUEDA  👆 ======== // 
 // ❌======== ACTUALIZACIÓN EN TIEMPO REAL Y OBTENCIÓN DE UBICACIÓN 👇 ======== //
 
@@ -183,44 +159,42 @@ function actualizarUbicacionReal() {
   navigator.geolocation.getCurrentPosition(
     (pos) => {
       const lat = pos.coords.latitude;
-      const lon = pos.coords.longitude;
+      const lng = pos.coords.longitude;
 
-        // 🔧 Normaliza y guarda
-        ubicacionReal = { lat, lng: lon };
+      ubicacionReal = { lat, lng };
+      currentCoords = { lat, lng };
 
-      currentCoords = [lat, lon];
-
-      // Crea o actualiza el marcador de la ubicación real
       if (!marcadorUbicacionReal) {
-        marcadorUbicacionReal = L.marker([lat, lon], {
-          icon: L.divIcon({
-            className: "marcador-real",
-            html: "🔵",
-            iconSize: [20, 20],
-            iconAnchor: [10, 10]
-          })
-        }).addTo(map);
+        marcadorUbicacionReal = new google.maps.Marker({
+          position: currentCoords,
+          map,
+          icon: {
+            path: google.maps.SymbolPath.CIRCLE,
+            scale: 8,
+            fillColor: "#00f",
+            fillOpacity: 1,
+            strokeWeight: 1,
+          }
+        });
       } else {
-        marcadorUbicacionReal.setLatLng([lat, lon]);
+        marcadorUbicacionReal.setPosition(currentCoords);
       }
 
-      map.setView([lat, lon], 16);
-
+      map.setCenter(currentCoords);
       actualizarCirculo();
       actualizarBusquedaActiva();
       renderizarFavoritos();
 
       document.getElementById("status").innerText = "";
     },
-
     (err) => {
       console.error(err);
       document.getElementById("status").innerText = "No se pudo obtener la ubicación";
     },
-
     { enableHighAccuracy: true }
   );
 }
+
 
 // 🔘 Botón en la esquina superior derecha para obtener la ubicación GPS real
 const botonUbicacion = L.control({ position: 'topright' });
@@ -431,8 +405,8 @@ async function buscar(tipo) {
 
       const lat1 = Array.isArray(userPos) ? userPos[0] : userPos.lat;
       const lon1 = Array.isArray(userPos) ? userPos[1] : userPos.lng;
-      const distanciaKm = calcularDistancia(lat1, lon1, coords[0], coords[1]);
-
+      
+      const distanciaKm = calcularDistancia(lat1, lon1, coords.lat, coords.lng);
       const tiempoCocheMin = Math.round((distanciaKm / 60) * 60);
       const tiempoPieMin = Math.round((distanciaKm / 5) * 60);
 
@@ -465,8 +439,23 @@ async function buscar(tipo) {
         </div>
       `;
 
-      const marker = L.marker(coords, { icon: iconos[tipo] }).addTo(map).bindPopup(popupHTML);
-      markersPorTipo[tipo].push(marker);
+    const marker = new google.maps.Marker({
+  position: { lat: coords[0], lng: coords[1] },
+  map,
+  icon: `Recursos/img/${tipo}mapa.png`, // usa las mismas imágenes
+  title: name
+});
+
+const infowindow = new google.maps.InfoWindow({
+  content: popupHTML
+});
+
+marker.addListener("click", () => {
+  infowindow.open(map, marker);
+});
+
+markersPorTipo[tipo].push(marker);
+
     });
 
     document.getElementById("status").innerText = `Mostrando ${data.elements.length} resultados para ${tipo}`;
@@ -541,7 +530,7 @@ function buscarLugar() {
       }
       const lat = parseFloat(data[0].lat);
       const lon = parseFloat(data[0].lon);
-      currentCoords = [lat, lon];
+      currentCoords = { lat, lng: lon };
       userMarker.setLatLng(currentCoords);
       map.setView(currentCoords, 14);
       actualizarCirculo();
@@ -737,7 +726,10 @@ function mostrarMarcadoresFavoritos() {
 favoritos.forEach(f => {
   const nombre = f.datosPersonalizados?.nombre || f.id;
   const tipo = f.tipo;
-  const coords = [f.lat, f.lon];
+  const coords = {
+    lat: e.type === "node" ? e.lat : e.center.lat,
+    lng: e.type === "node" ? e.lon : e.center.lon
+  };
   const idUnico = f.id;
 
   const userPos = ubicacionReal || currentCoords;

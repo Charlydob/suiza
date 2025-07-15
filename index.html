@@ -6,11 +6,14 @@
   <title>Mi Ruta en Caravana</title>
   <link rel="stylesheet" href="Styles/styles.css" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <!--<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />-->
   <link rel="apple-touch-icon" href="Recursos/icono.png" />
 </head>
 
 <!--SIDEBAR-->
+<script async
+  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA8KhfGc61uBT3DHS1hiCEl7HgnFYaWySI&callback=initMap&libraries=places"
+  defer></script>
 
 <body>
 <div id="sidebar">
@@ -139,8 +142,10 @@
 <!-- para pruebas de estetica en lan
   <div id="map"><img src="Recursos/img/fondoprueba.jpg"></div>
 -->
-  <!-- 1. Leaflet -->
+ <!-- <!-- 1. Leaflet 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+-->
+
 
 <!-- 2. Firebase SDKs -->
 <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
