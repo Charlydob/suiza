@@ -24,7 +24,7 @@ const markersPorTipo = {
   restaurant: [],
   cafe: [],
   hospital: [],
-
+  favoritos: []
 };
 // 🖼️ Iconos personalizados por tipo de lugar (para mostrar en el mapa)
 const iconos = {
@@ -81,7 +81,8 @@ const tipoActivo = {
   tourism: false,
   restaurant: false,
   cafe: false,
-  hospital: false
+  hospital: false,
+  favoritos: false
 };
 // ⭐ Favoritos y 🛇 Ignorados guardados en localStorage
 // 🟡 Estructura: { id, tipo, lat, lon, datosPersonalizados: {nombre, precio, horario, notas} }
@@ -421,15 +422,28 @@ function toggleTipo(tipo) {
   if (tipoActivo[tipo]) {
     boton.classList.add("activo");
     boton.classList.remove("inactivo");
-    buscar(tipo);
+
+    if (tipo === "favoritos") {
+      mostrarMarcadoresFavoritos();
+    } else {
+      buscar(tipo);
+    }
   } else {
     boton.classList.remove("activo");
     boton.classList.add("inactivo");
-    markersPorTipo[tipo].forEach(m => map.removeLayer(m));
-    markersPorTipo[tipo] = [];
+
+    if (tipo === "favoritos") {
+      marcadoresFavoritos.forEach(m => map.removeLayer(m));
+      marcadoresFavoritos = [];
+    } else {
+      markersPorTipo[tipo].forEach(m => map.removeLayer(m));
+      markersPorTipo[tipo] = [];
+    }
+
     document.getElementById("status").innerText = `Ocultando ${tipo}`;
   }
 }
+
 //✅======== INTERFAZ: BOTONES DE FILTRADO 👆 ======== // 
 //✅======== LIMPIEZA DEL MAPA 👇 ======== //
 // 🧼 Limpia todos los marcadores y resetea el estado
