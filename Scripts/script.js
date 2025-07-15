@@ -220,6 +220,18 @@ botonUbicacion.onAdd = function () {
 };
 
 //❌======== ACTUALIZACIÓN EN TIEMPO REAL Y OBTENCIÓN DE UBICACIÓN 👆 ======== //
+//❌======== CALCULAR DISTANCIAS 👇 ======== //
+function calcularDistancia(lat1, lon1, lat2, lon2) {
+  const R = 6371; // km
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+            Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+}
+//❌======== CALCULAR DISTANCIAS 👆 ======== //
 //✅======== CONSULTA A OVERPASS API (OpenStreetMap) 👇 ======== //
 // 🔎 Busca lugares de un tipo concreto cerca del usuario usando Overpass API
 function buscar(tipo) {
@@ -371,8 +383,8 @@ function buscar(tipo) {
     <b>${name}</b><br>
     Distancia: ${distanciaKm.toFixed(1)} km<br>
     ${tiempoCoche} | ${tiempoPie}<br>
-    <a href='${mapsLink}' target='_blank'>🧭 Cómo llegar</a><br>
-    <a href='${searchLink}' target='_blank'>🔎 Buscar en Maps</a><br>
+    <a href='${mapsLink}' target='_blank' style="text-decoration: none">🧭 Cómo llegar</a><br>
+    <a href='${searchLink}' target='_blank' style="text-decoration: none">🔎 Buscar en Maps</a><br>
     <button onclick="toggleFavorito('${idUnico}', '${tipo}', [${coords}], '${name.replace(/'/g, "\\'")}', this)">
       ${yaEsFavorito ? "⭐" : "☆"} Favorito
     </button>
@@ -456,18 +468,6 @@ function buscarLugar() {
     });
 }
 //✅======== BUSCAR UN LUGAR POR NOMBRE (input de texto) 👆 ======== // 
-//❌======== CALCULAR DISTANCIAS 👇 ======== //
-function calcularDistancia(lat1, lon1, lat2, lon2) {
-  const R = 6371; // km
-  const dLat = (lat2 - lat1) * Math.PI / 180;
-  const dLon = (lon2 - lon1) * Math.PI / 180;
-  const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-            Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-            Math.sin(dLon / 2) * Math.sin(dLon / 2);
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  return R * c;
-}
-//❌======== CALCULAR DISTANCIAS 👆 ======== //
 //❌======== GESTIÓN DE FAVORITOS 👇 ======== //
 // RENDERIZA FAVORITOS EN MAPA
       function renderizarFavoritos() {
@@ -518,7 +518,7 @@ function calcularDistancia(lat1, lon1, lat2, lon2) {
               <strong>${nombre}</strong><br>
               Distancia: ${distanciaKm.toFixed(1)} km<br>
               ${tiempoCoche} | ${tiempoPie}<br>
-              <a href="https://www.google.com/maps/dir/?api=1&destination=${f.lat},${f.lon}&travelmode=driving" target="_blank">🧭 Cómo llegar</a>
+              <a href="https://www.google.com/maps/dir/?api=1&destination=${f.lat},${f.lon}&travelmode=driving" target="_blank" style="text-decoration: none">🧭 Cómo llegar</a>
             `;
 
 
@@ -644,7 +644,7 @@ function mostrarMarcadoresFavoritos() {
       <b>${nombre}</b><br>
       Distancia: ${distanciaKm.toFixed(1)} km<br>
       ${tiempoCoche} | ${tiempoPie}<br>
-      <a href="https://www.google.com/maps/dir/?api=1&destination=${f.lat},${f.lon}&travelmode=driving" target="_blank">🧭 Cómo llegar</a><br>
+      <a href="https://www.google.com/maps/dir/?api=1&destination=${f.lat},${f.lon}&travelmode=driving" target="_blank"style="text-decoration: none" >🧭 Cómo llegar</a><br>
       ${f.datosPersonalizados?.precio ? `<span>💰 ${f.datosPersonalizados.precio}</span><br>` : ""}
       ${f.datosPersonalizados?.horario ? `<span>🕒 ${f.datosPersonalizados.horario}</span><br>` : ""}
       ${f.datosPersonalizados?.notas ? `<small>📝 ${f.datosPersonalizados.notas}</small>` : ""}
