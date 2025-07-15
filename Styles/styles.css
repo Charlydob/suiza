@@ -114,7 +114,8 @@ html, body {
   height: 100%;
   width: 280px;
   background: transparent;
-  background-blend-mode: exclusion;
+  backdrop-filter: blur(5px); 
+  border-right: 2px solid rgba(0, 0, 0, 0.1);
   padding: 20px;
   box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
   transform: translateX(-100%);
