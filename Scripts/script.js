@@ -555,75 +555,82 @@ function buscarLugar() {
 //✅======== BUSCAR UN LUGAR POR NOMBRE (input de texto) 👆 ======== // 
 //❌======== GESTIÓN DE FAVORITOS 👇 ======== //
 // RENDERIZA FAVORITOS EN MAPA
-      function renderizarFavoritos() {
-        const listaDiv = document.getElementById("listaFavoritos");
-        const contenedor = document.getElementById("contenedorFavoritos");
+function renderizarFavoritos() {
+  const listaDiv = document.getElementById("listaFavoritos");
+  const contenedor = document.getElementById("contenedorFavoritos");
+  const filtroTexto = document.getElementById("buscadorFavoritos")?.value.toLowerCase() || "";
+  const filtroTipo = document.getElementById("filtroTipoFavoritos")?.value || "";
+  const orden = document.getElementById("ordenFavoritos")?.value || "distanciaAsc";
 
+  contenedor.innerHTML = "";
 
-        contenedor.innerHTML = ""; // Limpia antes de renderizar
+  if (favoritos.length === 0) {
+    listaDiv.style.display = "none";
+    return;
+  }
 
-        if (favoritos.length === 0) {
-          listaDiv.style.display = "none";
-          return;
-        }
+  listaDiv.style.display = "block";
 
-        listaDiv.style.display = "block";
+  const userPos = ubicacionReal || currentCoords;
+  const lat1 = Array.isArray(userPos) ? userPos[0] : userPos.lat;
+  const lon1 = Array.isArray(userPos) ? userPos[1] : userPos.lng;
 
-        favoritos.forEach(f => {
-          const div = document.createElement("div");
-          div.className = "favorito-item";
-          div.style.marginBottom = "10px";
-          div.style.borderBottom = "1px solid #ccc";
-          div.style.paddingBottom = "5px";
-          div.style.cursor = "pointer";
+  // 🧠 Procesar favoritos con filtro, distancia y orden
+  let favoritosFiltrados = favoritos
+    .map(f => {
+      const distanciaKm = calcularDistancia(lat1, lon1, f.lat, f.lon);
+      return { ...f, distanciaKm };
+    })
+    .filter(f => {
+      const texto = `${f.datosPersonalizados?.nombre || ""} ${f.datosPersonalizados?.notas || ""}`.toLowerCase();
+      const coincideTexto = texto.includes(filtroTexto);
+      const coincideTipo = filtroTipo === "" || f.tipo === filtroTipo;
+      return coincideTexto && coincideTipo;
+    });
 
-          // Distancia y duración con API de rutas (simple con Haversine como placeholder)
-              const userPos = ubicacionReal || currentCoords;
+  if (orden === "distanciaAsc") {
+    favoritosFiltrados.sort((a, b) => a.distanciaKm - b.distanciaKm);
+  } else if (orden === "distanciaDesc") {
+    favoritosFiltrados.sort((a, b) => b.distanciaKm - a.distanciaKm);
+  }
 
-              const lat1 = Array.isArray(userPos) ? userPos[0] : userPos.lat;
-const lon1 = Array.isArray(userPos) ? userPos[1] : userPos.lng;
-const distanciaKm = calcularDistancia(lat1, lon1, f.lat, f.lon);
-              // Velocidades estimadas
-              const velCoche = 60; // km/h
-              const velPie = 5;    // km/h
+  favoritosFiltrados.forEach(f => {
+    const div = document.createElement("div");
+    div.className = "favorito-item";
+    div.style.marginBottom = "10px";
+    div.style.borderBottom = "1px solid #ccc";
+    div.style.paddingBottom = "5px";
+    div.style.cursor = "pointer";
 
-              const tiempoCocheMin = Math.round((distanciaKm / velCoche) * 60);
-              const tiempoPieMin = Math.round((distanciaKm / velPie) * 60);
+    const tiempoCocheMin = Math.round((f.distanciaKm / 60) * 60);
+    const tiempoPieMin = Math.round((f.distanciaKm / 5) * 60);
 
-              const tiempoCoche = tiempoCocheMin >= 60
-                ? `${(tiempoCocheMin / 60).toFixed(1)} h en coche`
-                : `${tiempoCocheMin} min en coche`;
+    const tiempoCoche = tiempoCocheMin >= 60
+      ? `${(tiempoCocheMin / 60).toFixed(1)} h en coche`
+      : `${tiempoCocheMin} min en coche`;
 
-              const tiempoPie = tiempoPieMin >= 60
-                ? `${(tiempoPieMin / 60).toFixed(1)} h a pie`
-                : `${tiempoPieMin} min a pie`;
-              const nombre = f.datosPersonalizados?.nombre || f.id;
+    const tiempoPie = tiempoPieMin >= 60
+      ? `${(tiempoPieMin / 60).toFixed(1)} h a pie`
+      : `${tiempoPieMin} min a pie`;
 
+    const nombre = f.datosPersonalizados?.nombre || f.id;
 
+    div.innerHTML = `
+      <strong>${nombre}</strong><br>
+      Distancia: ${f.distanciaKm.toFixed(1)} km<br>
+      ${tiempoCoche} | ${tiempoPie}<br>
+      <button onclick="window.open('https://www.google.com/maps/dir/?api=1&destination=${f.lat},${f.lon}&travelmode=driving', '_blank')">🧭 Cómo llegar</button>
+    `;
 
-          div.innerHTML = `
-              <strong>${nombre}</strong><br>
-              Distancia: ${distanciaKm.toFixed(1)} km<br>
-              ${tiempoCoche} | ${tiempoPie}<br>
-              <button onclick="window.open('https://www.google.com/maps/dir/?api=1&destination=${f.lat},${f.lon}&travelmode=driving', '_blank')">
-  🧭 Cómo llegar
-</button>
-
-            `;
-
-
-          // Al hacer clic, abre el editor y centra el mapa
-          div.onclick = () => {
-            setTimeout(() => {
-            map.setView([f.lat, f.lon], 16);
-          }, 100);
-
+    div.onclick = () => {
+      setTimeout(() => map.setView([f.lat, f.lon], 16), 100);
       mostrarEditorFavorito(f.id);
-          };
+    };
 
-          contenedor.appendChild(div);
-        });
-      }
+    contenedor.appendChild(div);
+  });
+}
+
 
 // ⭐ Alterna entre marcar o desmarcar un lugar como favorito
 function toggleFavorito(id, tipo, coords, name, btn) {
@@ -770,8 +777,10 @@ favoritos.forEach(f => {
 
     <div class="grupo-botones-abajo">
       <button onclick="editarFavoritoDesdeMapa('${idUnico}')">✏️ Editar favorito</button>
+      <button onclick="establecerCentroDesdeFavorito(${f.lat}, ${f.lon})">📌 Establecer como centro</button>
       <button onclick="toggleFavorito('${idUnico}', '${tipo}', [${coords}], '${nombre.replace(/'/g, "\\'")}', this)">🗑️ Eliminar</button>
     </div>
+
   </div>
 `;
 
@@ -837,6 +846,19 @@ function getLocation() {
     { enableHighAccuracy: true }
   );
 }
+function establecerCentroDesdeFavorito(lat, lon) {
+  const nuevaPosicion = [lat, lon];
+
+  // Mueve el marcador del usuario
+  if (userMarker) {
+    userMarker.setLatLng(nuevaPosicion);
+    currentCoords = nuevaPosicion;
+    map.setView(nuevaPosicion, 16); // Opcional: centra el mapa
+    actualizarCirculo();
+    actualizarBusquedaActiva();
+  }
+}
+
 
 //✅======== EVENTOS DE CARGA Y MANEJO DE SIDEBAR 👇 ======== //
 // 📲 Manejo de eventos una vez el DOM esté cargado
@@ -871,8 +893,30 @@ document.addEventListener("DOMContentLoaded", () => {
     e.stopPropagation();
   });
 
-  getLocation();
+  // 🔄 Listeners para filtros de favoritos
+document.getElementById("buscadorFavoritos").addEventListener("input", (e) => {
+  localStorage.setItem("filtroTextoFavoritos", e.target.value);
   renderizarFavoritos();
-
 });
+
+document.getElementById("filtroTipoFavoritos").addEventListener("change", (e) => {
+  localStorage.setItem("filtroTipoFavoritos", e.target.value);
+  renderizarFavoritos();
+});
+
+document.getElementById("ordenFavoritos").addEventListener("change", (e) => {
+  localStorage.setItem("ordenFavoritos", e.target.value);
+  renderizarFavoritos();
+});
+
+
+  getLocation();
+  // 🧠 Recuperar filtros guardados
+document.getElementById("buscadorFavoritos").value = localStorage.getItem("filtroTextoFavoritos") || "";
+document.getElementById("filtroTipoFavoritos").value = localStorage.getItem("filtroTipoFavoritos") || "";
+document.getElementById("ordenFavoritos").value = localStorage.getItem("ordenFavoritos") || "distanciaAsc";
+
+  renderizarFavoritos();
+});
+
 //✅======== EVENTOS DE CARGA Y MANEJO DE SIDEBAR 👆 ======== // 
