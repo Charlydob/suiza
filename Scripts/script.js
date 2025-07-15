@@ -646,16 +646,37 @@ function guardarEdicionFavorito() {
   renderizarFavoritos();
   mostrarMarcadoresFavoritos();
   cerrarEditorFavorito();
+
+  // 🔄 Guardar cambios también en Firebase si hay conexión
+  if (navigator.onLine && typeof db !== "undefined") {
+    const ref = db.ref(`${rutaFavoritos}/${favorito.id}`);
+    ref.set(favorito)
+      .then(() => console.log("✅ Favorito actualizado en Firebase"))
+      .catch(err => console.error("Error actualizando en Firebase:", err));
+  }
 }
+
 function borrarFavorito() {
   const index = favoritos.findIndex(f => f.id === favoritoEditandoId);
   if (index !== -1) {
+    const id = favoritos[index].id;
+
+    // 1. Eliminar de local
     favoritos.splice(index, 1);
     guardarListas();
     renderizarFavoritos();
     mostrarMarcadoresFavoritos();
     cerrarEditorFavorito();
+
+    // 2. Eliminar de Firebase si hay conexión
+    if (navigator.onLine && typeof db !== "undefined") {
+      const ref = db.ref(`${rutaFavoritos}/${id}`);
+      ref.remove()
+        .then(() => console.log("🗑️ Favorito eliminado de Firebase"))
+        .catch(err => console.error("Error eliminando de Firebase:", err));
+    }
   }
+
 }
 
 function cerrarEditorFavorito() {
