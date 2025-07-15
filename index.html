@@ -9,6 +9,9 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <link rel="apple-touch-icon" href="Recursos/icono.png" />
 </head>
+
+<!--SIDEBAR-->
+
 <body>
 <div id="sidebar">
   
@@ -74,6 +77,27 @@
 
   <button onclick="clearAll()" class="clear-button">🧹 Limpiar</button>
   <div id="status">Esperando ubicación...</div>
+  <!-- ⭐ Lista de Favoritos en el Sidebar -->
+<div id="listaFavoritos" style="margin-top: 20px; display: none;">
+  <h3>⭐ Favoritos</h3>
+  <div id="contenedorFavoritos"></div>
+</div>
+
+<!-- 📝 Editor de Favorito -->
+<div id="editorFavorito" style="display: none; padding: 10px;">
+  <h3>Editar lugar</h3>
+  <label>Nombre personalizado:</label>
+  <input type="text" id="editNombre"><br><br>
+  <label>Precio:</label>
+  <input type="text" id="editPrecio"><br><br>
+  <label>Horario:</label>
+  <input type="text" id="editHorario"><br><br>
+  <label>Observaciones:</label>
+  <textarea id="editNotas" rows="3"></textarea><br><br>
+  <button onclick="guardarEdicionFavorito()">💾 Guardar</button>
+  <button onclick="cerrarEditorFavorito()">❌ Cancelar</button>
+</div>
+
 </div>
 
   <button id="toggleMenu">›</button>

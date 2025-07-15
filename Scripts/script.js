@@ -1,4 +1,4 @@
-//================= VARIABLES GLOBALES 👇 ================= //
+//✅================= VARIABLES GLOBALES 👇 ================= //
 // 🌍 Variables principales del mapa
 let map;
 let userMarker;
@@ -76,8 +76,17 @@ const tipoActivo = {
   cafe: false,
   hospital: false
 };
-//================= VARIABLES GLOBALES 👆 ================= //✅
-//======== INICIALIZACIÓN DEL MAPA Y MARCADOR DEL USUARIO 👇 ======== //
+// ⭐ Favoritos y 🛇 Ignorados guardados en localStorage
+// 🟡 Estructura: { id, tipo, lat, lon, datosPersonalizados: {nombre, precio, horario, notas} }
+let favoritos = JSON.parse(localStorage.getItem("favoritos")) || [];
+const ignorados = JSON.parse(localStorage.getItem("ignorados")) || [];
+
+function guardarListas() {
+  localStorage.setItem("favoritos", JSON.stringify(favoritos));
+  localStorage.setItem("ignorados", JSON.stringify(ignorados));
+}
+//✅================= VARIABLES GLOBALES 👆 ================= //
+//✅======== INICIALIZACIÓN DEL MAPA Y MARCADOR DEL USUARIO 👇 ======== //
 // 🚀 Inicializa el mapa con la ubicación dada
 function initMap(lat, lon) {
   map = L.map("map").setView([lat, lon], 14);
@@ -105,9 +114,9 @@ function initMap(lat, lon) {
 
   document.getElementById("status").innerText = "Ubicación cargada";
 }
-//======== INICIALIZACIÓN DEL MAPA Y MARCADOR DEL USUARIO 👆 ======== //✅
+//✅======== INICIALIZACIÓN DEL MAPA Y MARCADOR DEL USUARIO 👆 ======== //
 
-//======== GESTIÓN DEL CÍRCULO DE BÚSQUEDA 👇 ======== //
+//✅======== GESTIÓN DEL CÍRCULO DE BÚSQUEDA 👇 ======== //
 // 🔵 Crea el círculo de búsqueda alrededor del usuario
 function crearCirculo() {
   const radius = parseInt(document.getElementById("radiusSlider").value);
@@ -125,8 +134,14 @@ function actualizarCirculo() {
   searchCircle.setLatLng(currentCoords);
   searchCircle.setRadius(radius);
 }
-//======== GESTIÓN DEL CÍRCULO DE BÚSQUEDA  👆 ======== // ✅
-//======== ACTUALIZACIÓN EN TIEMPO REAL Y OBTENCIÓN DE UBICACIÓN 👇 ======== //
+//✅======== GESTIÓN DEL CÍRCULO DE BÚSQUEDA  👆 ======== // 
+//❌======== ACTUALIZACIÓN EN TIEMPO REAL Y OBTENCIÓN DE UBICACIÓN 👇 ======== //
+// 🔁 Re-busca automáticamente lugares activos si cambia la ubicación
+function actualizarBusquedaActiva() {
+  Object.keys(tipoActivo).forEach(tipo => {
+    if (tipoActivo[tipo]) buscar(tipo);
+  });
+}
 // 📍 Usa la geolocalización del navegador para obtener la ubicación actual
 function getLocation() {
   if (!navigator.geolocation) {
@@ -157,14 +172,9 @@ function getLocation() {
     { enableHighAccuracy: true, maximumAge: 1000 }
   );
 }
-// 🔁 Re-busca automáticamente lugares activos si cambia la ubicación
-function actualizarBusquedaActiva() {
-  Object.keys(tipoActivo).forEach(tipo => {
-    if (tipoActivo[tipo]) buscar(tipo);
-  });
-}
-//======== ACTUALIZACIÓN EN TIEMPO REAL Y OBTENCIÓN DE UBICACIÓN 👆 ======== //
-//======== CONSULTA A OVERPASS API (OpenStreetMap) 👇 ======== //✅
+
+//❌======== ACTUALIZACIÓN EN TIEMPO REAL Y OBTENCIÓN DE UBICACIÓN 👆 ======== //
+//✅======== CONSULTA A OVERPASS API (OpenStreetMap) 👇 ======== //
 // 🔎 Busca lugares de un tipo concreto cerca del usuario usando Overpass API
 function buscar(tipo) {
   if (!currentCoords) return;
@@ -286,21 +296,32 @@ function buscar(tipo) {
       }
 
       data.elements.forEach(e => {
-        const coords = e.type === "node" ? [e.lat, e.lon] : [e.center.lat, e.center.lon];
-        const name = e.tags.name || tipo;
+  const coords = e.type === "node" ? [e.lat, e.lon] : [e.center.lat, e.center.lon];
+  const name = e.tags.name || tipo;
+  const idUnico = `${tipo}_${coords[0].toFixed(5)}_${coords[1].toFixed(5)}`;
 
-        const mapsLink = `https://www.google.com/maps/dir/?api=1&destination=${coords[0]},${coords[1]}&travelmode=driving&dir_action=navigate&avoid=tolls`;
-        const searchLink = `https://www.google.com/maps/search/${tipo}/@${coords[0]},${coords[1]},14z`;
+  if (ignorados.includes(idUnico)) return; // 👈 Saltar si está en ignorados
 
-        const popupHTML = `
-          <b>${name}</b><br>
-          <a href='${mapsLink}' target='_blank'>🧭 Cómo llegar</a><br>
-          <a href='${searchLink}' target='_blank'>🔎 Buscar en Maps</a>
-        `;
+  const mapsLink = `https://www.google.com/maps/dir/?api=1&destination=${coords[0]},${coords[1]}&travelmode=driving&dir_action=navigate&avoid=tolls`;
+  const searchLink = `https://www.google.com/maps/search/${tipo}/@${coords[0]},${coords[1]},14z`;
 
-        const marker = L.marker(coords, { icon: iconos[tipo] }).addTo(map).bindPopup(popupHTML);
-        markersPorTipo[tipo].push(marker);
-      });
+  const yaEsFavorito = favoritos.includes(idUnico);
+  const estrella = yaEsFavorito ? "⭐" : "☆";
+
+  const popupHTML = `
+  <b>${name}</b><br>
+  <a href='${mapsLink}' target='_blank'>🧭 Cómo llegar</a><br>
+  <a href='${searchLink}' target='_blank'>🔎 Buscar en Maps</a><br>
+  <button onclick="toggleFavorito('${idUnico}', '${tipo}', [${coords}], '${name.replace(/'/g, "\\'")}', this)">
+    ${yaEsFavorito ? "⭐" : "☆"} Favorito
+  </button>
+  <button onclick="ignorarLugar('${idUnico}')">🗑️ Ignorar</button>
+`;
+
+  const marker = L.marker(coords, { icon: iconos[tipo] }).addTo(map).bindPopup(popupHTML);
+  markersPorTipo[tipo].push(marker);
+});
+
 
       document.getElementById("status").innerText = `Mostrando ${data.elements.length} resultados para ${tipo}`;
     })
@@ -310,7 +331,7 @@ function buscar(tipo) {
       document.getElementById("status").innerText = "Error de búsqueda";
     });
 }
-//======== CONSULTA A OVERPASS API (OpenStreetMap) 👆 ======== //✅
+//✅======== CONSULTA A OVERPASS API (OpenStreetMap) 👆 ======== //
 //======== INTERFAZ: BOTONES DE FILTRADO 👇 ======== //
 // 🎚️ Activa o desactiva un tipo de lugar (botones de filtros)
 function toggleTipo(tipo) {
@@ -329,8 +350,8 @@ function toggleTipo(tipo) {
     document.getElementById("status").innerText = `Ocultando ${tipo}`;
   }
 }
-//======== INTERFAZ: BOTONES DE FILTRADO 👆 ======== //✅
-//======== LIMPIEZA DEL MAPA 👇 ======== //
+//✅======== INTERFAZ: BOTONES DE FILTRADO 👆 ======== // 
+//✅======== LIMPIEZA DEL MAPA 👇 ======== //
 // 🧼 Limpia todos los marcadores y resetea el estado
 function clearAll() {
   Object.keys(markersPorTipo).forEach(tipo => {
@@ -345,8 +366,8 @@ function clearAll() {
   });
   document.getElementById("status").innerText = "Mapa limpio";
 }
-//======== LIMPIEZA DEL MAPA  👆 ======== //✅
-//======== BUSCAR UN LUGAR POR NOMBRE (input de texto) 👇 ======== //
+//✅======== LIMPIEZA DEL MAPA  👆 ======== // 
+//✅======== BUSCAR UN LUGAR POR NOMBRE (input de texto) 👇 ======== //
 // 🧭 Busca una ciudad o dirección por nombre (con Nominatim)
 function buscarLugar() {
   const lugar = document.getElementById("locationSearch").value;
@@ -372,8 +393,143 @@ function buscarLugar() {
       alert("Error al buscar el lugar");
     });
 }
-//======== BUSCAR UN LUGAR POR NOMBRE (input de texto) 👆 ======== //✅
-//======== EVENTOS DE CARGA Y MANEJO DE SIDEBAR 👇 ======== //
+//✅======== BUSCAR UN LUGAR POR NOMBRE (input de texto) 👆 ======== // 
+//❌======== CALCULAR DISTANCIAS 👇 ======== //
+function calcularDistancia(lat1, lon1, lat2, lon2) {
+  const R = 6371; // km
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+            Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+}
+//❌======== CALCULAR DISTANCIAS 👆 ======== //
+//❌======== GESTIÓN DE FAVORITOS 👇 ======== //
+// RENDERIZA FAVORITOS EN MAPA
+function renderizarFavoritos() {
+  const contenedor = document.getElementById("contenedorFavoritos");
+  const listaDiv = document.getElementById("listaFavoritos");
+
+  contenedor.innerHTML = ""; // Limpia antes de renderizar
+
+  if (favoritos.length === 0) {
+    listaDiv.style.display = "none";
+    return;
+  }
+
+  listaDiv.style.display = "block";
+
+  favoritos.forEach(f => {
+    const div = document.createElement("div");
+    div.className = "favorito-item";
+    div.style.marginBottom = "10px";
+    div.style.borderBottom = "1px solid #ccc";
+    div.style.paddingBottom = "5px";
+    div.style.cursor = "pointer";
+
+    // Distancia y duración con API de rutas (simple con Haversine como placeholder)
+    const distancia = calcularDistancia(currentCoords[0], currentCoords[1], f.lat, f.lon);
+    const tiempoEstimado = Math.round(distancia / 60 * 100) / 100; // ~60km/h estimado
+
+    const nombre = f.datosPersonalizados?.nombre || f.id;
+
+    div.innerHTML = `
+      <strong>${nombre}</strong><br>
+      Distancia: ${distancia.toFixed(1)} km<br>
+      Tiempo estimado: ${tiempoEstimado.toFixed(1)} h<br>
+      <a href="https://www.google.com/maps/dir/?api=1&destination=${f.lat},${f.lon}&travelmode=driving" target="_blank">🧭 Cómo llegar</a>
+    `;
+
+    // Al hacer clic, abre el editor y centra el mapa
+    div.onclick = () => {
+      map.setView([f.lat, f.lon], 16);
+      mostrarEditorFavorito(f.id);
+    };
+
+    contenedor.appendChild(div);
+  });
+}
+
+// ⭐ Alterna entre marcar o desmarcar un lugar como favorito
+function toggleFavorito(id, tipo, coords, name, btn) {
+  const index = favoritos.findIndex(f => f.id === id);
+
+  if (index === -1) {
+    // Si no está, lo añade como objeto completo
+    favoritos.push({
+      id,
+      tipo,
+      lat: coords[0],
+      lon: coords[1],
+      datosPersonalizados: {
+        nombre: name,
+        precio: '',
+        horario: '',
+        notas: ''
+      }
+    });
+    btn.innerText = "⭐ Favorito";
+  } else {
+    // Si ya está, lo elimina
+    favoritos.splice(index, 1);
+    btn.innerText = "☆ Favorito";
+  }
+   // Guarda la lista actualizada en localStorage
+  guardarListas();
+  renderizarFavoritos();
+}
+let favoritoEditandoId = null;
+
+function mostrarEditorFavorito(id) {
+  const favorito = favoritos.find(f => f.id === id);
+  if (!favorito) return;
+
+  favoritoEditandoId = id;
+
+  document.getElementById("editNombre").value = favorito.datosPersonalizados.nombre || "";
+  document.getElementById("editPrecio").value = favorito.datosPersonalizados.precio || "";
+  document.getElementById("editHorario").value = favorito.datosPersonalizados.horario || "";
+  document.getElementById("editNotas").value = favorito.datosPersonalizados.notas || "";
+
+  document.getElementById("listaFavoritos").style.display = "none";
+  document.getElementById("editorFavorito").style.display = "block";
+}
+
+function guardarEdicionFavorito() {
+  const favorito = favoritos.find(f => f.id === favoritoEditandoId);
+  if (!favorito) return;
+
+  favorito.datosPersonalizados.nombre = document.getElementById("editNombre").value;
+  favorito.datosPersonalizados.precio = document.getElementById("editPrecio").value;
+  favorito.datosPersonalizados.horario = document.getElementById("editHorario").value;
+  favorito.datosPersonalizados.notas = document.getElementById("editNotas").value;
+
+  guardarListas();
+  renderizarFavoritos();
+  cerrarEditorFavorito();
+}
+
+function cerrarEditorFavorito() {
+  favoritoEditandoId = null;
+  document.getElementById("editorFavorito").style.display = "none";
+  document.getElementById("listaFavoritos").style.display = "block";
+}
+
+//❌======== GESTION DE FAVORITOS 👆 ======== //
+//❌======== GESTION DE IGNORADOS 👇 ======== //
+// 🗑️ Añade un lugar a la lista de ignorados y actualiza la vista
+function ignorarLugar(id) {
+  if (!ignorados.includes(id)) {
+    ignorados.push(id);
+    guardarListas();
+    actualizarBusquedaActiva();
+  }
+}
+//❌======== GESTION DE IGNORADOS 👆 ======== //
+
+//✅======== EVENTOS DE CARGA Y MANEJO DE SIDEBAR 👇 ======== //
 // 📲 Manejo de eventos una vez el DOM esté cargado
 document.addEventListener("DOMContentLoaded", () => {
   const toggleBtn = document.getElementById("toggleMenu");
@@ -409,4 +565,4 @@ document.addEventListener("DOMContentLoaded", () => {
 
   getLocation();
 });
-//======== EVENTOS DE CARGA Y MANEJO DE SIDEBAR 👆 ======== //✅
+//✅======== EVENTOS DE CARGA Y MANEJO DE SIDEBAR 👆 ======== // 
