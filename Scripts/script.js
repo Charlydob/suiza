@@ -360,8 +360,16 @@ document.addEventListener("DOMContentLoaded", () => {
   const toggleBtn = document.getElementById("toggleMenu");
   const sidebar = document.getElementById("sidebar");
 
+  // ⬇️ AÑADE ESTAS DOS LÍNEAS JUSTO AQUÍ
+  const closeBtn = document.getElementById("closeSidebar");
+  closeBtn.addEventListener("click", () => {
+    sidebar.classList.remove("open");
+    toggleBtn.style.display = "block";
+  });
+
   toggleBtn.addEventListener("click", () => {
     sidebar.classList.toggle("open");
+    toggleBtn.style.display = sidebar.classList.contains("open") ? "none" : "block";
   });
 
   document.getElementById("radiusSlider").addEventListener("input", () => {
@@ -382,3 +390,4 @@ document.addEventListener("DOMContentLoaded", () => {
 
   getLocation();
 });
+
