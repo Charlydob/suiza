@@ -9,28 +9,38 @@ const markersPorTipo = {
   parking: [],
   hotel: [],
   airbnb: [],
-  luggage: []
+  luggage: [],
+  airport: [],
+  tourism: []
 };
 
 const iconos = {
   camp_site: L.icon({
-    iconUrl: 'Recursos/img/camping.png', iconSize: [32, 32], iconAnchor: [14, 28], popupAnchor: [0, -30]
+    iconUrl: 'Recursos/img/campingmapa.png', iconSize: [32, 32], iconAnchor: [14, 28], popupAnchor: [0, -30]
   }),
   fuel: L.icon({
-    iconUrl: 'Recursos/img/gasolinera.png', iconSize: [32, 32], iconAnchor: [14, 28], popupAnchor: [0, -30]
+    iconUrl: 'Recursos/img/gasolineramapa.png', iconSize: [32, 32], iconAnchor: [14, 28], popupAnchor: [0, -30]
   }),
   parking: L.icon({
-    iconUrl: 'Recursos/img/parking.png', iconSize: [32, 32], iconAnchor: [14, 28], popupAnchor: [0, -30]
+    iconUrl: 'Recursos/img/parkingmapa.png', iconSize: [32, 32], iconAnchor: [14, 28], popupAnchor: [0, -30]
   }),
   hotel: L.icon({
-    iconUrl: 'Recursos/img/hotel.png', iconSize: [32, 32], iconAnchor: [14, 28], popupAnchor: [0, -30]
+    iconUrl: 'Recursos/img/hotelmapa.png', iconSize: [32, 32], iconAnchor: [14, 28], popupAnchor: [0, -30]
   }),
   airbnb: L.icon({
-    iconUrl: 'Recursos/img/airbnb.png', iconSize: [32, 32], iconAnchor: [14, 28], popupAnchor: [0, -30]
+    iconUrl: 'Recursos/img/airbnbmapa.png', iconSize: [32, 32], iconAnchor: [14, 28], popupAnchor: [0, -30]
   }),
   luggage: L.icon({
-    iconUrl: 'Recursos/img/maleta.png', iconSize: [32, 32], iconAnchor: [14, 28], popupAnchor: [0, -30]
-  })
+    iconUrl: 'Recursos/img/maletamapa.png', iconSize: [32, 32], iconAnchor: [14, 28], popupAnchor: [0, -30]
+  }),
+  // En iconos:
+  airport: L.icon({
+    iconUrl: 'Recursos/img/aeropuertomapa.png', iconSize: [32, 32], iconAnchor: [14, 28], popupAnchor: [0, -30]
+  }),
+  tourism: L.icon({
+    iconUrl: 'Recursos/img/turismomapa.png', iconSize: [32, 32], iconAnchor: [14, 28], popupAnchor: [0, -30]
+})
+
 };
 
 const iconoUbicacion = L.icon({
@@ -43,7 +53,9 @@ const tipoActivo = {
   parking: false,
   hotel: false,
   airbnb: false,
-  luggage: false
+  luggage: false,
+  airport: false,
+  ourism: false
 };
 
 function initMap(lat, lon) {
@@ -170,7 +182,27 @@ function buscar(tipo) {
       );
       out center;
     `;
-  } else {
+  } else if (tipo === "airport") {
+    query = `
+      [out:json];
+      (
+        node["aeroway"="aerodrome"](around:${radius},${lat},${lon});
+        node["aeroway"="airport"](around:${radius},${lat},${lon});
+      );
+      out center;
+    `;
+  } else if (tipo === "tourism") {
+    query = `
+      [out:json];
+      (
+        node["tourism"="attraction"](around:${radius},${lat},${lon});
+        node["tourism"="viewpoint"](around:${radius},${lat},${lon});
+        node["historic"](around:${radius},${lat},${lon});
+        node["tourism"="museum"](around:${radius},${lat},${lon});
+      );
+      out center;
+    `;
+  }else {
     query = `
       [out:json];
       (
