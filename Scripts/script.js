@@ -253,28 +253,28 @@ function calcularDistancia(lat1, lon1, lat2, lon2) {
 //❌======== CALCULAR DISTANCIAS 👆 ======== //
 //✅======== CONSULTA A OVERPASS API (OpenStreetMap) 👇 ======== //
 // 🔎 Busca lugares de un tipo concreto cerca del usuario usando Overpass API
-function buscar(tipo) {
+async function buscar(tipo) {
   if (!currentCoords) return;
 
-const centro = window.getCentroBusqueda?.();
-const lat = centro?.lat || currentCoords[0];
-const lon = centro?.lon || currentCoords[1];
+  const centro = window.getCentroBusqueda?.();
+  const lat = centro?.lat || currentCoords[0];
+  const lon = centro?.lon || currentCoords[1];
   const radius = parseInt(document.getElementById("radiusSlider").value);
 
   let query = "";
 
   if (tipo === "camping") {
-  query = `
-    [out:json];
-    (
-      node["tourism"="camp_site"](around:${radius},${lat},${lon});
-      way["tourism"="camp_site"](around:${radius},${lat},${lon});
-      node["tourism"="caravan_site"](around:${radius},${lat},${lon});
-      way["tourism"="caravan_site"](around:${radius},${lat},${lon});
-    );
-    out center;
-  `;
-} else if (tipo === "hotel") {
+    query = `
+      [out:json];
+      (
+        node["tourism"="camp_site"](around:${radius},${lat},${lon});
+        way["tourism"="camp_site"](around:${radius},${lat},${lon});
+        node["tourism"="caravan_site"](around:${radius},${lat},${lon});
+        way["tourism"="caravan_site"](around:${radius},${lat},${lon});
+      );
+      out center;
+    `;
+  } else if (tipo === "hotel") {
     query = `
       [out:json];
       (
@@ -293,19 +293,19 @@ const lon = centro?.lon || currentCoords[1];
       out center;
     `;
   } else if (tipo === "luggage") {
-  query = `
-    [out:json];
-    (
-      node["amenity"="locker"](around:${radius},${lat},${lon});
-      way["amenity"="locker"](around:${radius},${lat},${lon});
-      node["information"="luggage_storage"](around:${radius},${lat},${lon});
-      way["information"="luggage_storage"](around:${radius},${lat},${lon});
-      node["luggage"="yes"](around:${radius},${lat},${lon});
-      way["luggage"="yes"](around:${radius},${lat},${lon});
-    );
-    out center;
-  `;
-} else if (tipo === "parking") {
+    query = `
+      [out:json];
+      (
+        node["amenity"="locker"](around:${radius},${lat},${lon});
+        way["amenity"="locker"](around:${radius},${lat},${lon});
+        node["information"="luggage_storage"](around:${radius},${lat},${lon});
+        way["information"="luggage_storage"](around:${radius},${lat},${lon});
+        node["luggage"="yes"](around:${radius},${lat},${lon});
+        way["luggage"="yes"](around:${radius},${lat},${lon});
+      );
+      out center;
+    `;
+  } else if (tipo === "parking") {
     query = `
       [out:json];
       (
@@ -315,75 +315,62 @@ const lon = centro?.lon || currentCoords[1];
       out center;
     `;
   } else if (tipo === "airport") {
-  query = `
-    [out:json];
-    (
-      node["aeroway"="aerodrome"](around:${radius},${lat},${lon});
-      way["aeroway"="aerodrome"](around:${radius},${lat},${lon});
-      relation["aeroway"="aerodrome"](around:${radius},${lat},${lon});
-    );
-    out center;
-  `;
-} else if (tipo === "tourism") {
-  query = `
-    [out:json];
-    (
-      node["tourism"~"attraction|viewpoint|museum|artwork|theme_park|zoo|aquarium|gallery"](around:${radius},${lat},${lon});
-      way["tourism"~"attraction|viewpoint|museum|artwork|theme_park|zoo|aquarium|gallery"](around:${radius},${lat},${lon});
-      relation["tourism"~"attraction|viewpoint|museum|artwork|theme_park|zoo|aquarium|gallery"](around:${radius},${lat},${lon});
-
-      node["historic"](around:${radius},${lat},${lon});
-      way["historic"](around:${radius},${lat},${lon});
-      relation["historic"](around:${radius},${lat},${lon});
-    );
-    out center;
-  `;
-} else if (tipo === "restaurant") {
-  query = `
-    [out:json];
-    (
-      node["amenity"="restaurant"](around:${radius},${lat},${lon});
-      way["amenity"="restaurant"](around:${radius},${lat},${lon});
-      relation["amenity"="restaurant"](around:${radius},${lat},${lon});
-    );
-    out center;
-  `;
-} else if (tipo === "cafe") {
-  query = `
-    [out:json];
-    (
-      node["amenity"="cafe"](around:${radius},${lat},${lon})
-        ["name"!="Starbucks"]
-        ["amenity"!="bar"]
-        ["brand"!="Starbucks"];
-      way["amenity"="cafe"](around:${radius},${lat},${lon})
-        ["name"!="Starbucks"]
-        ["amenity"!="bar"]
-        ["brand"!="Starbucks"];
-      relation["amenity"="cafe"](around:${radius},${lat},${lon})
-        ["name"!="Starbucks"]
-        ["amenity"!="bar"]
-        ["brand"!="Starbucks"];
-    );
-    out center;
-  `;
-}
- else if (tipo === "hospital") {
-  query = `
-    [out:json];
-    (
-      node["amenity"="hospital"](around:${radius},${lat},${lon});
-      way["amenity"="hospital"](around:${radius},${lat},${lon});
-      relation["amenity"="hospital"](around:${radius},${lat},${lon});
-      
-      node["healthcare"="hospital"](around:${radius},${lat},${lon});
-      way["healthcare"="hospital"](around:${radius},${lat},${lon});
-      relation["healthcare"="hospital"](around:${radius},${lat},${lon});
-    );
-    out center;
-  `;
-}
-else {
+    query = `
+      [out:json];
+      (
+        node["aeroway"="aerodrome"](around:${radius},${lat},${lon});
+        way["aeroway"="aerodrome"](around:${radius},${lat},${lon});
+        relation["aeroway"="aerodrome"](around:${radius},${lat},${lon});
+      );
+      out center;
+    `;
+  } else if (tipo === "tourism") {
+    query = `
+      [out:json];
+      (
+        node["tourism"~"attraction|viewpoint|museum|artwork|theme_park|zoo|aquarium|gallery"](around:${radius},${lat},${lon});
+        way["tourism"~"attraction|viewpoint|museum|artwork|theme_park|zoo|aquarium|gallery"](around:${radius},${lat},${lon});
+        relation["tourism"~"attraction|viewpoint|museum|artwork|theme_park|zoo|aquarium|gallery"](around:${radius},${lat},${lon});
+        node["historic"](around:${radius},${lat},${lon});
+        way["historic"](around:${radius},${lat},${lon});
+        relation["historic"](around:${radius},${lat},${lon});
+      );
+      out center;
+    `;
+  } else if (tipo === "restaurant") {
+    query = `
+      [out:json];
+      (
+        node["amenity"="restaurant"](around:${radius},${lat},${lon});
+        way["amenity"="restaurant"](around:${radius},${lat},${lon});
+        relation["amenity"="restaurant"](around:${radius},${lat},${lon});
+      );
+      out center;
+    `;
+  } else if (tipo === "cafe") {
+    query = `
+      [out:json];
+      (
+        node["amenity"="cafe"](around:${radius},${lat},${lon})["name"!="Starbucks"]["amenity"!="bar"]["brand"!="Starbucks"];
+        way["amenity"="cafe"](around:${radius},${lat},${lon})["name"!="Starbucks"]["amenity"!="bar"]["brand"!="Starbucks"];
+        relation["amenity"="cafe"](around:${radius},${lat},${lon})["name"!="Starbucks"]["amenity"!="bar"]["brand"!="Starbucks"];
+      );
+      out center;
+    `;
+  } else if (tipo === "hospital") {
+    query = `
+      [out:json];
+      (
+        node["amenity"="hospital"](around:${radius},${lat},${lon});
+        way["amenity"="hospital"](around:${radius},${lat},${lon});
+        relation["amenity"="hospital"](around:${radius},${lat},${lon});
+        node["healthcare"="hospital"](around:${radius},${lat},${lon});
+        way["healthcare"="hospital"](around:${radius},${lat},${lon});
+        relation["healthcare"="hospital"](around:${radius},${lat},${lon});
+      );
+      out center;
+    `;
+  } else {
     query = `
       [out:json];
       (
@@ -395,89 +382,101 @@ else {
     `;
   }
 
-  fetch("https://overpass-api.de/api/interpreter", {
-    method: "POST",
-    body: query
-  })
-    .then(r => r.json())
-    .then(data => {
-      markersPorTipo[tipo].forEach(m => map.removeLayer(m));
-      markersPorTipo[tipo] = [];
+  try {
+    const response = await fetch("https://overpass-api.de/api/interpreter", {
+      method: "POST",
+      body: query
+    });
+    const data = await response.json();
 
-      if (data.elements.length === 0 && tipo === "luggage") {
-        const link = `https://www.google.com/maps/search/consigna+equipaje/@${lat},${lon},14z`;
-        document.getElementById("status").innerHTML = `No se encontraron consignas. <a href="${link}" target="_blank">Buscar en Google Maps</a>`;
+    markersPorTipo[tipo].forEach(m => map.removeLayer(m));
+    markersPorTipo[tipo] = [];
+
+    if (data.elements.length === 0 && tipo === "luggage") {
+      try {
+        const geoResp = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`);
+        const geoData = await geoResp.json();
+        const ciudad =
+          geoData.address.city ||
+          geoData.address.town ||
+          geoData.address.village ||
+          geoData.address.municipality ||
+          geoData.address.county ||
+          "la zona";
+
+        const link = `https://www.google.com/maps/search/consigna+equipaje+${encodeURIComponent(ciudad)}/@${lat},${lon},14z`;
+        document.getElementById("status").innerHTML = `No se encontraron consignas. <a href="${link}" target="_blank">Buscar en Google Maps en ${ciudad}</a>`;
+        return;
+      } catch (error) {
+        console.error("Error obteniendo ciudad:", error);
+        const fallbackLink = `https://www.google.com/maps/search/consigna+equipaje/@${lat},${lon},14z`;
+        document.getElementById("status").innerHTML = `No se encontraron consignas. <a href="${fallbackLink}" target="_blank">Buscar en Google Maps</a>`;
         return;
       }
+    }
 
-      data.elements.forEach(e => {
-  const coords = e.type === "node" ? [e.lat, e.lon] : [e.center.lat, e.center.lon];
-  const name = e.tags.name || tipo;
-  const idUnico = `${tipo}_${coords[0].toFixed(5)}_${coords[1].toFixed(5)}`;
+    data.elements.forEach(e => {
+      const coords = e.type === "node" ? [e.lat, e.lon] : [e.center.lat, e.center.lon];
+      const name = e.tags.name || tipo;
+      const idUnico = `${tipo}_${coords[0].toFixed(5)}_${coords[1].toFixed(5)}`;
 
-  if (ignorados.includes(idUnico)) return; // 👈 Saltar si está en ignorados
+      if (ignorados.includes(idUnico)) return;
 
-  const mapsLink = `https://www.google.com/maps/dir/?api=1&destination=${coords[0]},${coords[1]}&travelmode=driving&dir_action=navigate&avoid=tolls`;
-  const searchLink = `https://www.google.com/maps/search/${tipo}/@${coords[0]},${coords[1]},14z`;
-const exactSearchLink = `https://www.google.com/maps/search/?api=1&query=${coords[0]},${coords[1]}`;
+      const mapsLink = `https://www.google.com/maps/dir/?api=1&destination=${coords[0]},${coords[1]}&travelmode=driving&dir_action=navigate&avoid=tolls`;
+      const searchLink = `https://www.google.com/maps/search/${tipo}/@${coords[0]},${coords[1]},14z`;
+      const exactSearchLink = `https://www.google.com/maps/search/?api=1&query=${coords[0]},${coords[1]}`;
 
+      const yaEsFavorito = favoritos.includes(idUnico);
+      const userPos = ubicacionReal || currentCoords;
 
+      const lat1 = Array.isArray(userPos) ? userPos[0] : userPos.lat;
+      const lon1 = Array.isArray(userPos) ? userPos[1] : userPos.lng;
+      const distanciaKm = calcularDistancia(lat1, lon1, coords[0], coords[1]);
 
-  const yaEsFavorito = favoritos.includes(idUnico);
-  const userPos = ubicacionReal || currentCoords;
+      const tiempoCocheMin = Math.round((distanciaKm / 60) * 60);
+      const tiempoPieMin = Math.round((distanciaKm / 5) * 60);
 
-const lat1 = Array.isArray(userPos) ? userPos[0] : userPos.lat;
-const lon1 = Array.isArray(userPos) ? userPos[1] : userPos.lng;
-const distanciaKm = calcularDistancia(lat1, lon1, coords[0], coords[1]);
+      const tiempoCoche = tiempoCocheMin >= 60
+        ? `${(tiempoCocheMin / 60).toFixed(1)} h en coche`
+        : `${tiempoCocheMin} min en coche`;
 
+      const tiempoPie = tiempoPieMin >= 60
+        ? `${(tiempoPieMin / 60).toFixed(1)} h a pie`
+        : `${tiempoPieMin} min a pie`;
 
-  const tiempoCocheMin = Math.round((distanciaKm / 60) * 60);
-  const tiempoPieMin = Math.round((distanciaKm / 5) * 60);
+      const popupHTML = `
+        <div class="popup-personalizado">
+          <b>${name}</b><br>
+          Distancia: ${distanciaKm.toFixed(1)} km<br>
+          ${tiempoCoche} | ${tiempoPie}<br>
+          <div class="grupo-botones-arriba">
+            <button onclick="window.open('${mapsLink}', '_blank')">🧭 Cómo llegar</button>
+            <button onclick="window.open('${searchLink}', '_blank')">🔎 Similares</button>
+          </div>
+          <div class="boton-medio">
+            <button onclick="window.open('${exactSearchLink}', '_blank')">🔍 Ver este sitio</button><br>
+          </div>
+          <div class="grupo-botones-abajo">
+            <button onclick="toggleFavorito('${idUnico}', '${tipo}', [${coords}], '${name.replace(/'/g, "\\'")}', this)">
+              ${yaEsFavorito ? "⭐" : "☆"} Favorito
+            </button>
+            <button onclick="ignorarLugar('${idUnico}')">🗑️ Ignorar</button>
+          </div>
+        </div>
+      `;
 
-  const tiempoCoche = tiempoCocheMin >= 60
-    ? `${(tiempoCocheMin / 60).toFixed(1)} h en coche`
-    : `${tiempoCocheMin} min en coche`;
-
-  const tiempoPie = tiempoPieMin >= 60
-    ? `${(tiempoPieMin / 60).toFixed(1)} h a pie`
-    : `${tiempoPieMin} min a pie`;
-
-  const popupHTML = `
-  <div class="popup-personalizado">
-  <b>${name}</b><br>
-  Distancia: ${distanciaKm.toFixed(1)} km<br>
-  ${tiempoCoche} | ${tiempoPie}<br>
-  <div class="grupo-botones-arriba">
-    <button onclick="window.open('${mapsLink}', '_blank')">🧭 Cómo llegar</button>
-    <button onclick="window.open('${searchLink}', '_blank')">🔎 Similares</button>
-    </div>
-      <div class="boton-medio">
-    <button onclick="window.open('${exactSearchLink}', '_blank')">🔍 Ver este sitio</button><br>
-    </div>
-    <div class="grupo-botones-abajo">
-    <button onclick="toggleFavorito('${idUnico}', '${tipo}', [${coords}], '${name.replace(/'/g, "\\'")}', this)">
-      ${yaEsFavorito ? "⭐" : "☆"} Favorito
-    </button>
-    <button onclick="ignorarLugar('${idUnico}')">🗑️ Ignorar</button>
-    </div>
-  </div>
-`;
-
-
-
-  const marker = L.marker(coords, { icon: iconos[tipo] }).addTo(map).bindPopup(popupHTML);
-  markersPorTipo[tipo].push(marker);
-});
-
-
-      document.getElementById("status").innerText = `Mostrando ${data.elements.length} resultados para ${tipo}`;
-    })
-    .catch(err => {
-      console.error(err);
-      alert("Error buscando " + tipo);
-      document.getElementById("status").innerText = "Error de búsqueda";
+      const marker = L.marker(coords, { icon: iconos[tipo] }).addTo(map).bindPopup(popupHTML);
+      markersPorTipo[tipo].push(marker);
     });
+
+    document.getElementById("status").innerText = `Mostrando ${data.elements.length} resultados para ${tipo}`;
+  } catch (err) {
+    console.error(err);
+    alert("Error buscando " + tipo);
+    document.getElementById("status").innerText = "Error de búsqueda";
+  }
 }
+
 //✅======== CONSULTA A OVERPASS API (OpenStreetMap) 👆 ======== //
 //======== INTERFAZ: BOTONES DE FILTRADO 👇 ======== //
 // 🎚️ Activa o desactiva un tipo de lugar (botones de filtros)
