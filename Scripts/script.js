@@ -1,3 +1,77 @@
+// script.js
+
+let map;
+let userMarker;
+let currentCoords = { lat: 40.4168, lng: -3.7038 }; // fallback por si falla la geo
+
+function initApp() {
+  console.log("✅ Google Maps cargado");
+  getLocation();
+}
+
+function getLocation() {
+  console.log("🛰️ Intentando obtener ubicación...");
+
+  if (!navigator.geolocation) {
+    alert("Tu navegador no permite geolocalización.");
+    initMap(40.4168, -3.7038); // fallback
+    return;
+  }
+
+  navigator.geolocation.getCurrentPosition(
+    (pos) => {
+      const lat = pos.coords.latitude;
+      const lon = pos.coords.longitude;
+      console.log(`📍 Ubicación obtenida: ${lat}, ${lon}`);
+      initMap(lat, lon);
+    },
+    (err) => {
+      console.warn("❌ No se pudo obtener la ubicación: ", err);
+      alert("No se pudo obtener tu ubicación.");
+      initMap(40.4168, -3.7038); // fallback
+    },
+    {
+      enableHighAccuracy: true,
+      timeout: 10000,
+      maximumAge: 0
+    }
+  );
+}
+
+function initMap(lat, lon) {
+  currentCoords = { lat, lng: lon };
+
+  map = new google.maps.Map(document.getElementById("map"), {
+    center: currentCoords,
+    zoom: 14,
+    mapTypeControl: false,
+    fullscreenControl: false,
+    streetViewControl: false,
+  });
+
+  userMarker = new google.maps.Marker({
+    position: currentCoords,
+    map,
+    draggable: true,
+    icon: "Recursos/img/yo.png",
+    title: "📍 Aquí estás tú, piloto 🚌💨"
+  });
+
+  userMarker.addListener("dragend", (e) => {
+    currentCoords = {
+      lat: e.latLng.lat(),
+      lng: e.latLng.lng()
+    };
+    // Aquí llamas a lo que quieras: actualizarBusquedaActiva(), etc.
+  });
+}
+
+// Exponer al global para que Google Maps lo pueda llamar
+window.initApp = initApp;
+
+
+
+
 // Espera a que la API de Google esté lista
 window.initMap = function () {
   // No hacer nada aquí porque llamaremos a getLocation manualmente
@@ -12,10 +86,7 @@ if (document.readyState === "loading") {
 
 //✅================= VARIABLES GLOBALES 👇 ================= //
 // 🌍 Variables principales del mapa
-let map;
-let userMarker;
 let searchCircle;
-let currentCoords = null;
 let watchId = null;
 let seguimientoActivo = false;
 let centrarMapaActivo = false;

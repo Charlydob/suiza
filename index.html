@@ -22,9 +22,7 @@
 
 
 <!--SIDEBAR-->
-<script async
-  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA8KhfGc61uBT3DHS1hiCEl7HgnFYaWySI&libraries=places"
-  defer></script>
+
 
 <body>
 <div id="sidebar">
@@ -158,11 +156,11 @@
 -->
 
 
-<!-- 2. Firebase SDKs -->
+<!-- 1. Firebase SDKs -->
 <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database-compat.js"></script>
 
-<!-- 3. Configuración Firebase + Inicialización -->
+<!-- 2. Firebase Config + Init -->
 <script>
   const firebaseConfig = {
     apiKey: "AIzaSyAIRkX0m-qORww2kcYl_mbXm6IKh7j02dc",
@@ -179,8 +177,15 @@
   const rutaFavoritos = "favoritos/charlyylaura";
 </script>
 
-<!-- 4. Tu script principal (donde usas Leaflet y Firebase) -->
-<script src="Scripts/script.js"></script>
+<!-- 3. Google Maps con callback -->
+<script
+  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA8KhfGc61uBT3DHS1hiCEl7HgnFYaWySI&libraries=places&callback=initApp"
+  async defer>
+</script>
+
+<!-- 4. Tu script principal, como módulo -->
+<script type="module" src="Scripts/script.js"></script>
+
 
 </body>
 </html>
