@@ -757,7 +757,7 @@ favoritos.forEach(f => {
     ? `${(tiempoPieMin / 60).toFixed(1)} h a pie`
     : `${tiempoPieMin} min a pie`;
 
-  const exactSearchLink = `https://www.google.com/maps/search/${encodeURIComponent(nombre)}+@${f.lat},${f.lon},18z`;
+const exactSearchLink = `https://www.google.com/maps/search/?api=1&query=${coords[0]},${coords[1]}`;
 
   const popupHTML = `
   <div class="popup-personalizado">
