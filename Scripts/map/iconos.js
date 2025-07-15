@@ -36,3 +36,7 @@ export const iconos = {
   
 
 };
+
+const iconoUbicacion = L.icon({
+  iconUrl: 'Recursos/img/yo.png', iconSize: [32, 32], iconAnchor: [14, 28], popupAnchor: [0, -30]
+});
