@@ -75,6 +75,12 @@ function guardarListas() {
 //✅================= VARIABLES GLOBALES 👆 ================= //
 //✅======== INICIALIZACIÓN DEL MAPA Y MARCADOR DEL USUARIO 👇 ======== //
 // 🚀 Inicializa el mapa con la ubicación dada
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", inicializarInterfaz);
+} else {
+  inicializarInterfaz();
+}
+
 function initMap(lat = 40.4168, lon = -3.7038) {
   currentCoords = { lat, lng: lon };
 
@@ -105,7 +111,66 @@ function initMap(lat = 40.4168, lon = -3.7038) {
 
   crearCirculo();
   document.getElementById("status").innerText = "Ubicación cargada";
+
+  // 👇 Esta llamada es la clave
+  inicializarInterfaz();
+  getLocation();
 }
+
+function inicializarInterfaz() {
+  const toggleBtn = document.getElementById("toggleMenu");
+  const sidebar = document.getElementById("sidebar");
+
+  const closeBtn = document.getElementById("closeSidebar");
+  closeBtn.addEventListener("click", () => {
+    sidebar.classList.remove("open");
+    toggleBtn.style.display = "block";
+  });
+
+  toggleBtn.addEventListener("click", () => {
+    sidebar.classList.toggle("open");
+    toggleBtn.style.display = sidebar.classList.contains("open") ? "none" : "block";
+  });
+
+  document.getElementById("radiusSlider").addEventListener("input", () => {
+    document.getElementById("radiusValue").innerText = document.getElementById("radiusSlider").value;
+    actualizarCirculo();
+    actualizarBusquedaActiva();
+  });
+
+  sidebar.addEventListener("touchstart", function (e) {
+    if (e.touches.length > 1) return;
+    e.stopPropagation();
+  }, { passive: false });
+
+  sidebar.addEventListener("dblclick", function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+  });
+
+  document.getElementById("buscadorFavoritos").addEventListener("input", (e) => {
+    localStorage.setItem("filtroTextoFavoritos", e.target.value);
+    renderizarFavoritos();
+  });
+
+  document.getElementById("filtroTipoFavoritos").addEventListener("change", (e) => {
+    localStorage.setItem("filtroTipoFavoritos", e.target.value);
+    renderizarFavoritos();
+  });
+
+  document.getElementById("ordenFavoritos").addEventListener("change", (e) => {
+    localStorage.setItem("ordenFavoritos", e.target.value);
+    renderizarFavoritos();
+  });
+
+  // Recuperar filtros
+  document.getElementById("buscadorFavoritos").value = localStorage.getItem("filtroTextoFavoritos") || "";
+  document.getElementById("filtroTipoFavoritos").value = localStorage.getItem("filtroTipoFavoritos") || "";
+  document.getElementById("ordenFavoritos").value = localStorage.getItem("ordenFavoritos") || "distanciaAsc";
+
+  renderizarFavoritos();
+}
+
 
 //✅======== INICIALIZACIÓN DEL MAPA Y MARCADOR DEL USUARIO 👆 ======== //
 
@@ -854,61 +919,6 @@ function establecerCentroDesdeFavorito(lat, lon) {
 
 //✅======== EVENTOS DE CARGA Y MANEJO DE SIDEBAR 👇 ======== //
 // 📲 Manejo de eventos una vez el DOM esté cargado
-document.addEventListener("DOMContentLoaded", () => {
-  const toggleBtn = document.getElementById("toggleMenu");
-  const sidebar = document.getElementById("sidebar");
 
-  const closeBtn = document.getElementById("closeSidebar");
-  closeBtn.addEventListener("click", () => {
-    sidebar.classList.remove("open");
-    toggleBtn.style.display = "block";
-  });
-
-  toggleBtn.addEventListener("click", () => {
-    sidebar.classList.toggle("open");
-    toggleBtn.style.display = sidebar.classList.contains("open") ? "none" : "block";
-  });
-
-  document.getElementById("radiusSlider").addEventListener("input", () => {
-    document.getElementById("radiusValue").innerText = document.getElementById("radiusSlider").value;
-    actualizarCirculo();
-    actualizarBusquedaActiva();
-  });
-
-  sidebar.addEventListener("touchstart", function (e) {
-    if (e.touches.length > 1) return;
-    e.stopPropagation();
-  }, { passive: false });
-
-  sidebar.addEventListener("dblclick", function (e) {
-    e.preventDefault();
-    e.stopPropagation();
-  });
-
-  // 🔄 Listeners para filtros de favoritos
-document.getElementById("buscadorFavoritos").addEventListener("input", (e) => {
-  localStorage.setItem("filtroTextoFavoritos", e.target.value);
-  renderizarFavoritos();
-});
-
-document.getElementById("filtroTipoFavoritos").addEventListener("change", (e) => {
-  localStorage.setItem("filtroTipoFavoritos", e.target.value);
-  renderizarFavoritos();
-});
-
-document.getElementById("ordenFavoritos").addEventListener("change", (e) => {
-  localStorage.setItem("ordenFavoritos", e.target.value);
-  renderizarFavoritos();
-});
-
-
-  getLocation();
-  // 🧠 Recuperar filtros guardados
-document.getElementById("buscadorFavoritos").value = localStorage.getItem("filtroTextoFavoritos") || "";
-document.getElementById("filtroTipoFavoritos").value = localStorage.getItem("filtroTipoFavoritos") || "";
-document.getElementById("ordenFavoritos").value = localStorage.getItem("ordenFavoritos") || "distanciaAsc";
-
-  renderizarFavoritos();
-});
 
 //✅======== EVENTOS DE CARGA Y MANEJO DE SIDEBAR 👆 ======== // 
