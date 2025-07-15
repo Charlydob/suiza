@@ -256,7 +256,9 @@ function calcularDistancia(lat1, lon1, lat2, lon2) {
 function buscar(tipo) {
   if (!currentCoords) return;
 
-  const [lat, lon] = currentCoords;
+const centro = window.getCentroBusqueda?.();
+const lat = centro?.lat || currentCoords[0];
+const lon = centro?.lon || currentCoords[1];
   const radius = parseInt(document.getElementById("radiusSlider").value);
 
   let query = "";
@@ -403,7 +405,6 @@ else {
       markersPorTipo[tipo] = [];
 
       if (data.elements.length === 0 && tipo === "luggage") {
-        const [lat, lon] = currentCoords;
         const link = `https://www.google.com/maps/search/consigna+equipaje/@${lat},${lon},14z`;
         document.getElementById("status").innerHTML = `No se encontraron consignas. <a href="${link}" target="_blank">Buscar en Google Maps</a>`;
         return;

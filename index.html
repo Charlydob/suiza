@@ -22,6 +22,8 @@
         <div class="search-group">
           <input type="text" id="locationSearch" placeholder="Buscar lugar..." />
           <button onclick="buscarLugar()">🔍</button>
+          <button id="activarMarcadorBusqueda">🎯 Mover centro</button>
+
         </div>
         <label for="radiusSlider" class="slider-label">Radio búsqueda: <span id="radiusValue">5000</span>m</label>
         <input type="range" id="radiusSlider" min="0" max="10000" value="5000" step="100">
@@ -140,6 +142,33 @@
 
 <!-- 4. Tu script principal (donde usas Leaflet y Firebase) -->
 <script src="Scripts/script.js"></script>
+
+<!-- 5. Script adicional para marcador de búsqueda -->
+<script>
+  const marcadorBusqueda = L.marker([0, 0], { draggable: true }).addTo(map);
+  marcadorBusqueda.setOpacity(0);
+
+  let centroBusqueda = null;
+
+  window.getCentroBusqueda = function () {
+    return centroBusqueda || (currentCoords ? { lat: currentCoords[0], lon: currentCoords[1] } : null);
+  };
+
+  window.activarMarcadorBusqueda = function () {
+    if (!currentCoords) return;
+    marcadorBusqueda.setLatLng(currentCoords);
+    marcadorBusqueda.setOpacity(1);
+    centroBusqueda = marcadorBusqueda.getLatLng();
+
+    marcadorBusqueda.on("dragend", () => {
+      centroBusqueda = marcadorBusqueda.getLatLng();
+      console.log("Nuevo centro de búsqueda:", centroBusqueda);
+    });
+
+    const status = document.getElementById("status");
+    if (status) status.innerText = "🔵 Marcador activo: mueve el pin y haz una búsqueda";
+  };
+</script>
 
 </body>
 </html>
