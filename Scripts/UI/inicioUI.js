@@ -1,4 +1,3 @@
-
 import { actualizarCirculo } from '../mapa/circuloBusqueda.js';
 import { actualizarBusquedaActiva, getLocation } from '../mapa/ubicacion.js';
 
@@ -34,6 +33,31 @@ document.addEventListener("DOMContentLoaded", () => {
     e.stopPropagation();
   });
 
+  // Botón "Ver mi ubicación"
+  document.getElementById("btn-getLocation").addEventListener("click", getLocation);
+
+  // Botón "Buscar lugar"
+  document.getElementById("btn-buscarLugar").addEventListener("click", async () => {
+    const { buscarLugar } = await import('../mapa/busqueda.js');
+    buscarLugar();
+  });
+
+  // Botón "Limpiar"
+  document.getElementById("btn-clearAll").addEventListener("click", async () => {
+    const { clearAll } = await import('../mapa/limpiarMapa.js');
+    clearAll();
+  });
+
+  // Filtros de tipo (campings, gasolineras, etc.)
+  document.querySelectorAll(".filter-card").forEach(card => {
+    card.addEventListener("click", async () => {
+      const tipo = card.id.replace("btn-", "");
+      const { toggleTipo } = await import('../mapa/gestorTipos.js');
+      toggleTipo(tipo);
+    });
+  });
+
+  // Carga inicial: obtener ubicación
   getLocation();
 });
 //======== EVENTOS DE CARGA Y MANEJO DE SIDEBAR 👆 ========//
