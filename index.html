@@ -15,64 +15,64 @@
   <h2>Mi ruta en caravana</h2>
 
   <div id="location-controls">
-    <button id="btn-getLocation" class="action-button">📍 Ver mi ubicación</button>
+    <button onclick="getLocation()" class="action-button">📍 Ver mi ubicación</button>
     <div class="search-group">
       <input type="text" id="locationSearch" placeholder="Buscar lugar..." />
-      <button id="btn-getLocation" >🔍</button>
+      <button onclick="buscarLugar()">🔍</button>
     </div>
     <label for="radiusSlider" class="slider-label">Radio búsqueda: <span id="radiusValue">5000</span>m</label>
     <input type="range" id="radiusSlider" min="0" max="10000" value="5000" step="100">
   </div>
 
   <div class="filter-grid">
-    <div class="filter-card" id="btn-camp_site">
+    <div class="filter-card" id="btn-camp_site" onclick="toggleTipo('camp_site')">
       <img src="Recursos/img/camping.png" alt="camping">
       <span>Campings</span>
     </div>
-    <div class="filter-card" id="btn-fuel" >
+    <div class="filter-card" id="btn-fuel" onclick="toggleTipo('fuel')">
       <img src="Recursos/img/gasolinera.png" alt="gasolinera">
       <span>Gasolineras</span>
     </div>
-    <div class="filter-card" id="btn-parking" >
+    <div class="filter-card" id="btn-parking" onclick="toggleTipo('parking')">
       <img src="Recursos/img/parking.png" alt="parking">
       <span>Parkings</span>
     </div>
-    <div class="filter-card inactivo" id="btn-hotel">
+    <div class="filter-card inactivo" id="btn-hotel" onclick="toggleTipo('hotel')">
       <img src="Recursos/img/hotel.png" alt="hotel">
       <span>Hoteles</span>
     </div>
-    <div class="filter-card inactivo" id="btn-airbnb">
+    <div class="filter-card inactivo" id="btn-airbnb" onclick="toggleTipo('airbnb')">
       <img src="Recursos/img/airbnb.png" alt="airbnb">
       <span>Airbnb</span>
     </div>
-    <div class="filter-card inactivo" id="btn-luggage">
+    <div class="filter-card inactivo" id="btn-luggage" onclick="toggleTipo('luggage')">
       <img src="Recursos/img/maleta.png" alt="maleta">
       <span>Consigna</span>
     </div>
-    <div class="filter-card inactivo" id="btn-airport">
+    <div class="filter-card inactivo" id="btn-airport" onclick="toggleTipo('airport')">
       <img src="Recursos/img/aeropuerto.png" alt="aeropuerto">
       <span>Aeropuertos</span>
     </div>
-    <div class="filter-card inactivo" id="btn-tourism">
+    <div class="filter-card inactivo" id="btn-tourism" onclick="toggleTipo('tourism')">
       <img src="Recursos/img/turismo.png" alt="punto turístico">
   <span>Turismo</span>
   </div>
-    <div class="filter-card inactivo" id="btn-restaurant">
+    <div class="filter-card inactivo" id="btn-restaurant" onclick="toggleTipo('restaurant')">
       <img src="Recursos/img/restaurante.png" alt="restaurante">
       <span>Restaurantes</span>
     </div>
-    <div class="filter-card inactivo" id="btn-cafe">
+    <div class="filter-card inactivo" id="btn-cafe" onclick="toggleTipo('cafe')">
       <img src="Recursos/img/cafeteria.png" alt="cafetería">
       <span>Cafeterías</span>
     </div>
-    <div class="filter-card inactivo" id="btn-hospital">
+    <div class="filter-card inactivo" id="btn-hospital" onclick="toggleTipo('hospital')">
   <img src="Recursos/img/hospital.png" alt="hospital">
   <span>Hospitales</span>
     </div>
 <button id="closeSidebar">‹</button>
   </div>
 
-  <button id="btn-clearAll" class="clear-button">🧹 Limpiar</button>
+  <button onclick="clearAll()" class="clear-button">🧹 Limpiar</button>
   <div id="status">Esperando ubicación...</div>
 </div>
 
@@ -84,11 +84,11 @@
 -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   
-  <!-- Script modular ES6 -->
+  <!-- Script modular ES6 
     <script type="module" src="Scripts/main.js"></script>
-
-  <!-- Script normal
-  <script src="Scripts/script.js"></script>
     -->
+  <!-- Script normal    -->
+  <script src="Scripts/script.js"></script>
+
 </body>
 </html>

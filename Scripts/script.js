@@ -409,4 +409,4 @@ document.addEventListener("DOMContentLoaded", () => {
 
   getLocation();
 });
-//======== EVENTOS DE CARGA Y MANEJO DE SIDEBAR 👆 ======== //
+//======== EVENTOS DE CARGA Y MANEJO DE SIDEBAR 👆 ======== //✅
