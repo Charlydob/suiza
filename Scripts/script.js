@@ -169,6 +169,9 @@ function actualizarUbicacionReal() {
       const lat = pos.coords.latitude;
       const lon = pos.coords.longitude;
 
+        // 🔧 Normaliza y guarda
+        ubicacionReal = { lat, lng: lon };
+
       currentCoords = [lat, lon];
 
       // Crea o actualiza el marcador de la ubicación real
