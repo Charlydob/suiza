@@ -366,6 +366,8 @@ function buscar(tipo) {
 
   const mapsLink = `https://www.google.com/maps/dir/?api=1&destination=${coords[0]},${coords[1]}&travelmode=driving&dir_action=navigate&avoid=tolls`;
   const searchLink = `https://www.google.com/maps/search/${tipo}/@${coords[0]},${coords[1]},14z`;
+  const exactSearchLink = `https://www.google.com/maps/search/${encodeURIComponent(name)}+@${coords[0]},${coords[1]},18z`;
+
 
   const yaEsFavorito = favoritos.includes(idUnico);
   const userPos = ubicacionReal || currentCoords;
