@@ -444,8 +444,11 @@ function renderizarFavoritos() {
 
     // Al hacer clic, abre el editor y centra el mapa
     div.onclick = () => {
+      setTimeout(() => {
       map.setView([f.lat, f.lon], 16);
-      mostrarEditorFavorito(f.id);
+    }, 100);
+
+mostrarEditorFavorito(f.id);
     };
 
     contenedor.appendChild(div);
@@ -493,7 +496,7 @@ function mostrarEditorFavorito(id) {
   document.getElementById("editHorario").value = favorito.datosPersonalizados.horario || "";
   document.getElementById("editNotas").value = favorito.datosPersonalizados.notas || "";
 
-  document.getElementById("listaFavoritos").style.display = "none";
+  document.getElementById("sidebarContenido").style.display = "none";
   document.getElementById("editorFavorito").style.display = "block";
 }
 
@@ -514,7 +517,7 @@ function guardarEdicionFavorito() {
 function cerrarEditorFavorito() {
   favoritoEditandoId = null;
   document.getElementById("editorFavorito").style.display = "none";
-  document.getElementById("listaFavoritos").style.display = "block";
+  document.getElementById("sidebarContenido").style.display = "block";
 }
 
 //❌======== GESTION DE FAVORITOS 👆 ======== //

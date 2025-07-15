@@ -14,75 +14,75 @@
 
 <body>
 <div id="sidebar">
-  
+  <div id="sidebarContenido">
   <h2>Mi ruta en caravana</h2>
 
-  <div id="location-controls">
-    <button onclick="getLocation()" class="action-button">📍 Ver mi ubicación</button>
-    <div class="search-group">
-      <input type="text" id="locationSearch" placeholder="Buscar lugar..." />
-      <button onclick="buscarLugar()">🔍</button>
-    </div>
-    <label for="radiusSlider" class="slider-label">Radio búsqueda: <span id="radiusValue">5000</span>m</label>
-    <input type="range" id="radiusSlider" min="0" max="10000" value="5000" step="100">
-  </div>
+      <div id="location-controls">
+        <button onclick="getLocation()" class="action-button">📍 Ver mi ubicación</button>
+        <div class="search-group">
+          <input type="text" id="locationSearch" placeholder="Buscar lugar..." />
+          <button onclick="buscarLugar()">🔍</button>
+        </div>
+        <label for="radiusSlider" class="slider-label">Radio búsqueda: <span id="radiusValue">5000</span>m</label>
+        <input type="range" id="radiusSlider" min="0" max="10000" value="5000" step="100">
+      </div>
 
-  <div class="filter-grid">
-    <div class="filter-card" id="btn-camp_site" onclick="toggleTipo('camp_site')">
-      <img src="Recursos/img/camping.png" alt="camping">
-      <span>Campings</span>
-    </div>
-    <div class="filter-card" id="btn-fuel" onclick="toggleTipo('fuel')">
-      <img src="Recursos/img/gasolinera.png" alt="gasolinera">
-      <span>Gasolineras</span>
-    </div>
-    <div class="filter-card" id="btn-parking" onclick="toggleTipo('parking')">
-      <img src="Recursos/img/parking.png" alt="parking">
-      <span>Parkings</span>
-    </div>
-    <div class="filter-card inactivo" id="btn-hotel" onclick="toggleTipo('hotel')">
-      <img src="Recursos/img/hotel.png" alt="hotel">
-      <span>Hoteles</span>
-    </div>
-    <div class="filter-card inactivo" id="btn-airbnb" onclick="toggleTipo('airbnb')">
-      <img src="Recursos/img/airbnb.png" alt="airbnb">
-      <span>Airbnb</span>
-    </div>
-    <div class="filter-card inactivo" id="btn-luggage" onclick="toggleTipo('luggage')">
-      <img src="Recursos/img/maleta.png" alt="maleta">
-      <span>Consigna</span>
-    </div>
-    <div class="filter-card inactivo" id="btn-airport" onclick="toggleTipo('airport')">
-      <img src="Recursos/img/aeropuerto.png" alt="aeropuerto">
-      <span>Aeropuertos</span>
-    </div>
-    <div class="filter-card inactivo" id="btn-tourism" onclick="toggleTipo('tourism')">
-      <img src="Recursos/img/turismo.png" alt="punto turístico">
-  <span>Turismo</span>
-  </div>
-    <div class="filter-card inactivo" id="btn-restaurant" onclick="toggleTipo('restaurant')">
-      <img src="Recursos/img/restaurante.png" alt="restaurante">
-      <span>Restaurantes</span>
-    </div>
-    <div class="filter-card inactivo" id="btn-cafe" onclick="toggleTipo('cafe')">
-      <img src="Recursos/img/cafeteria.png" alt="cafetería">
-      <span>Cafeterías</span>
-    </div>
-    <div class="filter-card inactivo" id="btn-hospital" onclick="toggleTipo('hospital')">
-  <img src="Recursos/img/hospital.png" alt="hospital">
-  <span>Hospitales</span>
-    </div>
-<button id="closeSidebar">‹</button>
-  </div>
+      <div class="filter-grid">
+            <div class="filter-card" id="btn-camp_site" onclick="toggleTipo('camp_site')">
+              <img src="Recursos/img/camping.png" alt="camping">
+              <span>Campings</span>
+            </div>
+            <div class="filter-card" id="btn-fuel" onclick="toggleTipo('fuel')">
+              <img src="Recursos/img/gasolinera.png" alt="gasolinera">
+              <span>Gasolineras</span>
+            </div>
+            <div class="filter-card" id="btn-parking" onclick="toggleTipo('parking')">
+              <img src="Recursos/img/parking.png" alt="parking">
+              <span>Parkings</span>
+            </div>
+            <div class="filter-card inactivo" id="btn-hotel" onclick="toggleTipo('hotel')">
+              <img src="Recursos/img/hotel.png" alt="hotel">
+              <span>Hoteles</span>
+            </div>
+            <div class="filter-card inactivo" id="btn-airbnb" onclick="toggleTipo('airbnb')">
+              <img src="Recursos/img/airbnb.png" alt="airbnb">
+              <span>Airbnb</span>
+            </div>
+            <div class="filter-card inactivo" id="btn-luggage" onclick="toggleTipo('luggage')">
+              <img src="Recursos/img/maleta.png" alt="maleta">
+              <span>Consigna</span>
+            </div>
+            <div class="filter-card inactivo" id="btn-airport" onclick="toggleTipo('airport')">
+              <img src="Recursos/img/aeropuerto.png" alt="aeropuerto">
+              <span>Aeropuertos</span>
+            </div>
+              <div class="filter-card inactivo" id="btn-tourism" onclick="toggleTipo('tourism')">
+                <img src="Recursos/img/turismo.png" alt="punto turístico">
+            <span>Turismo</span>
+            </div>
+            <div class="filter-card inactivo" id="btn-restaurant" onclick="toggleTipo('restaurant')">
+              <img src="Recursos/img/restaurante.png" alt="restaurante">
+              <span>Restaurantes</span>
+            </div>
+            <div class="filter-card inactivo" id="btn-cafe" onclick="toggleTipo('cafe')">
+              <img src="Recursos/img/cafeteria.png" alt="cafetería">
+              <span>Cafeterías</span>
+            </div>
+            <div class="filter-card inactivo" id="btn-hospital" onclick="toggleTipo('hospital')">
+          <img src="Recursos/img/hospital.png" alt="hospital">
+          <span>Hospitales</span>
+            </div>
+      </div>
+      <button id="closeSidebar">‹</button>
 
-  <button onclick="clearAll()" class="clear-button">🧹 Limpiar</button>
-  <div id="status">Esperando ubicación...</div>
+            <button onclick="clearAll()" class="clear-button">🧹 Limpiar</button>
+            <div id="status">Esperando ubicación...</div>
   <!-- ⭐ Lista de Favoritos en el Sidebar -->
-<div id="listaFavoritos" style="margin-top: 20px; display: none;">
-  <h3>⭐ Favoritos</h3>
-  <div id="contenedorFavoritos"></div>
+          <div id="listaFavoritos" style="margin-top: 20px; display: none;">
+            <h3>⭐ Favoritos</h3>
+            <div id="contenedorFavoritos"></div>
+          </div>
 </div>
-
 <!-- 📝 Editor de Favorito -->
 <div id="editorFavorito" style="display: none; padding: 10px;">
   <h3>Editar lugar</h3>
