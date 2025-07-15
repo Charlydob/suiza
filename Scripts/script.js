@@ -1,4 +1,82 @@
+//================= VARIABLES GLOBALES 👇 ================= //
+// 🌍 Variables principales del mapa
+let map;
+let userMarker;
+let searchCircle;
+let currentCoords = null;
+// 📍 Marcadores agrupados por tipo de lugar (para borrarlos fácilmente luego)
+const markersPorTipo = {
+  camp_site: [],
+  fuel: [],
+  parking: [],
+  hotel: [],
+  airbnb: [],
+  luggage: [],
+  airport: [],
+  tourism: [],
+  restaurant: [],
+  cafe: [],
+  hospital: [],
 
+};
+// 🖼️ Iconos personalizados por tipo de lugar (para mostrar en el mapa)
+const iconos = {
+  camp_site: L.icon({
+    iconUrl: 'Recursos/img/campingmapa.png', iconSize: [32, 32], iconAnchor: [14, 28], popupAnchor: [0, -30]
+  }),
+  fuel: L.icon({
+    iconUrl: 'Recursos/img/gasolineramapa.png', iconSize: [32, 32], iconAnchor: [14, 28], popupAnchor: [0, -30]
+  }),
+  parking: L.icon({
+    iconUrl: 'Recursos/img/parkingmapa.png', iconSize: [32, 32], iconAnchor: [14, 28], popupAnchor: [0, -30]
+  }),
+  hotel: L.icon({
+    iconUrl: 'Recursos/img/hotelmapa.png', iconSize: [32, 32], iconAnchor: [14, 28], popupAnchor: [0, -30]
+  }),
+  airbnb: L.icon({
+    iconUrl: 'Recursos/img/airbnbmapa.png', iconSize: [32, 32], iconAnchor: [14, 28], popupAnchor: [0, -30]
+  }),
+  luggage: L.icon({
+    iconUrl: 'Recursos/img/maletamapa.png', iconSize: [32, 32], iconAnchor: [14, 28], popupAnchor: [0, -30]
+  }),
+  // En iconos:
+  airport: L.icon({
+    iconUrl: 'Recursos/img/aeropuertomapa.png', iconSize: [32, 32], iconAnchor: [14, 28], popupAnchor: [0, -30]
+  }),
+  tourism: L.icon({
+    iconUrl: 'Recursos/img/turismomapa.png', iconSize: [32, 32], iconAnchor: [14, 28], popupAnchor: [0, -30]
+  }),
+  restaurant: L.icon({
+    iconUrl: 'Recursos/img/restaurantemapa.png', iconSize: [32, 32], iconAnchor: [14, 28], popupAnchor: [0, -30]
+  }),
+  cafe: L.icon({
+    iconUrl: 'Recursos/img/cafeteriamapa.png', iconSize: [32, 32], iconAnchor: [14, 28], popupAnchor: [0, -30]
+  }),
+  hospital: L.icon({
+    iconUrl: 'Recursos/img/hospitalmapa.png', iconSize: [32, 32], iconAnchor: [14, 28], popupAnchor: [0, -30]
+  }),
+  
+
+};
+// 🧭 Icono de la ubicación del usuario
+const iconoUbicacion = L.icon({
+  iconUrl: 'Recursos/img/yo.png', iconSize: [32, 32], iconAnchor: [14, 28], popupAnchor: [0, -30]
+});
+// ✅ Estado de activación de cada tipo de marcador
+const tipoActivo = {
+  camp_site: false,
+  fuel: false,
+  parking: false,
+  hotel: false,
+  airbnb: false,
+  luggage: false,
+  airport: false,
+  tourism: false,
+  restaurant: false,
+  cafe: false,
+  hospital: false
+};
+//================= VARIABLES GLOBALES 👆 ================= //✅
 //======== INICIALIZACIÓN DEL MAPA Y MARCADOR DEL USUARIO 👇 ======== //
 // 🚀 Inicializa el mapa con la ubicación dada
 function initMap(lat, lon) {
@@ -233,7 +311,41 @@ function buscar(tipo) {
     });
 }
 //======== CONSULTA A OVERPASS API (OpenStreetMap) 👆 ======== //✅
+//======== INTERFAZ: BOTONES DE FILTRADO 👇 ======== //
+// 🎚️ Activa o desactiva un tipo de lugar (botones de filtros)
+function toggleTipo(tipo) {
+  tipoActivo[tipo] = !tipoActivo[tipo];
+  const boton = document.getElementById(`btn-${tipo}`);
 
+  if (tipoActivo[tipo]) {
+    boton.classList.add("activo");
+    boton.classList.remove("inactivo");
+    buscar(tipo);
+  } else {
+    boton.classList.remove("activo");
+    boton.classList.add("inactivo");
+    markersPorTipo[tipo].forEach(m => map.removeLayer(m));
+    markersPorTipo[tipo] = [];
+    document.getElementById("status").innerText = `Ocultando ${tipo}`;
+  }
+}
+//======== INTERFAZ: BOTONES DE FILTRADO 👆 ======== //✅
+//======== LIMPIEZA DEL MAPA 👇 ======== //
+// 🧼 Limpia todos los marcadores y resetea el estado
+function clearAll() {
+  Object.keys(markersPorTipo).forEach(tipo => {
+    markersPorTipo[tipo].forEach(m => map.removeLayer(m));
+    markersPorTipo[tipo] = [];
+    tipoActivo[tipo] = false;
+    const boton = document.getElementById(`btn-${tipo}`);
+    if (boton) {
+      boton.classList.remove("activo");
+      boton.classList.add("inactivo");
+    }
+  });
+  document.getElementById("status").innerText = "Mapa limpio";
+}
+//======== LIMPIEZA DEL MAPA  👆 ======== //✅
 //======== BUSCAR UN LUGAR POR NOMBRE (input de texto) 👇 ======== //
 // 🧭 Busca una ciudad o dirección por nombre (con Nominatim)
 function buscarLugar() {
@@ -261,4 +373,40 @@ function buscarLugar() {
     });
 }
 //======== BUSCAR UN LUGAR POR NOMBRE (input de texto) 👆 ======== //✅
+//======== EVENTOS DE CARGA Y MANEJO DE SIDEBAR 👇 ======== //
+// 📲 Manejo de eventos una vez el DOM esté cargado
+document.addEventListener("DOMContentLoaded", () => {
+  const toggleBtn = document.getElementById("toggleMenu");
+  const sidebar = document.getElementById("sidebar");
 
+  // ⬇️ AÑADE ESTAS DOS LÍNEAS JUSTO AQUÍ
+  const closeBtn = document.getElementById("closeSidebar");
+  closeBtn.addEventListener("click", () => {
+    sidebar.classList.remove("open");
+    toggleBtn.style.display = "block";
+  });
+
+  toggleBtn.addEventListener("click", () => {
+    sidebar.classList.toggle("open");
+    toggleBtn.style.display = sidebar.classList.contains("open") ? "none" : "block";
+  });
+
+  document.getElementById("radiusSlider").addEventListener("input", () => {
+    document.getElementById("radiusValue").innerText = document.getElementById("radiusSlider").value;
+    actualizarCirculo();
+    actualizarBusquedaActiva();
+  });
+
+  sidebar.addEventListener("touchstart", function (e) {
+    if (e.touches.length > 1) return;
+    e.stopPropagation();
+  }, { passive: false });
+
+  sidebar.addEventListener("dblclick", function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+  });
+
+  getLocation();
+});
+//======== EVENTOS DE CARGA Y MANEJO DE SIDEBAR 👆 ======== //✅
