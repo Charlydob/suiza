@@ -151,8 +151,8 @@ function actualizarBusquedaActiva() {
   });
 }
 
-// 📍 Solicita la ubicación inicial y activa seguimiento si aún no está en marcha
-function getLocation() {
+// 📍 Obtiene una única vez la ubicación actual y actualiza elementos
+function actualizarUbicacionUnaVez() {
   if (!navigator.geolocation) {
     alert("Tu navegador no permite geolocalización");
     return;
@@ -160,16 +160,7 @@ function getLocation() {
 
   document.getElementById("status").innerText = "Obteniendo ubicación...";
 
-  if (!seguimientoActivo) {
-    iniciarSeguimiento(); // Solo esto, sin duplicar tracking
-  }
-}
-
-// 🚶‍♂️ Inicia el seguimiento de la posición actual en tiempo real
-function iniciarSeguimiento() {
-  seguimientoActivo = true;
-
-  watchId = navigator.geolocation.watchPosition(
+  navigator.geolocation.getCurrentPosition(
     (pos) => {
       const lat = pos.coords.latitude;
       const lon = pos.coords.longitude;
@@ -180,9 +171,9 @@ function iniciarSeguimiento() {
         initMap(lat, lon);
       }
 
-      // Crear o mover marcador de ubicación actual
       if (!marcadorUbicacion) {
         marcadorUbicacion = L.marker([lat, lon], {
+          draggable: true,
           icon: L.divIcon({
             className: "marcador-usuario",
             html: "📍",
@@ -190,18 +181,24 @@ function iniciarSeguimiento() {
             iconAnchor: [15, 30]
           })
         }).addTo(map);
+
+        marcadorUbicacion.on("dragend", function () {
+          currentCoords = [this.getLatLng().lat, this.getLatLng().lng];
+          actualizarCirculo();
+          actualizarBusquedaActiva();
+          renderizarFavoritos();
+        });
       } else {
         marcadorUbicacion.setLatLng([lat, lon]);
       }
 
-      // Centrar si el centrado automático está activado
-      if (centrarMapaActivo) {
-        map.setView([lat, lon], 16);
-      }
+      map.setView([lat, lon], 16);
 
-      actualizarCirculo();            // Redibuja el área de búsqueda
-      actualizarBusquedaActiva();     // Lanza nuevas búsquedas
-      renderizarFavoritos();          // Actualiza las distancias mostradas
+      actualizarCirculo();
+      actualizarBusquedaActiva();
+      renderizarFavoritos();
+
+      document.getElementById("status").innerText = "";
     },
 
     (err) => {
@@ -209,9 +206,27 @@ function iniciarSeguimiento() {
       document.getElementById("status").innerText = "No se pudo obtener la ubicación";
     },
 
-    { enableHighAccuracy: true, maximumAge: 1000 }
+    { enableHighAccuracy: true }
   );
 }
+// Añade un botón al mapa para actualizar la ubicación una vez
+const botonActualizarUbicacion = L.control({ position: 'topright' });
+botonActualizarUbicacion.onAdd = function () {
+  const div = L.DomUtil.create('div', 'leaflet-bar leaflet-control');
+  div.innerHTML = '<a href="#" title="Actualizar ubicación">📍</a>';
+  div.style.backgroundColor = 'white';
+  div.style.padding = '5px';
+
+  div.onclick = function (e) {
+    e.preventDefault();
+    actualizarUbicacionUnaVez();
+  };
+
+  return div;
+};
+botonActualizarUbicacion.addTo(map);
+
+
 
 
 //❌======== ACTUALIZACIÓN EN TIEMPO REAL Y OBTENCIÓN DE UBICACIÓN 👆 ======== //
