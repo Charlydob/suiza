@@ -113,7 +113,8 @@ html, body {
   left: 0;
   height: 100%;
   width: 280px;
-  background: white;
+  background: transparent;
+  background-blend-mode: exclusion;
   padding: 20px;
   box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
   transform: translateX(-100%);
@@ -131,7 +132,7 @@ html, body {
 }
 #closeSidebar {
   position: absolute;
-  top: 10px;
+  top: 605px;
   right: 10px;
   width: 36px;
   height: 36px;
@@ -208,10 +209,10 @@ html, body {
   margin-top: 5px;
 }
 
-/* GRID DE FILTROS */
+/* GRID DE FILTROS LOS BOTONES */
 .filter-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  display: grid;;
+  grid-template-columns: repeat(3, 1fr);
   gap: 10px;
 }
 
@@ -219,7 +220,7 @@ html, body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 12px;
+  padding: 10px;
   border-radius: 16px;
   background: #f9f9f9;
   box-shadow: 0 2px 8px rgba(0,0,0,0.05);
@@ -233,9 +234,9 @@ html, body {
   height: 40px;
   margin-bottom: 6px;
 }
-
+/*CONTENEDORES BOTONES*/
 .filter-card span {
-  font-size: 14px;
+  font-size: 10px;
   font-weight: 600;
   color: #333;
 }
