@@ -4,6 +4,11 @@ let map;
 let userMarker;
 let searchCircle;
 let currentCoords = null;
+let watchId = null;
+let seguimientoActivo = false;
+let centrarMapaActivo = false;
+let marcadorUbicacion = null;
+
 // 📍 Marcadores agrupados por tipo de lugar (para borrarlos fácilmente luego)
 const markersPorTipo = {
   camp_site: [],
@@ -80,6 +85,8 @@ const tipoActivo = {
 // 🟡 Estructura: { id, tipo, lat, lon, datosPersonalizados: {nombre, precio, horario, notas} }
 let favoritos = JSON.parse(localStorage.getItem("favoritos")) || [];
 const ignorados = JSON.parse(localStorage.getItem("ignorados")) || [];
+let marcadoresFavoritos = [];
+
 
 function guardarListas() {
   localStorage.setItem("favoritos", JSON.stringify(favoritos));
@@ -137,12 +144,14 @@ function actualizarCirculo() {
 //✅======== GESTIÓN DEL CÍRCULO DE BÚSQUEDA  👆 ======== // 
 //❌======== ACTUALIZACIÓN EN TIEMPO REAL Y OBTENCIÓN DE UBICACIÓN 👇 ======== //
 // 🔁 Re-busca automáticamente lugares activos si cambia la ubicación
+// 🔁 Actualiza resultados activos en el mapa
 function actualizarBusquedaActiva() {
   Object.keys(tipoActivo).forEach(tipo => {
     if (tipoActivo[tipo]) buscar(tipo);
   });
 }
-// 📍 Usa la geolocalización del navegador para obtener la ubicación actual
+
+// 📍 Solicita la ubicación inicial y activa seguimiento si aún no está en marcha
 function getLocation() {
   if (!navigator.geolocation) {
     alert("Tu navegador no permite geolocalización");
@@ -151,27 +160,59 @@ function getLocation() {
 
   document.getElementById("status").innerText = "Obteniendo ubicación...";
 
-  navigator.geolocation.getCurrentPosition(
+  if (!seguimientoActivo) {
+    iniciarSeguimiento(); // Solo esto, sin duplicar tracking
+  }
+}
+
+// 🚶‍♂️ Inicia el seguimiento de la posición actual en tiempo real
+function iniciarSeguimiento() {
+  seguimientoActivo = true;
+
+  watchId = navigator.geolocation.watchPosition(
     (pos) => {
       const lat = pos.coords.latitude;
       const lon = pos.coords.longitude;
+
+      currentCoords = [lat, lon];
+
       if (!map) {
         initMap(lat, lon);
-      } else {
-        userMarker.setLatLng([lat, lon]);
-        map.setView([lat, lon], 14);
-        currentCoords = [lat, lon];
-        actualizarCirculo();
-        actualizarBusquedaActiva();
       }
+
+      // Crear o mover marcador de ubicación actual
+      if (!marcadorUbicacion) {
+        marcadorUbicacion = L.marker([lat, lon], {
+          icon: L.divIcon({
+            className: "marcador-usuario",
+            html: "📍",
+            iconSize: [30, 30],
+            iconAnchor: [15, 30]
+          })
+        }).addTo(map);
+      } else {
+        marcadorUbicacion.setLatLng([lat, lon]);
+      }
+
+      // Centrar si el centrado automático está activado
+      if (centrarMapaActivo) {
+        map.setView([lat, lon], 16);
+      }
+
+      actualizarCirculo();            // Redibuja el área de búsqueda
+      actualizarBusquedaActiva();     // Lanza nuevas búsquedas
+      renderizarFavoritos();          // Actualiza las distancias mostradas
     },
+
     (err) => {
       console.error(err);
       document.getElementById("status").innerText = "No se pudo obtener la ubicación";
     },
+
     { enableHighAccuracy: true, maximumAge: 1000 }
   );
 }
+
 
 //❌======== ACTUALIZACIÓN EN TIEMPO REAL Y OBTENCIÓN DE UBICACIÓN 👆 ======== //
 //✅======== CONSULTA A OVERPASS API (OpenStreetMap) 👇 ======== //
@@ -306,17 +347,32 @@ function buscar(tipo) {
   const searchLink = `https://www.google.com/maps/search/${tipo}/@${coords[0]},${coords[1]},14z`;
 
   const yaEsFavorito = favoritos.includes(idUnico);
-  const estrella = yaEsFavorito ? "⭐" : "☆";
+  const userPos = userMarker ? userMarker.getLatLng() : currentCoords;
+  const distanciaKm = calcularDistancia(userPos.lat, userPos.lng, coords[0], coords[1]);
+
+  const tiempoCocheMin = Math.round((distanciaKm / 60) * 60);
+  const tiempoPieMin = Math.round((distanciaKm / 5) * 60);
+
+  const tiempoCoche = tiempoCocheMin >= 60
+    ? `${(tiempoCocheMin / 60).toFixed(1)} h en coche`
+    : `${tiempoCocheMin} min en coche`;
+
+  const tiempoPie = tiempoPieMin >= 60
+    ? `${(tiempoPieMin / 60).toFixed(1)} h a pie`
+    : `${tiempoPieMin} min a pie`;
 
   const popupHTML = `
-  <b>${name}</b><br>
-  <a href='${mapsLink}' target='_blank'>🧭 Cómo llegar</a><br>
-  <a href='${searchLink}' target='_blank'>🔎 Buscar en Maps</a><br>
-  <button onclick="toggleFavorito('${idUnico}', '${tipo}', [${coords}], '${name.replace(/'/g, "\\'")}', this)">
-    ${yaEsFavorito ? "⭐" : "☆"} Favorito
-  </button>
-  <button onclick="ignorarLugar('${idUnico}')">🗑️ Ignorar</button>
-`;
+    <b>${name}</b><br>
+    Distancia: ${distanciaKm.toFixed(1)} km<br>
+    ${tiempoCoche} | ${tiempoPie}<br>
+    <a href='${mapsLink}' target='_blank'>🧭 Cómo llegar</a><br>
+    <a href='${searchLink}' target='_blank'>🔎 Buscar en Maps</a><br>
+    <button onclick="toggleFavorito('${idUnico}', '${tipo}', [${coords}], '${name.replace(/'/g, "\\'")}', this)">
+      ${yaEsFavorito ? "⭐" : "☆"} Favorito
+    </button>
+    <button onclick="ignorarLugar('${idUnico}')">🗑️ Ignorar</button>
+  `;
+
 
   const marker = L.marker(coords, { icon: iconos[tipo] }).addTo(map).bindPopup(popupHTML);
   markersPorTipo[tipo].push(marker);
@@ -549,17 +605,44 @@ function cerrarEditorFavorito() {
   document.getElementById("sidebarContenido").style.display = "block";
 }
 function mostrarMarcadoresFavoritos() {
-  // Opcional: podrías limpiar antes si ya los hubieras pintado antes
+  // Borra marcadores anteriores
+  marcadoresFavoritos.forEach(m => map.removeLayer(m));
+  marcadoresFavoritos = [];
+
   favoritos.forEach(f => {
     const nombre = f.datosPersonalizados?.nombre || f.id;
+
+    // Distancia desde la ubicación real
+    const userPos = userMarker ? userMarker.getLatLng() : currentCoords;
+    const distanciaKm = calcularDistancia(userPos.lat, userPos.lng, f.lat, f.lon);
+
+    // Estimaciones de tiempo
+    const velCoche = 60; // km/h
+    const velPie = 5;    // km/h
+
+    const tiempoCocheMin = Math.round((distanciaKm / velCoche) * 60);
+    const tiempoPieMin = Math.round((distanciaKm / velPie) * 60);
+
+    const tiempoCoche = tiempoCocheMin >= 60
+      ? `${(tiempoCocheMin / 60).toFixed(1)} h en coche`
+      : `${tiempoCocheMin} min en coche`;
+
+    const tiempoPie = tiempoPieMin >= 60
+      ? `${(tiempoPieMin / 60).toFixed(1)} h a pie`
+      : `${tiempoPieMin} min a pie`;
+
+    // HTML del popup
     const popupHTML = `
       <b>${nombre}</b><br>
+      Distancia: ${distanciaKm.toFixed(1)} km<br>
+      ${tiempoCoche} | ${tiempoPie}<br>
       <a href="https://www.google.com/maps/dir/?api=1&destination=${f.lat},${f.lon}&travelmode=driving" target="_blank">🧭 Cómo llegar</a><br>
-      <span>${f.datosPersonalizados?.precio || ''}</span><br>
-      <span>${f.datosPersonalizados?.horario || ''}</span><br>
-      <small>${f.datosPersonalizados?.notas || ''}</small>
+      ${f.datosPersonalizados?.precio ? `<span>💰 ${f.datosPersonalizados.precio}</span><br>` : ""}
+      ${f.datosPersonalizados?.horario ? `<span>🕒 ${f.datosPersonalizados.horario}</span><br>` : ""}
+      ${f.datosPersonalizados?.notas ? `<small>📝 ${f.datosPersonalizados.notas}</small>` : ""}
     `;
 
+    // Icono personalizado de estrella
     const iconoEstrella = L.divIcon({
       className: 'icono-favorito',
       html: '⭐',
@@ -567,11 +650,15 @@ function mostrarMarcadoresFavoritos() {
       iconAnchor: [15, 30]
     });
 
-    L.marker([f.lat, f.lon], { icon: iconoEstrella })
+    // Crear marcador y guardar referencia
+    const marcador = L.marker([f.lat, f.lon], { icon: iconoEstrella })
       .addTo(map)
       .bindPopup(popupHTML);
+
+    marcadoresFavoritos.push(marcador);
   });
 }
+
 
 
 //❌======== GESTION DE FAVORITOS 👆 ======== //
