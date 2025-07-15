@@ -13,7 +13,7 @@ let marcadorUbicacionReal = null; // Marcador azul real
 
 // 📍 Marcadores agrupados por tipo de lugar (para borrarlos fácilmente luego)
 const markersPorTipo = {
-  camp_site: [],
+  camping: [],
   fuel: [],
   parking: [],
   hotel: [],
@@ -28,7 +28,7 @@ const markersPorTipo = {
 };
 // 🖼️ Iconos personalizados por tipo de lugar (para mostrar en el mapa)
 const iconos = {
-  camp_site: L.icon({
+  camping: L.icon({
     iconUrl: 'Recursos/img/campingmapa.png', iconSize: [32, 32], iconAnchor: [14, 28], popupAnchor: [0, -30]
   }),
   fuel: L.icon({
@@ -71,7 +71,7 @@ const iconoUbicacion = L.icon({
 });
 // ✅ Estado de activación de cada tipo de marcador
 const tipoActivo = {
-  camp_site: false,
+  camping: false,
   fuel: false,
   parking: false,
   hotel: false,
@@ -261,7 +261,18 @@ function buscar(tipo) {
 
   let query = "";
 
-  if (tipo === "hotel") {
+  if (tipo === "camping") {
+  query = `
+    [out:json];
+    (
+      node["tourism"="camp_site"](around:${radius},${lat},${lon});
+      way["tourism"="camp_site"](around:${radius},${lat},${lon});
+      node["tourism"="caravan_site"](around:${radius},${lat},${lon});
+      way["tourism"="caravan_site"](around:${radius},${lat},${lon});
+    );
+    out center;
+  `;
+} else if (tipo === "hotel") {
     query = `
       [out:json];
       (
@@ -280,15 +291,19 @@ function buscar(tipo) {
       out center;
     `;
   } else if (tipo === "luggage") {
-    query = `
-      [out:json];
-      (
-        node["amenity"="locker"](around:${radius},${lat},${lon});
-        way["amenity"="locker"](around:${radius},${lat},${lon});
-      );
-      out center;
-    `;
-  } else if (tipo === "parking") {
+  query = `
+    [out:json];
+    (
+      node["amenity"="locker"](around:${radius},${lat},${lon});
+      way["amenity"="locker"](around:${radius},${lat},${lon});
+      node["information"="luggage_storage"](around:${radius},${lat},${lon});
+      way["information"="luggage_storage"](around:${radius},${lat},${lon});
+      node["luggage"="yes"](around:${radius},${lat},${lon});
+      way["luggage"="yes"](around:${radius},${lat},${lon});
+    );
+    out center;
+  `;
+} else if (tipo === "parking") {
     query = `
       [out:json];
       (
@@ -298,53 +313,75 @@ function buscar(tipo) {
       out center;
     `;
   } else if (tipo === "airport") {
-    query = `
-      [out:json];
-      (
-        node["aeroway"="aerodrome"](around:${radius},${lat},${lon});
-        node["aeroway"="airport"](around:${radius},${lat},${lon});
-      );
-      out center;
-    `;
-  } else if (tipo === "tourism") {
-    query = `
-      [out:json];
-      (
-        node["tourism"="attraction"](around:${radius},${lat},${lon});
-        node["tourism"="viewpoint"](around:${radius},${lat},${lon});
-        node["historic"](around:${radius},${lat},${lon});
-        node["tourism"="museum"](around:${radius},${lat},${lon});
-      );
-      out center;
-    `;
-  }else if (tipo === "restaurant") {
-    query = `
-      [out:json];
-      (
-        node["amenity"="restaurant"](around:${radius},${lat},${lon});
-        way["amenity"="restaurant"](around:${radius},${lat},${lon});
-      );
-      out center;
-    `;
-  }else if (tipo === "cafe") {
   query = `
     [out:json];
     (
-      node["amenity"="cafe"](around:${radius},${lat},${lon});
-      way["amenity"="cafe"](around:${radius},${lat},${lon});
+      node["aeroway"="aerodrome"](around:${radius},${lat},${lon});
+      way["aeroway"="aerodrome"](around:${radius},${lat},${lon});
+      relation["aeroway"="aerodrome"](around:${radius},${lat},${lon});
     );
     out center;
   `;
-  }else if (tipo === "hospital") {
+} else if (tipo === "tourism") {
+  query = `
+    [out:json];
+    (
+      node["tourism"~"attraction|viewpoint|museum|artwork|theme_park|zoo|aquarium|gallery"](around:${radius},${lat},${lon});
+      way["tourism"~"attraction|viewpoint|museum|artwork|theme_park|zoo|aquarium|gallery"](around:${radius},${lat},${lon});
+      relation["tourism"~"attraction|viewpoint|museum|artwork|theme_park|zoo|aquarium|gallery"](around:${radius},${lat},${lon});
+
+      node["historic"](around:${radius},${lat},${lon});
+      way["historic"](around:${radius},${lat},${lon});
+      relation["historic"](around:${radius},${lat},${lon});
+    );
+    out center;
+  `;
+} else if (tipo === "restaurant") {
+  query = `
+    [out:json];
+    (
+      node["amenity"="restaurant"](around:${radius},${lat},${lon});
+      way["amenity"="restaurant"](around:${radius},${lat},${lon});
+      relation["amenity"="restaurant"](around:${radius},${lat},${lon});
+    );
+    out center;
+  `;
+} else if (tipo === "cafe") {
+  query = `
+    [out:json];
+    (
+      node["amenity"="cafe"](around:${radius},${lat},${lon})
+        ["name"!="Starbucks"]
+        ["amenity"!="bar"]
+        ["brand"!="Starbucks"];
+      way["amenity"="cafe"](around:${radius},${lat},${lon})
+        ["name"!="Starbucks"]
+        ["amenity"!="bar"]
+        ["brand"!="Starbucks"];
+      relation["amenity"="cafe"](around:${radius},${lat},${lon})
+        ["name"!="Starbucks"]
+        ["amenity"!="bar"]
+        ["brand"!="Starbucks"];
+    );
+    out center;
+  `;
+}
+ else if (tipo === "hospital") {
   query = `
     [out:json];
     (
       node["amenity"="hospital"](around:${radius},${lat},${lon});
       way["amenity"="hospital"](around:${radius},${lat},${lon});
+      relation["amenity"="hospital"](around:${radius},${lat},${lon});
+      
+      node["healthcare"="hospital"](around:${radius},${lat},${lon});
+      way["healthcare"="hospital"](around:${radius},${lat},${lon});
+      relation["healthcare"="hospital"](around:${radius},${lat},${lon});
     );
     out center;
   `;
-  }else {
+}
+else {
     query = `
       [out:json];
       (
