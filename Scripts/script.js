@@ -1,3 +1,15 @@
+// Espera a que la API de Google esté lista
+window.initMap = function () {
+  // No hacer nada aquí porque llamaremos a getLocation manualmente
+};
+
+// Espera a que el DOM esté listo, y entonces inicia todo
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", getLocation);
+} else {
+  getLocation();
+}
+
 //✅================= VARIABLES GLOBALES 👇 ================= //
 // 🌍 Variables principales del mapa
 let map;
@@ -75,11 +87,7 @@ function guardarListas() {
 //✅================= VARIABLES GLOBALES 👆 ================= //
 //✅======== INICIALIZACIÓN DEL MAPA Y MARCADOR DEL USUARIO 👇 ======== //
 // 🚀 Inicializa el mapa con la ubicación dada
-if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", inicializarInterfaz);
-} else {
-  inicializarInterfaz();
-}
+
 
 function initMap(lat = 40.4168, lon = -3.7038) {
   currentCoords = { lat, lng: lon };
@@ -109,13 +117,32 @@ function initMap(lat = 40.4168, lon = -3.7038) {
     actualizarCirculo();
   });
 
+  // ✅ Crear el botón de ubicación manualmente (fuera del dragend)
+  const controlDiv = document.createElement("div");
+  controlDiv.style.margin = "10px";
+
+  const botonUbicacion = document.createElement("button");
+  botonUbicacion.innerText = "📍";
+  botonUbicacion.title = "Obtener ubicación real";
+  botonUbicacion.style.fontSize = "20px";
+  botonUbicacion.style.padding = "5px 10px";
+  botonUbicacion.style.background = "white";
+  botonUbicacion.style.border = "1px solid #999";
+  botonUbicacion.style.borderRadius = "4px";
+  botonUbicacion.style.cursor = "pointer";
+
+  botonUbicacion.onclick = () => actualizarUbicacionReal();
+
+  controlDiv.appendChild(botonUbicacion);
+  map.controls[google.maps.ControlPosition.TOP_RIGHT].push(controlDiv);
+
   crearCirculo();
   document.getElementById("status").innerText = "Ubicación cargada";
 
-  // 👇 Esta llamada es la clave
   inicializarInterfaz();
   getLocation();
 }
+
 
 function inicializarInterfaz() {
   const toggleBtn = document.getElementById("toggleMenu");
@@ -262,7 +289,6 @@ function actualizarUbicacionReal() {
 
 
 // 🔘 Botón en la esquina superior derecha para obtener la ubicación GPS real
-const botonUbicacion = L.control({ position: 'topright' });
 botonUbicacion.onAdd = function () {
   const div = L.DomUtil.create('div', 'leaflet-bar leaflet-control');
   div.innerHTML = '<a href="#" title="Obtener ubicación real">📍</a>';
@@ -791,10 +817,8 @@ function mostrarMarcadoresFavoritos() {
 favoritos.forEach(f => {
   const nombre = f.datosPersonalizados?.nombre || f.id;
   const tipo = f.tipo;
-  const coords = {
-    lat: e.type === "node" ? e.lat : e.center.lat,
-    lng: e.type === "node" ? e.lon : e.center.lon
-  };
+  const coords = { lat: f.lat, lng: f.lon };
+
   const idUnico = f.id;
 
   const userPos = ubicacionReal || currentCoords;
