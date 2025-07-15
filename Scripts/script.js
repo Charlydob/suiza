@@ -102,6 +102,7 @@ function initMap(lat, lon) {
   L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
     attribution: "© OpenStreetMap"
   }).addTo(map);
+  botonUbicacion.addTo(map);
 
   currentCoords = [lat, lon];
 
@@ -217,7 +218,6 @@ botonUbicacion.onAdd = function () {
 
   return div;
 };
-botonUbicacion.addTo(map);
 
 //❌======== ACTUALIZACIÓN EN TIEMPO REAL Y OBTENCIÓN DE UBICACIÓN 👆 ======== //
 //✅======== CONSULTA A OVERPASS API (OpenStreetMap) 👇 ======== //
@@ -715,6 +715,5 @@ document.addEventListener("DOMContentLoaded", () => {
     e.stopPropagation();
   });
 
-  getLocation();
 });
 //✅======== EVENTOS DE CARGA Y MANEJO DE SIDEBAR 👆 ======== // 
