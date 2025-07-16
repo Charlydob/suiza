@@ -1,4 +1,65 @@
-//✅================= VARIABLES GLOBALES 👇 ================= //
+// Scripts/script.js
+import { db, rutaFavoritos } from "./firebase.js";
+
+
+// ✅ script.js
+// Este archivo es el punto de entrada de tu app web.
+// Se ejecuta automáticamente porque se carga con type="module" en el HTML.
+// Aquí conectamos todas las piezas y asignamos los eventos del DOM.
+
+// 📦 IMPORTACIONES DE MÓDULOS
+import { initMap } from "./initMap.js";//✅
+import { initSidebar } from "./sidebar.js"; //✅ // carga listeners y filtros de favoritos
+import { getLocation } from "./centrarFavorito.js";//✅
+import { toggleTipo } from "./tipoActivo.js";//✅
+import { buscarLugar } from "./buscar.js";//✅
+import { clearAll } from "./limpiarMapa.js";//✅
+import {
+  guardarEdicionFavorito,//✅
+  borrarFavorito,//✅
+  cerrarEditorFavorito,//✅
+} from "./favoritesManager.js";
+
+// ✅ Esta función se ejecuta cuando Google Maps termina de cargarse (callback en HTML)
+window.initApp = function () {
+  // Coordenadas iniciales: se usan si no hay geolocalización disponible
+  initMap(40.4168, -3.7038); // Madrid como fallback
+
+  // Carga el sidebar, listeners de filtros, sliders, favoritos, etc.
+  initSidebar();
+};
+
+// ✅ Este bloque se ejecuta cuando el DOM ha terminado de cargarse (independiente de Maps)
+document.addEventListener("DOMContentLoaded", () => {
+  // 🔍 Botón para buscar texto en el input de lugar
+  const btnBuscar = document.querySelector(".search-group button");
+  btnBuscar?.addEventListener("click", buscarLugar);
+
+  // 🧹 Botón para limpiar resultados
+  const btnLimpiar = document.querySelector(".clear-button");
+  btnLimpiar?.addEventListener("click", clearAll);
+
+  // 💾 Botón para guardar la edición de un favorito
+  document
+    .getElementById("btnGuardarFavorito")
+    ?.addEventListener("click", guardarEdicionFavorito);
+
+  // 🗑️ Botón para eliminar un favorito
+  document
+    .getElementById("btnBorrarFavorito")
+    ?.addEventListener("click", borrarFavorito);
+
+  // ❌ Botón para cancelar la edición
+  document
+    .getElementById("btnCancelarEdicion")
+    ?.addEventListener("click", cerrarEditorFavorito);
+});
+
+window.initApp = initApp;
+
+
+
+/*//✅================= VARIABLES GLOBALES 👇 ================= //
 // 🌍 Variables principales del mapa
 let map;
 let userMarker;
@@ -107,8 +168,6 @@ function guardarListas() {
   // Guardar ignorados en localStorage
   localStorage.setItem("ignorados", JSON.stringify(ignorados));
 }
-
-
 //✅================= VARIABLES GLOBALES 👆 ================= //
 //✅======== INICIALIZACIÓN DEL MAPA Y MARCADOR DEL USUARIO 👇 ======== //
 // 🚀 Inicializa el mapa con la ubicación dada
@@ -142,7 +201,8 @@ function initMap(lat, lon) {
   document.getElementById("status").innerText = "Ubicación cargada";
 }
 //✅======== INICIALIZACIÓN DEL MAPA Y MARCADOR DEL USUARIO 👆 ======== //
-
+*/
+/*
 //✅======== GESTIÓN DEL CÍRCULO DE BÚSQUEDA 👇 ======== //
 // 🔵 Crea el círculo de búsqueda alrededor del usuario
 function crearCirculo() {
@@ -162,7 +222,9 @@ function actualizarCirculo() {
   searchCircle.setRadius(radius);
 }
 //✅======== GESTIÓN DEL CÍRCULO DE BÚSQUEDA  👆 ======== // 
-// ❌======== ACTUALIZACIÓN EN TIEMPO REAL Y OBTENCIÓN DE UBICACIÓN 👇 ======== //
+*/
+/*
+// ======== ACTUALIZACIÓN EN TIEMPO REAL Y OBTENCIÓN DE UBICACIÓN 👇 ======== //
 
 // 🔁 Re-busca automáticamente lugares activos si cambia la ubicación
 function actualizarBusquedaActiva() {
@@ -239,7 +301,8 @@ botonUbicacion.onAdd = function () {
 };
 
 //❌======== ACTUALIZACIÓN EN TIEMPO REAL Y OBTENCIÓN DE UBICACIÓN 👆 ======== //
-//❌======== CALCULAR DISTANCIAS 👇 ======== //
+*/
+/*//❌======== CALCULAR DISTANCIAS 👇 ======== //
 function calcularDistancia(lat1, lon1, lat2, lon2) {
   const R = 6371; // km
   const dLat = (lat2 - lat1) * Math.PI / 180;
@@ -251,6 +314,8 @@ function calcularDistancia(lat1, lon1, lat2, lon2) {
   return R * c;
 }
 //❌======== CALCULAR DISTANCIAS 👆 ======== //
+*/
+/*
 //✅======== CONSULTA A OVERPASS API (OpenStreetMap) 👇 ======== //
 // 🔎 Busca lugares de un tipo concreto cerca del usuario usando Overpass API
 async function buscar(tipo) {
@@ -478,6 +543,8 @@ async function buscar(tipo) {
 }
 
 //✅======== CONSULTA A OVERPASS API (OpenStreetMap) 👆 ======== //
+*/
+/*
 //======== INTERFAZ: BOTONES DE FILTRADO 👇 ======== //
 // 🎚️ Activa o desactiva un tipo de lugar (botones de filtros)
 function toggleTipo(tipo) {
@@ -510,7 +577,9 @@ function toggleTipo(tipo) {
 }
 
 //✅======== INTERFAZ: BOTONES DE FILTRADO 👆 ======== // 
+*/
 //✅======== LIMPIEZA DEL MAPA 👇 ======== //
+/*
 // 🧼 Limpia todos los marcadores y resetea el estado
 function clearAll() {
   Object.keys(markersPorTipo).forEach(tipo => {
@@ -526,7 +595,8 @@ function clearAll() {
   document.getElementById("status").innerText = "Mapa limpio";
 }
 //✅======== LIMPIEZA DEL MAPA  👆 ======== // 
-//✅======== BUSCAR UN LUGAR POR NOMBRE (input de texto) 👇 ======== //
+*/
+/*//✅======== BUSCAR UN LUGAR POR NOMBRE (input de texto) 👇 ======== //
 // 🧭 Busca una ciudad o dirección por nombre (con Nominatim)
 function buscarLugar() {
   const lugar = document.getElementById("locationSearch").value;
@@ -553,6 +623,8 @@ function buscarLugar() {
     });
 }
 //✅======== BUSCAR UN LUGAR POR NOMBRE (input de texto) 👆 ======== // 
+*/
+/*
 //❌======== GESTIÓN DE FAVORITOS 👇 ======== //
 // RENDERIZA FAVORITOS EN MAPA
 function renderizarFavoritos() {
@@ -816,6 +888,8 @@ function editarFavoritoDesdeMapa(id) {
 
 
 //❌======== GESTION DE FAVORITOS 👆 ======== //
+*/
+/*
 //❌======== GESTION DE IGNORADOS 👇 ======== //
 // 🗑️ Añade un lugar a la lista de ignorados y actualiza la vista
 function ignorarLugar(id) {
@@ -826,6 +900,8 @@ function ignorarLugar(id) {
   }
 }
 //❌======== GESTION DE IGNORADOS 👆 ======== //
+*/
+/*
 function getLocation() {
   if (!navigator.geolocation) {
     alert("Tu navegador no permite geolocalización");
@@ -858,8 +934,8 @@ function establecerCentroDesdeFavorito(lat, lon) {
     actualizarBusquedaActiva();
   }
 }
-
-
+*/
+/*
 //✅======== EVENTOS DE CARGA Y MANEJO DE SIDEBAR 👇 ======== //
 // 📲 Manejo de eventos una vez el DOM esté cargado
 document.addEventListener("DOMContentLoaded", () => {
@@ -919,4 +995,4 @@ document.getElementById("ordenFavoritos").value = localStorage.getItem("ordenFav
   renderizarFavoritos();
 });
 
-//✅======== EVENTOS DE CARGA Y MANEJO DE SIDEBAR 👆 ======== // 
+//✅======== EVENTOS DE CARGA Y MANEJO DE SIDEBAR 👆 ======== // */
