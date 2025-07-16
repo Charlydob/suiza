@@ -144,7 +144,12 @@
 
 
   <!-- 2. Google Maps con callback -->
-  <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA8KhfGc61uBT3DHS1hiCEl7HgnFYaWySI&libraries=places&callback=initApp">
+  <script 
+  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA8KhfGc61uBT3DHS1hiCEl7HgnFYaWySI&libraries=places&callback=initApp"
+  async 
+  defer
+  type="module"
+  ></script>
   </script>
     <!-- 3. Tu script principal como módulo -->
   <script type="module" src="Scripts/script.js"></script>
