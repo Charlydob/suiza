@@ -1,92 +1,9 @@
-// script.js
-
-let map;
-let userMarker;
-let currentCoords = { lat: 40.4168, lng: -3.7038 }; // fallback por si falla la geo
-
-function initApp() {
-  console.log("✅ Google Maps cargado");
-  getLocation();
-}
-
-function getLocation() {
-  console.log("🛰️ Intentando obtener ubicación...");
-
-  if (!navigator.geolocation) {
-    alert("Tu navegador no permite geolocalización.");
-    initMap(40.4168, -3.7038); // fallback
-    return;
-  }
-
-  navigator.geolocation.getCurrentPosition(
-    (pos) => {
-      const lat = pos.coords.latitude;
-      const lon = pos.coords.longitude;
-      console.log(`📍 Ubicación obtenida: ${lat}, ${lon}`);
-      initMap(lat, lon);
-    },
-    (err) => {
-      console.warn("❌ No se pudo obtener la ubicación: ", err);
-      alert("No se pudo obtener tu ubicación.");
-      initMap(40.4168, -3.7038); // fallback
-    },
-    {
-      enableHighAccuracy: true,
-      timeout: 10000,
-      maximumAge: 0
-    }
-  );
-}
-
-function initMap(lat, lon) {
-  currentCoords = { lat, lng: lon };
-
-  map = new google.maps.Map(document.getElementById("map"), {
-    center: currentCoords,
-    zoom: 14,
-    mapTypeControl: false,
-    fullscreenControl: false,
-    streetViewControl: false,
-  });
-
-  userMarker = new google.maps.Marker({
-    position: currentCoords,
-    map,
-    draggable: true,
-    icon: "Recursos/img/yo.png",
-    title: "📍 Aquí estás tú, piloto 🚌💨"
-  });
-
-  userMarker.addListener("dragend", (e) => {
-    currentCoords = {
-      lat: e.latLng.lat(),
-      lng: e.latLng.lng()
-    };
-    // Aquí llamas a lo que quieras: actualizarBusquedaActiva(), etc.
-  });
-}
-
-// Exponer al global para que Google Maps lo pueda llamar
-window.initApp = initApp;
-
-
-
-
-// Espera a que la API de Google esté lista
-window.initMap = function () {
-  // No hacer nada aquí porque llamaremos a getLocation manualmente
-};
-
-// Espera a que el DOM esté listo, y entonces inicia todo
-if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", getLocation);
-} else {
-  getLocation();
-}
-
 //✅================= VARIABLES GLOBALES 👇 ================= //
 // 🌍 Variables principales del mapa
+let map;
+let userMarker;
 let searchCircle;
+let currentCoords = null;
 let watchId = null;
 let seguimientoActivo = false;
 let centrarMapaActivo = false;
@@ -110,20 +27,48 @@ const markersPorTipo = {
   favoritos: []
 };
 // 🖼️ Iconos personalizados por tipo de lugar (para mostrar en el mapa)
+const iconos = {
+  camping: L.icon({
+    iconUrl: 'Recursos/img/campingmapa.png', iconSize: [32, 32], iconAnchor: [14, 28], popupAnchor: [0, -30]
+  }),
+  fuel: L.icon({
+    iconUrl: 'Recursos/img/gasolineramapa.png', iconSize: [32, 32], iconAnchor: [14, 28], popupAnchor: [0, -30]
+  }),
+  parking: L.icon({
+    iconUrl: 'Recursos/img/parkingmapa.png', iconSize: [32, 32], iconAnchor: [14, 28], popupAnchor: [0, -30]
+  }),
+  hotel: L.icon({
+    iconUrl: 'Recursos/img/hotelmapa.png', iconSize: [32, 32], iconAnchor: [14, 28], popupAnchor: [0, -30]
+  }),
+  airbnb: L.icon({
+    iconUrl: 'Recursos/img/airbnbmapa.png', iconSize: [32, 32], iconAnchor: [14, 28], popupAnchor: [0, -30]
+  }),
+  luggage: L.icon({
+    iconUrl: 'Recursos/img/maletamapa.png', iconSize: [32, 32], iconAnchor: [14, 28], popupAnchor: [0, -30]
+  }),
+  // En iconos:
+  airport: L.icon({
+    iconUrl: 'Recursos/img/aeropuertomapa.png', iconSize: [32, 32], iconAnchor: [14, 28], popupAnchor: [0, -30]
+  }),
+  tourism: L.icon({
+    iconUrl: 'Recursos/img/turismomapa.png', iconSize: [32, 32], iconAnchor: [14, 28], popupAnchor: [0, -30]
+  }),
+  restaurant: L.icon({
+    iconUrl: 'Recursos/img/restaurantemapa.png', iconSize: [32, 32], iconAnchor: [14, 28], popupAnchor: [0, -30]
+  }),
+  cafe: L.icon({
+    iconUrl: 'Recursos/img/cafeteriamapa.png', iconSize: [32, 32], iconAnchor: [14, 28], popupAnchor: [0, -30]
+  }),
+  hospital: L.icon({
+    iconUrl: 'Recursos/img/hospitalmapa.png', iconSize: [32, 32], iconAnchor: [14, 28], popupAnchor: [0, -30]
+  }),
+  
 
+};
 // 🧭 Icono de la ubicación del usuario
-userMarker = new google.maps.Marker({
-  position: currentCoords,
-  map,
-  draggable: true,
-  icon: {
-    url: "Recursos/img/yo.png",
-    scaledSize: new google.maps.Size(32, 32),
-    anchor: new google.maps.Point(14, 28)
-  },
-  title: "📍 Aquí estás tú, piloto 🚌💨"
+const iconoUbicacion = L.icon({
+  iconUrl: 'Recursos/img/yo.png', iconSize: [32, 32], iconAnchor: [14, 28], popupAnchor: [0, -30]
 });
-
 // ✅ Estado de activación de cada tipo de marcador
 const tipoActivo = {
   camping: false,
@@ -167,148 +112,55 @@ function guardarListas() {
 //✅================= VARIABLES GLOBALES 👆 ================= //
 //✅======== INICIALIZACIÓN DEL MAPA Y MARCADOR DEL USUARIO 👇 ======== //
 // 🚀 Inicializa el mapa con la ubicación dada
+function initMap(lat, lon) {
+  map = L.map("map").setView([lat, lon], 14);
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    attribution: "© OpenStreetMap"
+  }).addTo(map);
+  botonUbicacion.addTo(map);
 
+  currentCoords = [lat, lon];
 
-function initMap(lat = 40.4168, lon = -3.7038) {
-  currentCoords = { lat, lng: lon };
-
-  map = new google.maps.Map(document.getElementById("map"), {
-    center: currentCoords,
-    zoom: 14,
-    mapTypeControl: false,
-    fullscreenControl: false,
-    streetViewControl: false,
-  });
-
-  userMarker = new google.maps.Marker({
-    position: currentCoords,
-    map,
-    draggable: true,
-    icon: "Recursos/img/yo.png",
-    title: "📍 Aquí estás tú, piloto 🚌💨"
-  });
-
-  userMarker.addListener("dragend", (e) => {
-    currentCoords = {
-      lat: e.latLng.lat(),
-      lng: e.latLng.lng()
-    };
-    actualizarBusquedaActiva();
-    actualizarCirculo();
-  });
-
-  // ✅ Crear el botón de ubicación manualmente (fuera del dragend)
-  const controlDiv = document.createElement("div");
-  controlDiv.style.margin = "10px";
-
-  const botonUbicacion = document.createElement("button");
-  botonUbicacion.innerText = "📍";
-  botonUbicacion.title = "Obtener ubicación real";
-  botonUbicacion.style.fontSize = "20px";
-  botonUbicacion.style.padding = "5px 10px";
-  botonUbicacion.style.background = "white";
-  botonUbicacion.style.border = "1px solid #999";
-  botonUbicacion.style.borderRadius = "4px";
-  botonUbicacion.style.cursor = "pointer";
-
-  botonUbicacion.onclick = () => actualizarUbicacionReal();
-
-  controlDiv.appendChild(botonUbicacion);
-  map.controls[google.maps.ControlPosition.TOP_RIGHT].push(controlDiv);
+  userMarker = L.marker(currentCoords, {
+    icon: iconoUbicacion,
+    draggable: true
+  }).addTo(map)
+    .bindPopup("📍 Aquí estás tú, piloto 🚌💨")
+    .openPopup();
 
   crearCirculo();
-  document.getElementById("status").innerText = "Ubicación cargada";
 
-  inicializarInterfaz();
-  getLocation();
-}
-
-
-function inicializarInterfaz() {
-  const toggleBtn = document.getElementById("toggleMenu");
-  const sidebar = document.getElementById("sidebar");
-
-  const closeBtn = document.getElementById("closeSidebar");
-  closeBtn.addEventListener("click", () => {
-    sidebar.classList.remove("open");
-    toggleBtn.style.display = "block";
-  });
-
-  toggleBtn.addEventListener("click", () => {
-    sidebar.classList.toggle("open");
-    toggleBtn.style.display = sidebar.classList.contains("open") ? "none" : "block";
-  });
-
-  document.getElementById("radiusSlider").addEventListener("input", () => {
-    document.getElementById("radiusValue").innerText = document.getElementById("radiusSlider").value;
+  userMarker.on("dragend", () => {
+    const pos = userMarker.getLatLng();
+    currentCoords = [pos.lat, pos.lng];
     actualizarCirculo();
     actualizarBusquedaActiva();
+    
   });
 
-  sidebar.addEventListener("touchstart", function (e) {
-    if (e.touches.length > 1) return;
-    e.stopPropagation();
-  }, { passive: false });
 
-  sidebar.addEventListener("dblclick", function (e) {
-    e.preventDefault();
-    e.stopPropagation();
-  });
-
-  document.getElementById("buscadorFavoritos").addEventListener("input", (e) => {
-    localStorage.setItem("filtroTextoFavoritos", e.target.value);
-    renderizarFavoritos();
-  });
-
-  document.getElementById("filtroTipoFavoritos").addEventListener("change", (e) => {
-    localStorage.setItem("filtroTipoFavoritos", e.target.value);
-    renderizarFavoritos();
-  });
-
-  document.getElementById("ordenFavoritos").addEventListener("change", (e) => {
-    localStorage.setItem("ordenFavoritos", e.target.value);
-    renderizarFavoritos();
-  });
-
-  // Recuperar filtros
-  document.getElementById("buscadorFavoritos").value = localStorage.getItem("filtroTextoFavoritos") || "";
-  document.getElementById("filtroTipoFavoritos").value = localStorage.getItem("filtroTipoFavoritos") || "";
-  document.getElementById("ordenFavoritos").value = localStorage.getItem("ordenFavoritos") || "distanciaAsc";
-
-  renderizarFavoritos();
+  document.getElementById("status").innerText = "Ubicación cargada";
 }
-
-
 //✅======== INICIALIZACIÓN DEL MAPA Y MARCADOR DEL USUARIO 👆 ======== //
 
 //✅======== GESTIÓN DEL CÍRCULO DE BÚSQUEDA 👇 ======== //
 // 🔵 Crea el círculo de búsqueda alrededor del usuario
 function crearCirculo() {
   const radius = parseInt(document.getElementById("radiusSlider").value);
-
-  if (searchCircle) searchCircle.setMap(null);
-
-  searchCircle = new google.maps.Circle({
-    strokeColor: "#0000ff",
-    strokeOpacity: 0.5,
-    strokeWeight: 1,
+  if (searchCircle) map.removeLayer(searchCircle);
+  searchCircle = L.circle(currentCoords, {
+    radius,
+    color: "blue",
     fillColor: "#5fa",
-    fillOpacity: 0.2,
-    map,
-    center: currentCoords,
-    radius: radius,
-  });
+    fillOpacity: 0.2
+  }).addTo(map);
 }
-
 // 🔁 Actualiza el círculo cuando cambia la ubicación o el radio
 function actualizarCirculo() {
   const radius = parseInt(document.getElementById("radiusSlider").value);
-  if (searchCircle) {
-    searchCircle.setCenter(currentCoords);
-    searchCircle.setRadius(radius);
-  }
+  searchCircle.setLatLng(currentCoords);
+  searchCircle.setRadius(radius);
 }
-
 //✅======== GESTIÓN DEL CÍRCULO DE BÚSQUEDA  👆 ======== // 
 // ❌======== ACTUALIZACIÓN EN TIEMPO REAL Y OBTENCIÓN DE UBICACIÓN 👇 ======== //
 
@@ -331,62 +183,60 @@ function actualizarUbicacionReal() {
   navigator.geolocation.getCurrentPosition(
     (pos) => {
       const lat = pos.coords.latitude;
-      const lng = pos.coords.longitude;
+      const lon = pos.coords.longitude;
 
-      ubicacionReal = { lat, lng };
-      currentCoords = { lat, lng };
+        // 🔧 Normaliza y guarda
+        ubicacionReal = { lat, lng: lon };
 
+      currentCoords = [lat, lon];
+
+      // Crea o actualiza el marcador de la ubicación real
       if (!marcadorUbicacionReal) {
-        marcadorUbicacionReal = new google.maps.Marker({
-          position: currentCoords,
-          map,
-          icon: {
-            path: google.maps.SymbolPath.CIRCLE,
-            scale: 8,
-            fillColor: "#00f",
-            fillOpacity: 1,
-            strokeWeight: 1,
-          }
-        });
+        marcadorUbicacionReal = L.marker([lat, lon], {
+          icon: L.divIcon({
+            className: "marcador-real",
+            html: "🔵",
+            iconSize: [20, 20],
+            iconAnchor: [10, 10]
+          })
+        }).addTo(map);
       } else {
-        marcadorUbicacionReal.setPosition(currentCoords);
+        marcadorUbicacionReal.setLatLng([lat, lon]);
       }
 
-      map.setCenter(currentCoords);
+      map.setView([lat, lon], 16);
+
       actualizarCirculo();
       actualizarBusquedaActiva();
       renderizarFavoritos();
 
       document.getElementById("status").innerText = "";
     },
+
     (err) => {
       console.error(err);
       document.getElementById("status").innerText = "No se pudo obtener la ubicación";
     },
+
     { enableHighAccuracy: true }
   );
 }
 
-
 // 🔘 Botón en la esquina superior derecha para obtener la ubicación GPS real
-const controlDiv = document.createElement("div");
-controlDiv.style.margin = "10px";
+const botonUbicacion = L.control({ position: 'topright' });
+botonUbicacion.onAdd = function () {
+  const div = L.DomUtil.create('div', 'leaflet-bar leaflet-control');
+  div.innerHTML = '<a href="#" title="Obtener ubicación real">📍</a>';
+  div.style.backgroundColor = 'white';
+  div.style.padding = '5px';
 
-const botonUbicacion = document.createElement("button");
-botonUbicacion.innerText = "📍";
-botonUbicacion.title = "Obtener ubicación real";
-botonUbicacion.style.fontSize = "20px";
-botonUbicacion.style.padding = "5px 10px";
-botonUbicacion.style.background = "white";
-botonUbicacion.style.border = "1px solid #999";
-botonUbicacion.style.borderRadius = "4px";
-botonUbicacion.style.cursor = "pointer";
+  div.onclick = function (e) {
+    e.preventDefault();
+    actualizarUbicacionReal();
+  };
 
-botonUbicacion.onclick = () => actualizarUbicacionReal();
-
-controlDiv.appendChild(botonUbicacion);
-map.controls[google.maps.ControlPosition.TOP_RIGHT].push(controlDiv);
-
+  return div;
+};
 
 //❌======== ACTUALIZACIÓN EN TIEMPO REAL Y OBTENCIÓN DE UBICACIÓN 👆 ======== //
 //❌======== CALCULAR DISTANCIAS 👇 ======== //
@@ -581,8 +431,8 @@ async function buscar(tipo) {
 
       const lat1 = Array.isArray(userPos) ? userPos[0] : userPos.lat;
       const lon1 = Array.isArray(userPos) ? userPos[1] : userPos.lng;
-      
-      const distanciaKm = calcularDistancia(lat1, lon1, coords.lat, coords.lng);
+      const distanciaKm = calcularDistancia(lat1, lon1, coords[0], coords[1]);
+
       const tiempoCocheMin = Math.round((distanciaKm / 60) * 60);
       const tiempoPieMin = Math.round((distanciaKm / 5) * 60);
 
@@ -615,23 +465,8 @@ async function buscar(tipo) {
         </div>
       `;
 
-    const marker = new google.maps.Marker({
-  position: { lat: coords[0], lng: coords[1] },
-  map,
-  icon: `Recursos/img/${tipo}mapa.png`, // usa las mismas imágenes
-  title: name
-});
-
-const infowindow = new google.maps.InfoWindow({
-  content: popupHTML
-});
-
-marker.addListener("click", () => {
-  infowindow.open(map, marker);
-});
-
-markersPorTipo[tipo].push(marker);
-
+      const marker = L.marker(coords, { icon: iconos[tipo] }).addTo(map).bindPopup(popupHTML);
+      markersPorTipo[tipo].push(marker);
     });
 
     document.getElementById("status").innerText = `Mostrando ${data.elements.length} resultados para ${tipo}`;
@@ -706,7 +541,7 @@ function buscarLugar() {
       }
       const lat = parseFloat(data[0].lat);
       const lon = parseFloat(data[0].lon);
-      currentCoords = { lat, lng: lon };
+      currentCoords = [lat, lon];
       userMarker.setLatLng(currentCoords);
       map.setView(currentCoords, 14);
       actualizarCirculo();
@@ -896,82 +731,75 @@ function cerrarEditorFavorito() {
 }
 function mostrarMarcadoresFavoritos() {
   // Borra marcadores anteriores
-  marcadoresFavoritos.forEach(m => m.setMap(null));
+  marcadoresFavoritos.forEach(m => map.removeLayer(m));
   marcadoresFavoritos = [];
 
-  favoritos.forEach(f => {
-    const nombre = f.datosPersonalizados?.nombre || f.id;
-    const tipo = f.tipo;
-    const coords = { lat: f.lat, lng: f.lon };
+favoritos.forEach(f => {
+  const nombre = f.datosPersonalizados?.nombre || f.id;
+  const tipo = f.tipo;
+  const coords = [f.lat, f.lon];
+  const idUnico = f.id;
 
-    const idUnico = f.id;
+  const userPos = ubicacionReal || currentCoords;
+  const lat1 = Array.isArray(userPos) ? userPos[0] : userPos.lat;
+  const lon1 = Array.isArray(userPos) ? userPos[1] : userPos.lng;
+  const distanciaKm = calcularDistancia(lat1, lon1, f.lat, f.lon);
 
-    const userPos = ubicacionReal || currentCoords;
-    const lat1 = Array.isArray(userPos) ? userPos[0] : userPos.lat;
-    const lon1 = Array.isArray(userPos) ? userPos[1] : userPos.lng;
-    const distanciaKm = calcularDistancia(lat1, lon1, f.lat, f.lon);
+  const tiempoCocheMin = Math.round((distanciaKm / 60) * 60);
+  const tiempoPieMin = Math.round((distanciaKm / 5) * 60);
 
-    const tiempoCocheMin = Math.round((distanciaKm / 60) * 60);
-    const tiempoPieMin = Math.round((distanciaKm / 5) * 60);
+  const tiempoCoche = tiempoCocheMin >= 60
+    ? `${(tiempoCocheMin / 60).toFixed(1)} h en coche`
+    : `${tiempoCocheMin} min en coche`;
 
-    const tiempoCoche = tiempoCocheMin >= 60
-      ? `${(tiempoCocheMin / 60).toFixed(1)} h en coche`
-      : `${tiempoCocheMin} min en coche`;
+  const tiempoPie = tiempoPieMin >= 60
+    ? `${(tiempoPieMin / 60).toFixed(1)} h a pie`
+    : `${tiempoPieMin} min a pie`;
 
-    const tiempoPie = tiempoPieMin >= 60
-      ? `${(tiempoPieMin / 60).toFixed(1)} h a pie`
-      : `${tiempoPieMin} min a pie`;
+const exactSearchLink = `https://www.google.com/maps/search/?api=1&query=${coords[0]},${coords[1]}`;
 
-    const exactSearchLink = `https://www.google.com/maps/search/?api=1&query=${coords.lat},${coords.lng}`;
+  const popupHTML = `
+  <div class="popup-personalizado">
+    <b>${nombre}</b><br>
+    Distancia: ${distanciaKm.toFixed(1)} km<br>
+    ${tiempoCoche} | ${tiempoPie}<br>
 
-    const popupHTML = `
-      <div class="popup-personalizado">
-        <b>${nombre}</b><br>
-        Distancia: ${distanciaKm.toFixed(1)} km<br>
-        ${tiempoCoche} | ${tiempoPie}<br>
+    <div class="grupo-botones-arriba">
+      <button onclick="window.open('https://www.google.com/maps/dir/?api=1&destination=${f.lat},${f.lon}&travelmode=driving', '_blank')">🧭 Cómo llegar</button>
+      <button onclick="window.open('${exactSearchLink}', '_blank')">🔍 Ver este sitio</button>
+    </div>
 
-        <div class="grupo-botones-arriba">
-          <button onclick="window.open('https://www.google.com/maps/dir/?api=1&destination=${f.lat},${f.lon}&travelmode=driving', '_blank')">🧭 Cómo llegar</button>
-          <button onclick="window.open('${exactSearchLink}', '_blank')">🔍 Ver este sitio</button>
-        </div>
+    <div class="boton-medio">
+      ${f.datosPersonalizados?.precio ? `💰 ${f.datosPersonalizados.precio}<br>` : ""}
+      ${f.datosPersonalizados?.horario ? `🕒 ${f.datosPersonalizados.horario}<br>` : ""}
+      ${f.datosPersonalizados?.notas ? `📝 <small>${f.datosPersonalizados.notas}</small><br>` : ""}
+    </div>
 
-        <div class="boton-medio">
-          ${f.datosPersonalizados?.precio ? `💰 ${f.datosPersonalizados.precio}<br>` : ""}
-          ${f.datosPersonalizados?.horario ? `🕒 ${f.datosPersonalizados.horario}<br>` : ""}
-          ${f.datosPersonalizados?.notas ? `📝 <small>${f.datosPersonalizados.notas}</small><br>` : ""}
-        </div>
+    <div class="grupo-botones-abajo">
+      <button onclick="editarFavoritoDesdeMapa('${idUnico}')">✏️ Editar favorito</button>
+      <button onclick="establecerCentroDesdeFavorito(${f.lat}, ${f.lon})">📌 Establecer como centro</button>
+      <button onclick="toggleFavorito('${idUnico}', '${tipo}', [${coords}], '${nombre.replace(/'/g, "\\'")}', this)">🗑️ Eliminar</button>
+    </div>
 
-        <div class="grupo-botones-abajo">
-          <button onclick="editarFavoritoDesdeMapa('${idUnico}')">✏️ Editar favorito</button>
-          <button onclick="establecerCentroDesdeFavorito(${f.lat}, ${f.lon})">📌 Establecer como centro</button>
-          <button onclick="toggleFavorito('${idUnico}', '${tipo}', [${coords.lat}, ${coords.lng}], '${nombre.replace(/'/g, "\\'")}', this)">🗑️ Eliminar</button>
-        </div>
-      </div>
-    `;
+  </div>
+`;
 
-    const marcador = new google.maps.Marker({
-      position: coords,
-      map,
-      icon: {
-        url: "Recursos/img/favorito.png", // Usa aquí tu propia estrella o cambia el path
-        scaledSize: new google.maps.Size(30, 30),
-        anchor: new google.maps.Point(15, 30)
-      },
-      title: nombre
-    });
 
-    const infowindow = new google.maps.InfoWindow({
-      content: popupHTML
-    });
-
-    marcador.addListener("click", () => {
-      infowindow.open(map, marcador);
-    });
-
-    marcadoresFavoritos.push(marcador);
+  const iconoEstrella = L.divIcon({
+    className: 'icono-favorito',
+    html: '⭐',
+    iconSize: [30, 30],
+    iconAnchor: [15, 30]
   });
-}
 
+  const marcador = L.marker([f.lat, f.lon], { icon: iconoEstrella })
+    .addTo(map)
+    .bindPopup(popupHTML);
+
+  marcadoresFavoritos.push(marcador);
+});
+
+}
 
 function editarFavoritoDesdeMapa(id) {
   const favorito = favoritos.find(f => f.id === id);
@@ -999,35 +827,25 @@ function ignorarLugar(id) {
 }
 //❌======== GESTION DE IGNORADOS 👆 ======== //
 function getLocation() {
-  console.log("🛰️ Intentando obtener ubicación...");
-
   if (!navigator.geolocation) {
-    alert("Tu navegador no permite geolocalización.");
-    initMap(40.4168, -3.7038); // 🧭 Madrid como fallback
+    alert("Tu navegador no permite geolocalización");
+    initMap(40.4168, -3.7038); // 🧭 Coordenadas por defecto: Madrid
     return;
   }
 
   navigator.geolocation.getCurrentPosition(
     (pos) => {
-      console.log("✅ Ubicación obtenida", pos);
       const lat = pos.coords.latitude;
       const lon = pos.coords.longitude;
       initMap(lat, lon);
     },
     (err) => {
-      console.warn("❌ No se pudo obtener la ubicación: ", err);
-      alert("No se pudo obtener tu ubicación. Asegúrate de permitirla o prueba en otro navegador.");
-      initMap(40.4168, -3.7038); // fallback
+      console.warn("No se pudo obtener la ubicación. Usando ubicación por defecto.");
+      initMap(40.4168, -3.7038); // 🧭 Madrid como fallback
     },
-    {
-      enableHighAccuracy: true,
-      timeout: 10000,
-      maximumAge: 0
-    }
+    { enableHighAccuracy: true }
   );
 }
-
-
 function establecerCentroDesdeFavorito(lat, lon) {
   const nuevaPosicion = [lat, lon];
 
@@ -1044,6 +862,61 @@ function establecerCentroDesdeFavorito(lat, lon) {
 
 //✅======== EVENTOS DE CARGA Y MANEJO DE SIDEBAR 👇 ======== //
 // 📲 Manejo de eventos una vez el DOM esté cargado
+document.addEventListener("DOMContentLoaded", () => {
+  const toggleBtn = document.getElementById("toggleMenu");
+  const sidebar = document.getElementById("sidebar");
 
+  const closeBtn = document.getElementById("closeSidebar");
+  closeBtn.addEventListener("click", () => {
+    sidebar.classList.remove("open");
+    toggleBtn.style.display = "block";
+  });
+
+  toggleBtn.addEventListener("click", () => {
+    sidebar.classList.toggle("open");
+    toggleBtn.style.display = sidebar.classList.contains("open") ? "none" : "block";
+  });
+
+  document.getElementById("radiusSlider").addEventListener("input", () => {
+    document.getElementById("radiusValue").innerText = document.getElementById("radiusSlider").value;
+    actualizarCirculo();
+    actualizarBusquedaActiva();
+  });
+
+  sidebar.addEventListener("touchstart", function (e) {
+    if (e.touches.length > 1) return;
+    e.stopPropagation();
+  }, { passive: false });
+
+  sidebar.addEventListener("dblclick", function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+  });
+
+  // 🔄 Listeners para filtros de favoritos
+document.getElementById("buscadorFavoritos").addEventListener("input", (e) => {
+  localStorage.setItem("filtroTextoFavoritos", e.target.value);
+  renderizarFavoritos();
+});
+
+document.getElementById("filtroTipoFavoritos").addEventListener("change", (e) => {
+  localStorage.setItem("filtroTipoFavoritos", e.target.value);
+  renderizarFavoritos();
+});
+
+document.getElementById("ordenFavoritos").addEventListener("change", (e) => {
+  localStorage.setItem("ordenFavoritos", e.target.value);
+  renderizarFavoritos();
+});
+
+
+  getLocation();
+  // 🧠 Recuperar filtros guardados
+document.getElementById("buscadorFavoritos").value = localStorage.getItem("filtroTextoFavoritos") || "";
+document.getElementById("filtroTipoFavoritos").value = localStorage.getItem("filtroTipoFavoritos") || "";
+document.getElementById("ordenFavoritos").value = localStorage.getItem("ordenFavoritos") || "distanciaAsc";
+
+  renderizarFavoritos();
+});
 
 //✅======== EVENTOS DE CARGA Y MANEJO DE SIDEBAR 👆 ======== // 

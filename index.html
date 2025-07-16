@@ -3,26 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-
-  <!-- ✅ PWA + iOS friendly -->
-  <meta name="theme-color" content="#1a73e8" />
-  <link rel="manifest" href="manifest.json" />
-
-  <!-- Para Safari y Brave en iOS -->
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-title" content="RutaCaravana" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <link rel="apple-touch-icon" href="Recursos/icono.png" />
-
-  <!-- Título y estilo -->
   <title>Mi Ruta en Caravana</title>
   <link rel="stylesheet" href="Styles/styles.css" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="apple-touch-icon" href="Recursos/icono.png" />
 </head>
 
-
 <!--SIDEBAR-->
-
 
 <body>
 <div id="sidebar">
@@ -151,16 +139,14 @@
 <!-- para pruebas de estetica en lan
   <div id="map"><img src="Recursos/img/fondoprueba.jpg"></div>
 -->
- <!-- <!-- 1. Leaflet 
+  <!-- 1. Leaflet -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
--->
 
-
-<!-- 1. Firebase SDKs -->
+<!-- 2. Firebase SDKs -->
 <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database-compat.js"></script>
 
-<!-- 2. Firebase Config + Init -->
+<!-- 3. Configuración Firebase + Inicialización -->
 <script>
   const firebaseConfig = {
     apiKey: "AIzaSyAIRkX0m-qORww2kcYl_mbXm6IKh7j02dc",
@@ -177,15 +163,8 @@
   const rutaFavoritos = "favoritos/charlyylaura";
 </script>
 
-<!-- 3. Google Maps con callback -->
-<script
-  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA8KhfGc61uBT3DHS1hiCEl7HgnFYaWySI&libraries=places&callback=initApp"
-  async defer>
-</script>
-
-<!-- 4. Tu script principal, como módulo -->
-<script type="module" src="Scripts/script.js"></script>
-
+<!-- 4. Tu script principal (donde usas Leaflet y Firebase) -->
+<script src="Scripts/script.js"></script>
 
 </body>
 </html>
