@@ -52,6 +52,10 @@ function initMap(lat, lon) {
 
   // Mostrar estado en UI
   document.getElementById("status").innerText = "Ubicación cargada";
+
+  return mapa;
+
+  
 }
 
 export { initMap };
