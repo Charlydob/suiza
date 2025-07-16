@@ -1,5 +1,5 @@
 // Scripts/circuloBusqueda.js
-import { map, searchCircle, currentCoords } from './variablesGlobales.js'; //✅
+import { map, searchCircle, currentCoords, iconoUbicacion } from './variablesGlobales.js'; //✅
 
 let circuloBusqueda = null;
 

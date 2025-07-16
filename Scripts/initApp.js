@@ -47,14 +47,14 @@ export function initApp() {
   log("✅ initApp ejecutada");
 
   // 🌍 Inicializa el mapa con fallback a Madrid
-  initMap();
+  //initMap();
 
   // 🧭 Intenta centrar en la ubicación actual
   getLocation();
 
   // 🧩 Inicializa sidebar y filtros
   initSidebar();
-// crea el circulo
+// crea el cir
   crearCirculo();
 
   // 🧠 Restaura filtros guardados
