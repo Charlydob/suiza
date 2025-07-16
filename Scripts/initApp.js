@@ -68,6 +68,8 @@ export function initApp() {
   actualizarBusquedaActiva();
 
   // 🧠 Listeners que dependen del DOM
+
+
   const btnBuscar = document.querySelector(".search-group button");
   btnBuscar?.addEventListener("click", buscarLugar);
 
