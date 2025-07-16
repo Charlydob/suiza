@@ -67,4 +67,8 @@ navigator.geolocation.getCurrentPosition(
   document.getElementById("btnGuardarFavorito")?.addEventListener("click", guardarEdicionFavorito);
   document.getElementById("btnBorrarFavorito")?.addEventListener("click", borrarFavorito);
   document.getElementById("btnCancelarEdicion")?.addEventListener("click", cerrarEditorFavorito);
+
+// Hacer que initApp sea accesible desde el ámbito global
+window.initApp = initApp;
+
 }
