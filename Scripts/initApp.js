@@ -47,7 +47,6 @@ export function initApp() {
   log("✅ initApp ejecutada");
 
   // 🌍 Inicializa el mapa con fallback a Madrid
-  //initMap();
 
   // 🧭 Intenta centrar en la ubicación actual
   getLocation();
