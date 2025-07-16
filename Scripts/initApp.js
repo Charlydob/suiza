@@ -6,6 +6,7 @@ import { actualizarBusquedaActiva } from './searchManager.js';
 import { actualizarCirculo } from './circuloBusqueda.js';
 
 export function initApp() {
+    console.log("✅ initApp ejecutada");
   // 🌍 Inicia el mapa con la ubicación actual o fallback
   getLocation();
 

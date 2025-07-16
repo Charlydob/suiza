@@ -1,6 +1,5 @@
 // Scripts/script.js
-import { initApp } from "./initApp.js";
-window.initApp = initApp;
+
 import { db, rutaFavoritos } from "./firebase.js";
 
 
