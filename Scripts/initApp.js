@@ -1,7 +1,7 @@
 // initApp.js
 import { initMap } from './initMap.js';
 import { getLocation } from './centrarFavorito.js';
-import { renderizarFavoritos } from './favoritosManager.js';
+import { renderizarFavoritos } from './favoritesManager.js';
 import { actualizarBusquedaActiva } from './searchManager.js';
 import { actualizarCirculo } from './circuloBusqueda.js';
 
