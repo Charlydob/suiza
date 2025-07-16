@@ -32,7 +32,7 @@ import { initMap } from './initMap.js';
 import { getLocation } from './centrarFavorito.js';
 import { renderizarFavoritos } from './favoritesManager.js';
 import { actualizarBusquedaActiva } from './searchManager.js';
-import { actualizarCirculo } from './circuloBusqueda.js';
+import { crearCirculo, actualizarCirculo } from './circuloBusqueda.js';
 import { initSidebar } from './sidebar.js';
 import { buscarLugar } from './buscar.js';
 import { clearAll } from './limpiarMapa.js';
@@ -47,13 +47,15 @@ export function initApp() {
   log("✅ initApp ejecutada");
 
   // 🌍 Inicializa el mapa con fallback a Madrid
-
+  initMap();
 
   // 🧭 Intenta centrar en la ubicación actual
   getLocation();
 
   // 🧩 Inicializa sidebar y filtros
   initSidebar();
+// crea el circulo
+  crearCirculo();
 
   // 🧠 Restaura filtros guardados
   document.getElementById("buscadorFavoritos").value = localStorage.getItem("filtroTextoFavoritos") || "";
