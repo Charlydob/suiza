@@ -1,5 +1,7 @@
 // Scripts/script.js
 import { db, rutaFavoritos } from "./firebase.js";
+import { initApp } from "./initAap.js";
+window.initApp = initApp;
 
 
 // ✅ script.js
@@ -55,7 +57,7 @@ document.addEventListener("DOMContentLoaded", () => {
     ?.addEventListener("click", cerrarEditorFavorito);
 });
 
-window.initApp = initApp;
+
 
 
 
