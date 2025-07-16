@@ -16,19 +16,6 @@ import {
   cerrarEditorFavorito,
 } from "./favoritesManager.js";
 
-// 🗺️ Callback para Google Maps (definido como global)
-window.initApp = function () {
-  console.log("✅ initApp ejecutada");
-
-  // 🌍 Inicializa el mapa centrado (fallback Madrid si no hay ubicación)
-  initMap(40.4168, -3.7038);
-
-  // 🧭 Intenta centrar en la ubicación actual
-  getLocation();
-
-  // 🧩 Inicializa el sidebar con filtros, sliders, favoritos, etc.
-  initSidebar();
-};
 
 // 🧠 Lógica que no depende de Google Maps
 document.addEventListener("DOMContentLoaded", () => {
