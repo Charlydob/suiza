@@ -1,34 +1,38 @@
 // Scripts/initMap.js
 import {
   map, userMarker, searchCircle,
-  currentCoords, iconoUbicacion
+  currentCoords, iconoUbicacion, setUbicacionReal, ubicacionReal
 } from './variablesGlobales.js'; //✅
-
+window.ubicacionReal = { lat, lng: lon };
 import { crearCirculo, actualizarCirculo } from './circuloBusqueda.js'; //✅
-import { actualizarBusquedaActiva } from './searchManager.js';//✅
+import { actualizarBusquedaActiva } from './searchManager.js'; //✅
 
 let infoWindow;
 
 function initMap(lat, lon) {
+  const centro = { lat, lng: lon };
+
   // Crear el mapa en el div #map
   const mapa = new google.maps.Map(document.getElementById("map"), {
-    center: { lat, lng: lon },
+    center: centro,
     zoom: 14,
     mapId: "Sigueme_Illoo!!" // opcional, para mapas personalizados
   });
-
+  // ✅ Actualiza la ubicación real correctamente
+  setUbicacionReal(centro);
   // Guardar referencia global
   window.map = mapa;
-
-  // Guardar coordenadas actuales
   window.currentCoords = [lat, lon];
 
-  // Crear marcador del usuario (arrastrable)
+  // 📍 Crear marcador arrastrable en la ubicación real
   const marker = new google.maps.Marker({
-    position: { lat, lng: lon },
+    position: centro,
     map: mapa,
-    icon: iconoUbicacion,
-    draggable: true
+    draggable: true,
+    icon: {
+      url: iconoUbicacion,
+      scaledSize: new google.maps.Size(40, 40),
+    },
   });
 
   window.userMarker = marker;
@@ -40,7 +44,7 @@ function initMap(lat, lon) {
   infoWindow.open(mapa, marker);
 
   // Crear círculo de búsqueda
-  crearCirculo(mapa, { lat, lng: lon });
+  crearCirculo(mapa, centro);
 
   // Evento: cuando se arrastra el marcador
   marker.addListener("dragend", () => {
@@ -54,8 +58,6 @@ function initMap(lat, lon) {
   document.getElementById("status").innerText = "Ubicación cargada";
 
   return mapa;
-
-  
 }
 
 export { initMap };

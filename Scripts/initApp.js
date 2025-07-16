@@ -24,42 +24,25 @@ export function initApp() {
   const mapa = initMap(40.4168, -3.7038); // debes asegurarte de que initMap devuelva el mapa creado
 
   // 🧭 Obtener ubicación real
-  navigator.geolocation.getCurrentPosition(
-    (position) => {
-      const lat = position.coords.latitude;
-      const lng = position.coords.longitude;
-      const centro = { lat, lng };
+// Scripts/initApp.js
 
-      // 📍 Crear marcador arrastrable en la ubicación real
-      const marcador = new google.maps.Marker({
-        position: centro,
-        map: mapa,
-        draggable: true,
-        icon: {
-          url: iconoUbicacion,
-          scaledSize: new google.maps.Size(40, 40),
-        },
-      });
+navigator.geolocation.getCurrentPosition(
+  (position) => {
+    const lat = position.coords.latitude;
+    const lng = position.coords.longitude;
 
-      // Centrar el mapa en la ubicación real
-      mapa.setCenter(centro);
+    // ✅ Llamamos a initMap y dejamos que se encargue de todo
+    const mapa = initMap(lat, lng);
+  },
+  (err) => {
+    console.warn("⚠️ No se pudo obtener la ubicación real:", err);
+    // Puedes elegir usar coordenadas por defecto aquí si quieres:
+    const lat = 40.4168; // Madrid
+    const lng = -3.7038;
+    const mapa = initMap(lat, lng);
+  }
+);
 
-      // 🔵 Crear círculo inicial alrededor del marcador
-      crearCirculo(mapa, centro);
-
-      // 🔁 Actualizar círculo si el usuario arrastra el marcador
-      marcador.addListener('dragend', () => {
-        const nuevaPos = marcador.getPosition();
-        const nuevasCoords = [nuevaPos.lat(), nuevaPos.lng()];
-        actualizarCirculo(nuevasCoords);
-        mapa.setCenter(nuevaPos);
-      });
-    },
-    (err) => {
-      console.warn("⚠️ No se pudo obtener la ubicación real:", err);
-      // El mapa ya estará centrado en Madrid por defecto
-    }
-  );
 
   // 🧩 Inicializa el sidebar y filtros
   initSidebar();

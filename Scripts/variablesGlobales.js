@@ -86,13 +86,20 @@ function guardarListas() {
   ref(db, rutaFavoritos).set(favoritos);
   localStorage.setItem("ignorados", JSON.stringify(ignorados));
 }
+function setUbicacionReal(coord) {
+  ubicacionReal = coord;
+}
 
+function getUbicacionReal() {
+  return ubicacionReal;
+}
 // Exportar todo
 export {
   map, userMarker, searchCircle, currentCoords,
   watchId, seguimientoActivo, centrarMapaActivo,
   marcadorUbicacion, ubicacionReal, marcadorUbicacionReal,
   markersPorTipo, iconos, iconoUbicacion, tipoActivo,
-  favoritos, ignorados, marcadoresFavoritos,
+  favoritos, ignorados, setUbicacionReal,
+  getUbicacionReal, marcadoresFavoritos,
   guardarListas
 };
