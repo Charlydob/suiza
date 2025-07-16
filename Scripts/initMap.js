@@ -3,6 +3,7 @@ import {
   map, userMarker, searchCircle,
   currentCoords, iconoUbicacion, setUbicacionReal, ubicacionReal
 } from './variablesGlobales.js'; //✅
+window.ubicacionReal = { lat, lng: lon };
 import { crearCirculo, actualizarCirculo } from './circuloBusqueda.js'; //✅
 import { actualizarBusquedaActiva } from './searchManager.js'; //✅
 
@@ -17,8 +18,7 @@ function initMap(lat, lon) {
     zoom: 14,
     mapId: "Sigueme_Illoo!!" // opcional, para mapas personalizados
   });
-  // ✅ Actualiza la ubicación real correctamente
-  setUbicacionReal(centro);
+
   // Guardar referencia global
   window.map = mapa;
   window.currentCoords = [lat, lon];
