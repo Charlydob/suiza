@@ -44,7 +44,7 @@ import {
 
 // ✅ Función principal que se ejecuta cuando Google Maps carga (callback)
 export function initApp() {
-  console.log("✅ initApp ejecutada");
+  log("✅ initApp ejecutada");
 
   // 🌍 Inicializa el mapa con fallback a Madrid
   initMap(40.4168, -3.7038);

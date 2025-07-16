@@ -154,6 +154,14 @@
     <!-- 3. Tu script principal como módulo -->
   <script type="module" src="Scripts/script.js"></script>
 
+<div id="debug" style="white-space: pre-wrap; font-size: 10px; background: #000; color: lime; padding: 10px;"></div>
+<script>
+  const log = (...args) => {
+    const el = document.getElementById('debug');
+    el.textContent += args.map(a => typeof a === 'object' ? JSON.stringify(a) : a).join(' ') + '\n';
+  };
+  window.log = log;
+</script>
 
 </body>
 </html>
