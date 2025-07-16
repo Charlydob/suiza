@@ -3,7 +3,6 @@ import {
   map, userMarker, searchCircle,
   currentCoords, iconoUbicacion, setUbicacionReal, ubicacionReal
 } from './variablesGlobales.js'; //✅
-window.ubicacionReal = { lat, lng: lon };
 import { crearCirculo, actualizarCirculo } from './circuloBusqueda.js'; //✅
 import { actualizarBusquedaActiva } from './searchManager.js'; //✅
 
