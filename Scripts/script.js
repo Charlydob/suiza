@@ -1,5 +1,7 @@
 // script.js
 // ✅ Punto de entrada principal de la app
+import { initApp } from "./initApp.js";
+window.initApp = initApp;
 
 // 📦 Importaciones de módulos
 import { initMap } from "./initMap.js";
