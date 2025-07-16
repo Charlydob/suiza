@@ -73,7 +73,7 @@ const ignorados = JSON.parse(localStorage.getItem("ignorados")) || [];
 let marcadoresFavoritos = [];
 
 // 🔄 Escucha en Firebase
-db.ref(rutaFavoritos).on("value", snapshot => {
+ref(db, rutaFavoritos).on("value", snapshot => {
   const data = snapshot.val();
   favoritos = data || JSON.parse(localStorage.getItem("favoritos")) || [];
   if (data) localStorage.setItem("favoritos", JSON.stringify(data));
@@ -83,7 +83,7 @@ db.ref(rutaFavoritos).on("value", snapshot => {
 
 // 💾 Guardar listas
 function guardarListas() {
-  db.ref(rutaFavoritos).set(favoritos);
+  ref(db, rutaFavoritos).set(favoritos);
   localStorage.setItem("ignorados", JSON.stringify(ignorados));
 }
 

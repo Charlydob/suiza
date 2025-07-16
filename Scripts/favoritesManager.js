@@ -4,6 +4,7 @@
 import { calcularDistancia } from "./calcularDistancia.js"; //✅
 import { rutaFavoritos, db } from "./firebase.js";//✅
 import { favoritos, currentCoords, ubicacionReal, map, marcadoresFavoritos, guardarListas } from "./variablesGlobales.js";//✅
+import { set, child, ref, remove } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-database.js";
 
 let favoritoEditandoId = null;
 
@@ -140,10 +141,11 @@ export function guardarEdicionFavorito() {
   cerrarEditorFavorito();
 
   if (navigator.onLine && db) {
-    db.ref(`${rutaFavoritos}/${favorito.id}`).set(favorito)
-      .then(() => console.log("✅ Favorito actualizado en Firebase"))
-      .catch(err => console.error("Error actualizando en Firebase:", err));
-  }
+  const favoritoRef = child(rutaFavoritos, favorito.id);
+  set(favoritoRef, favorito)
+    .then(() => console.log("✅ Favorito actualizado en Firebase"))
+    .catch(err => console.error("Error actualizando en Firebase:", err));
+}
 }
 
 export function borrarFavorito() {
@@ -157,10 +159,11 @@ export function borrarFavorito() {
     cerrarEditorFavorito();
 
     if (navigator.onLine && db) {
-      db.ref(`${rutaFavoritos}/${id}`).remove()
-        .then(() => console.log("🗑️ Favorito eliminado de Firebase"))
-        .catch(err => console.error("Error eliminando de Firebase:", err));
-    }
+  const ruta = ref(db, `${rutaFavoritos}/${id}`);
+  remove(ruta)
+    .then(() => console.log("🗑️ Favorito eliminado de Firebase"))
+    .catch(err => console.error("Error eliminando de Firebase:", err));
+}
   }
 }
 
