@@ -1,4 +1,4 @@
-/*// Scripts/script.js
+// Scripts/script.js
 
 import { db, rutaFavoritos } from "./firebase.js";
 
@@ -58,7 +58,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 
-*/
+
 
 
 /*//✅================= VARIABLES GLOBALES 👇 ================= //

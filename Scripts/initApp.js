@@ -1,57 +1,24 @@
-// script.js
-// ✅ Punto de entrada principal de la app
+// initApp.js
+import { initMap } from './initMap.js';
+import { getLocation } from './centrarFavorito.js';
+import { renderizarFavoritos } from './favoritesManager.js';
+import { actualizarBusquedaActiva } from './searchManager.js';
+import { actualizarCirculo } from './circuloBusqueda.js';
 
-// 📦 Importaciones de módulos
-import { initMap } from "./initMap.js";
-import { initSidebar } from "./sidebar.js";
-import { getLocation } from "./centrarFavorito.js";
-import { toggleTipo } from "./tipoActivo.js";
-import { buscarLugar } from "./buscar.js";
-import { clearAll } from "./limpiarMapa.js";
-import {
-  guardarEdicionFavorito,
-  borrarFavorito,
-  cerrarEditorFavorito,
-} from "./favoritesManager.js";
-
-// 🗺️ Callback para Google Maps (definido como global)
-window.initApp = function () {
-  console.log("✅ initApp ejecutada");
-
-  // 🌍 Inicializa el mapa centrado (fallback Madrid si no hay ubicación)
-  initMap(40.4168, -3.7038);
-
-  // 🧭 Intenta centrar en la ubicación actual
+export function initApp() {
+    console.log("✅ initApp ejecutada");
+  // 🌍 Inicia el mapa con la ubicación actual o fallback
   getLocation();
 
-  // 🧩 Inicializa el sidebar con filtros, sliders, favoritos, etc.
-  initSidebar();
-};
+  // 🧠 Restaura filtros guardados
+  document.getElementById("buscadorFavoritos").value = localStorage.getItem("filtroTextoFavoritos") || "";
+  document.getElementById("filtroTipoFavoritos").value = localStorage.getItem("filtroTipoFavoritos") || "";
+  document.getElementById("ordenFavoritos").value = localStorage.getItem("ordenFavoritos") || "distanciaAsc";
 
-// 🧠 Lógica que no depende de Google Maps
-document.addEventListener("DOMContentLoaded", () => {
-  console.log("✅ DOM listo");
+  // 🎯 Renderiza favoritos filtrados
+  renderizarFavoritos();
 
-  // 🔍 Buscar lugar
-  const btnBuscar = document.querySelector(".search-group button");
-  btnBuscar?.addEventListener("click", buscarLugar);
-
-  // 🧹 Limpiar resultados
-  const btnLimpiar = document.querySelector(".clear-button");
-  btnLimpiar?.addEventListener("click", clearAll);
-
-  // 💾 Guardar edición de favorito
-  document
-    .getElementById("btnGuardarFavorito")
-    ?.addEventListener("click", guardarEdicionFavorito);
-
-  // 🗑️ Eliminar favorito
-  document
-    .getElementById("btnBorrarFavorito")
-    ?.addEventListener("click", borrarFavorito);
-
-  // ❌ Cancelar edición
-  document
-    .getElementById("btnCancelarEdicion")
-    ?.addEventListener("click", cerrarEditorFavorito);
-});
+  // 🔄 Actualiza radio de búsqueda
+  actualizarCirculo();
+  actualizarBusquedaActiva();
+}
