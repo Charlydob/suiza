@@ -18,7 +18,25 @@ export function initApp() {
   console.log("✅ initApp ejecutada");
 
   // 🗺️ Inicializa mapa con fallback (Madrid)
-  let mapa = initMap(40.4168, -3.7038);
+window.initMapInterno = initMap; // por si quieres usarlo luego desde fuera
+
+// Primero centra en fallback, luego intenta detectar ubicación
+let mapa;
+const fallbackLat = 40.4168;
+const fallbackLng = -3.7038;
+mapa = initMap(fallbackLat, fallbackLng);
+
+// Luego reemplaza con ubicación real si se consigue
+navigator.geolocation.getCurrentPosition(
+  (position) => {
+    const lat = position.coords.latitude;
+    const lng = position.coords.longitude;
+    mapa = initMap(lat, lng); // ⚠️ esto solo funciona si google.maps ya está definido
+  },
+  (err) => {
+    console.warn("⚠️ No se pudo obtener la ubicación real:", err);
+  }
+);
 
   // 🧭 Intentar obtener ubicación real
   navigator.geolocation.getCurrentPosition(
