@@ -135,15 +135,16 @@
   <button id="toggleMenu">›</button>
 
   <div id="map"></div>
+  <!--
 <script type="module">
   import { initApp } from "./Scripts/initApp.js";
   window.initApp = initApp;
 </script>
+-->
 
 
   <!-- 2. Google Maps con callback -->
-  <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA8KhfGc61uBT3DHS1hiCEl7HgnFYaWySI&libraries=places&callback=initApp"
-    >
+  <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA8KhfGc61uBT3DHS1hiCEl7HgnFYaWySI&libraries=places&callback=initApp">
   </script>
     <!-- 3. Tu script principal como módulo -->
   <script type="module" src="Scripts/script.js"></script>
