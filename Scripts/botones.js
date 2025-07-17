@@ -29,84 +29,83 @@ async function buscar(tipo) {
       document.getElementById("status").innerText = `Este tipo no está disponible con Google Maps`;
       return;
     }
+
     const centro = window.getCentroBusqueda?.() || { lat: currentCoords[0], lng: currentCoords[1] };
     const radius = parseInt(document.getElementById("radiusSlider").value);
     const service = new google.maps.places.PlacesService(map);
 
+    // Solo idioma local
+    const idiomaLocal = obtenerIdiomaLocal(); // debe devolver por ejemplo 'es'
+    document.getElementById("idiomaBusqueda").innerText = `Buscando en: ${idiomaLocal.toUpperCase()}`;
+    const keywordsCombinados = construirKeywords(configTipo.keyword, idiomaLocal);
 
-const idiomas = obtenerIdiomasParaBusqueda(); // de idioma.js
-const keywordsCombinados = construirKeywords(configTipo.keyword, obtenerIdiomaLocal()); // solo el idioma local
+    const request = {
+      location: centro,
+      radius: radius,
+      type: configTipo.type,
+      keyword: keywordsCombinados
+    };
 
-const request = {
-  location: centro,
-  radius: radius,
-  type: configTipo.type,
-  keyword: keywordsCombinados
-};
+    service.nearbySearch(request, (results, status) => {
+      try {
+        if (status !== google.maps.places.PlacesServiceStatus.OK || !results) {
+          document.getElementById("status").innerText = `No se encontraron resultados para ${tipo}`;
+          return;
+        }
 
+        (markersPorTipo[tipo] ||= []).forEach(m => m.setMap(null));
+        markersPorTipo[tipo] = [];
 
-service.nearbySearch(request, (results, status) => {
-  try {
-    if (status !== google.maps.places.PlacesServiceStatus.OK || !results) {
-      document.getElementById("status").innerText = `No se encontraron resultados para ${tipo}`;
-      return;
-    }
+        results.forEach(place => {
+          const pos = place.geometry.location;
+          const name = place.name;
+          const idUnico = `${tipo}_${pos.lat().toFixed(5)}_${pos.lng().toFixed(5)}`;
+          if (ignorados.includes(idUnico)) return;
 
-    (markersPorTipo[tipo] ||= []).forEach(m => m.setMap(null));
-    markersPorTipo[tipo] = [];
+          const distanciaKm = calcularDistancia(currentCoords[0], currentCoords[1], pos.lat(), pos.lng());
+          if (distanciaKm > radius / 1000) return;
 
-    results.forEach(place => {
-      const pos = place.geometry.location;
-      const name = place.name;
-      const idUnico = `${tipo}_${pos.lat().toFixed(5)}_${pos.lng().toFixed(5)}`;
-      if (ignorados.includes(idUnico)) return;
+          const tiempoCoche = Math.round((distanciaKm / 60) * 60);
+          const tiempoPie = Math.round((distanciaKm / 5) * 60);
 
-      // ✅ CALCULAR DISTANCIA
-      const distanciaKm = calcularDistancia(currentCoords[0], currentCoords[1], pos.lat(), pos.lng());
+          const popupHTML = `
+            <div class="popup-personalizado">
+              <b>${name}</b><br>
+              Distancia: ${distanciaKm.toFixed(1)} km<br>
+              ${tiempoCoche} min en coche | ${tiempoPie} min a pie<br>
+              <div class="grupo-botones-abajo">
+                <button onclick="toggleFavorito('${idUnico}', '${tipo}', [${pos.lat()}, ${pos.lng()}], '${name.replace(/'/g, "\\'")}', this)">
+                  ${favoritos.includes(idUnico) ? "⭐" : "☆"} Favorito
+                </button>
+                <button onclick="ignorarLugar('${idUnico}')">🗑️ Ignorar</button>
+              </div>
+            </div>
+          `;
 
-      // ✅ FILTRAR LOS FUERA DE RADIO (en km)
-      if (distanciaKm > radius / 1000) return;
+          const marker = new google.maps.Marker({
+            position: pos,
+            map,
+            title: name,
+            icon: iconos[tipo] || undefined
+          });
 
-      const tiempoCoche = Math.round((distanciaKm / 60) * 60);
-      const tiempoPie = Math.round((distanciaKm / 5) * 60);
+          const infowindow = new google.maps.InfoWindow({ content: popupHTML });
+          marker.addListener("click", () => infowindow.open(map, marker));
+          markersPorTipo[tipo].push(marker);
+        });
 
-      const popupHTML = `
-        <div class="popup-personalizado">
-          <b>${name}</b><br>
-          Distancia: ${distanciaKm.toFixed(1)} km<br>
-          ${tiempoCoche} min en coche | ${tiempoPie} min a pie<br>
-          <div class="grupo-botones-abajo">
-            <button onclick="toggleFavorito('${idUnico}', '${tipo}', [${pos.lat()}, ${pos.lng()}], '${name.replace(/'/g, "\\'")}', this)">
-              ${favoritos.includes(idUnico) ? "⭐" : "☆"} Favorito
-            </button>
-            <button onclick="ignorarLugar('${idUnico}')">🗑️ Ignorar</button>
-          </div>
-        </div>
-      `;
-
-      const marker = new google.maps.Marker({
-        position: pos,
-        map,
-        title: name,
-        icon: iconos[tipo] || undefined
-      });
-
-      const infowindow = new google.maps.InfoWindow({ content: popupHTML });
-      marker.addListener("click", () => infowindow.open(map, marker));
-      markersPorTipo[tipo].push(marker);
+        document.getElementById("status").innerText = `Mostrando ${markersPorTipo[tipo].length} resultados para ${tipo}`;
+      } catch (err) {
+        reportarError(err);
+      }
     });
 
-    document.getElementById("status").innerText = `Mostrando ${markersPorTipo[tipo].length} resultados para ${tipo}`;
-  } catch (err) {
-    reportarError(err);
-  }
-});
-
   } catch (error) {
-    reportarError(error); // ⬅️ Aquí también
+    reportarError(error);
     document.getElementById("status").innerText = `Hubo un error al buscar ${tipo}`;
   }
 }
+
 
 
 
