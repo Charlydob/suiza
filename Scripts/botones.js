@@ -135,19 +135,30 @@ results.forEach(function (place) {
   const tiempoCoche = Math.round((distanciaKm / 60) * 60);
   const tiempoPie = Math.round((distanciaKm / 5) * 60);
 
-  const popupHTML = `
-    <div class="popup-personalizado">
-      <b>${name}</b><br>
-      Distancia: ${distanciaKm.toFixed(1)} km<br>
-      ${tiempoCoche} min en coche | ${tiempoPie} min a pie<br>
-      <div class="grupo-botones-abajo">
-        <button onclick="toggleFavorito('${idUnico}', '${tipo}', [${pos.lat()}, ${pos.lng()}], '${name.replace(/'/g, "\\'")}', this)">
-          ${favoritos.indexOf(idUnico) !== -1 ? "⭐" : "☆"} Favorito
-        </button>
-        <button onclick="ignorarLugar('${idUnico}')">🗑️ Ignorar</button>
-      </div>
+const popupHTML = `
+  <div class="popup-personalizado normal">
+    <b>${name}</b><br>
+    Distancia: ${distanciaKm.toFixed(1)} km<br>
+    ${tiempoCoche} | ${tiempoPie}<br>
+
+    <div class="grupo-botones-arriba">
+      <button onclick="window.open('${mapsLink}', '_blank')">🧭 Cómo llegar</button>
+      <button onclick="window.open('${searchLink}', '_blank')">🔎 Similares</button>
     </div>
-  `;
+
+    <div class="boton-medio">
+      <button onclick="window.open('${exactSearchLink}', '_blank')">🔍 Ver este sitio</button>
+    </div>
+
+    <div class="grupo-botones-abajo">
+      <button onclick="toggleFavorito('${idUnico}', '${tipo}', [${coords}], '${name.replace(/'/g, "\\'")}', this)">
+        ${yaEsFavorito ? "⭐" : "☆"} Favorito
+      </button>
+      <button onclick="ignorarLugar('${idUnico}')">🗑️ Ignorar</button>
+    </div>
+  </div>
+`;
+
 
   const marker = new google.maps.Marker({
     position: pos,
