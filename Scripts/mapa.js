@@ -15,6 +15,7 @@ function crearCirculo() {
     strokeOpacity: 0.6,
     strokeWeight: 2,
     fillColor: "#5fa",
+    clickable: false,
     fillOpacity: 0.2,
     map: map,
     center: { lat: currentCoords[0], lng: currentCoords[1] },
