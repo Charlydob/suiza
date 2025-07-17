@@ -394,6 +394,7 @@ b {
 /* Elimina el padding interno del InfoWindow */
 .gm-style-iw > div {
   padding: 0 !important;
+  background-color: transparent !important;
 }
 
 /* Aplica tu diseño dentro del contenedor del InfoWindow */
