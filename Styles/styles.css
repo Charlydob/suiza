@@ -410,9 +410,12 @@ b {
 }
 /* Aplica tu diseño dentro del contenedor del InfoWindow */
 .popup-personalizado {
-  width: 100%;
-  
-  background-color: rgba(0, 255, 234, 0.11);
+  width: 90%;
+  height: 90%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  background-color: rgba(3, 104, 163, 0.11);
   backdrop-filter: blur(6px);
   border-radius: 10px;
   padding: 10px;
