@@ -142,6 +142,7 @@ console.log("DEBUG:", {
   exactSearchLink,
   yaEsFavorito
 });
+const coords = `${pos.lat()},${pos.lng()}`;
 const popupHTML = `
   <div class="popup-personalizado normal">
     <b>${name}</b><br>
@@ -149,22 +150,23 @@ const popupHTML = `
     ${tiempoCoche} | ${tiempoPie}<br>
 
     <div class="grupo-botones-arriba">
-      <button onclick="window.open('${mapsLink}', '_blank')">🧭 Cómo llegar</button>
-      <button onclick="window.open('${searchLink}', '_blank')">🔎 Similares</button>
+      <button onclick="window.open('https://www.google.com/maps/dir/?api=1&destination=${coords}', '_blank')">🧭 Cómo llegar</button>
+      <button onclick="window.open('https://www.google.com/maps/search/${tipo} cerca de ${coords}', '_blank')">🔎 Similares</button>
     </div>
 
     <div class="boton-medio">
-      <button onclick="window.open('${exactSearchLink}', '_blank')">🔍 Ver este sitio</button>
+      <button onclick="window.open('https://www.google.com/maps/search/${encodeURIComponent(name)} cerca de ${coords}', '_blank')">🔍 Ver este sitio</button>
     </div>
 
     <div class="grupo-botones-abajo">
-      <button onclick="toggleFavorito('${idUnico}', '${tipo}', [${coords}], '${name.replace(/'/g, "\\'")}', this)">
-        ${yaEsFavorito ? "⭐" : "☆"} Favorito
+      <button onclick="toggleFavorito('${idUnico}', '${tipo}', [${pos.lat()}, ${pos.lng()}], '${name.replace(/'/g, "\\'")}', this)">
+        ${favoritos.indexOf(idUnico) !== -1 ? "⭐" : "☆"} Favorito
       </button>
       <button onclick="ignorarLugar('${idUnico}')">🗑️ Ignorar</button>
     </div>
   </div>
 `;
+
 
 
   const marker = new google.maps.Marker({
