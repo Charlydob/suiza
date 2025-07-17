@@ -212,6 +212,7 @@ function mostrarMarcadoresFavoritos() {
     const marcador = new google.maps.Marker({
       position: coords,
       map,
+      title: nombre,
       icon: {
         url: "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(`
           <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30">
@@ -223,7 +224,8 @@ function mostrarMarcadoresFavoritos() {
       }
     });
 
-
+    const infoWindow = new google.maps.InfoWindow({ content: popupHTML });
+    marcador.addListener("click", () => infoWindow.open(map, marcador));
 
     marcadoresFavoritos.push(marcador);
   });
@@ -317,6 +319,4 @@ window.toggleFavorito = toggleFavorito;
 window.renderizarFavoritos = renderizarFavoritos;
 window.editarFavoritoDesdeMapa = editarFavoritoDesdeMapa;
 
-window.onload = function () {
-  cargarFavoritosDesdeFirebase();
-};
+window.onload = function () {cargarFavoritosDesdeFirebase();}
