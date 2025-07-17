@@ -49,11 +49,11 @@ async function buscar(tipo) {
       },
       restaurant: {
         type: "restaurant",
-        keyword: "fast food burger pizza mcdonalds kebab tacos comida rápida"
+  keyword: "restaurant food fast food pizza burger mcdonalds subway kfc burger king tacos comida rápida coop restaurant migros restaurant tibits vapiano nordsee spiga"
       },
       cafe: {
         type: "cafe",
-        keyword: "-starbucks coffee tea cozy breakfast "
+  keyword: "coffee tea breakfast brunch espresso café coffeehouse sprüngli vicafe bachmann schwarz coffee grindel bohnenblust trestle café henrici blackbird"
       },
       hospital: {
         type: "hospital",
@@ -170,3 +170,26 @@ function toggleTipo(tipo) {
   }
 }
 //✅======== INTERFAZ: BOTONES DE FILTRADO 👆 ======== //
+//✅======== LIMPIEZA DEL MAPA 👇 ======== //
+// 🧼 Limpia todos los marcadores y resetea el estado
+function clearAll() {
+  Object.keys(markersPorTipo).forEach(tipo => {
+    markersPorTipo[tipo].forEach(m => m.setMap(null)); // ← Google Maps
+    markersPorTipo[tipo] = [];
+    tipoActivo[tipo] = false;
+
+    const boton = document.getElementById(`btn-${tipo}`);
+    if (boton) {
+      boton.classList.remove("activo");
+      boton.classList.add("inactivo");
+    }
+  });
+
+  if (typeof marcadoresFavoritos !== "undefined") {
+    marcadoresFavoritos.forEach(m => m.setMap(null));
+    marcadoresFavoritos = [];
+  }
+
+  document.getElementById("status").innerText = "Mapa limpio";
+}
+//✅======== LIMPIEZA DEL MAPA 👆 ======== //
