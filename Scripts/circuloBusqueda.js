@@ -4,12 +4,19 @@ import { map, searchCircle, currentCoords, iconoUbicacion } from './variablesGlo
 let circuloBusqueda = null;
 
 // 🔵 Crea el círculo de búsqueda alrededor del usuario
-function crearCirculo(mapa, centro) {
+export function crearCirculo() {
   const radius = parseInt(document.getElementById("radiusSlider").value);
+  const mapa = window.map;
+  const centro = { lat: window.currentCoords[0], lng: window.currentCoords[1] };
 
-  if (circuloBusqueda) circuloBusqueda.setMap(null);
+  if (!mapa || !centro.lat || !document.getElementById("radiusSlider")) {
+    log("❌ crearCirculo: faltan elementos necesarios");
+    return;
+  }
 
-  circuloBusqueda = new google.maps.Circle({
+  if (window.searchCircle) window.searchCircle.setMap(null);
+
+  window.searchCircle = new google.maps.Circle({
     strokeColor: "#0000ff",
     strokeOpacity: 0.5,
     strokeWeight: 1.5,
@@ -17,11 +24,12 @@ function crearCirculo(mapa, centro) {
     fillOpacity: 0.2,
     map: mapa,
     center: centro,
-    radius: radius
+    radius: radius,
   });
 
-  window.searchCircle = circuloBusqueda; // si sigues usando variables globales
+  log("✅ Círculo creado correctamente");
 }
+
 
 // 🔁 Actualiza el círculo cuando cambia la ubicación o el radio
 function actualizarCirculo(nuevasCoords) {
