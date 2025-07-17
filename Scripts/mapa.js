@@ -79,6 +79,93 @@ function initMap(lat = 46.8182, lon = 8.2275) {
   } catch (error) {
     reportarError(error);
   }
+  agregarBotonUbicacionAlMapa();
 }
 
 //================= INICIALIZACIÓN DEL MAPA Y MARCADOR DEL USUARIO 👆 =================//
+//================= ACTUALIZACIÓN EN TIEMPO REAL Y UBICACIÓN GPS 👇 =================//
+
+// 🔁 Re-busca automáticamente lugares activos si cambia la ubicación
+function actualizarBusquedaActiva() {
+  Object.keys(tipoActivo).forEach(tipo => {
+    if (tipoActivo[tipo]) buscar(tipo);
+  });
+}
+
+// ✅ Obtiene ubicación GPS real, actualiza currentCoords y crea marcador azul no arrastrable
+function actualizarUbicacionReal() {
+  if (!navigator.geolocation) {
+    alert("Tu navegador no permite geolocalización");
+    return;
+  }
+
+  document.getElementById("status").innerText = "Obteniendo ubicación real...";
+
+  navigator.geolocation.getCurrentPosition(
+    (pos) => {
+      const lat = pos.coords.latitude;
+      const lon = pos.coords.longitude;
+
+      ubicacionReal = { lat, lng: lon };
+      currentCoords = [lat, lon];
+
+      // Crear o actualizar marcador azul
+      if (!marcadorUbicacionReal) {
+        marcadorUbicacionReal = new google.maps.Marker({
+          position: ubicacionReal,
+          map: map,
+          icon: {
+            path: google.maps.SymbolPath.CIRCLE,
+            scale: 8,
+            fillColor: "#00f",
+            fillOpacity: 1,
+            strokeColor: "#fff",
+            strokeWeight: 2
+          },
+          title: "Ubicación real",
+          clickable: false
+        });
+      } else {
+        marcadorUbicacionReal.setPosition(ubicacionReal);
+      }
+
+      map.setCenter(ubicacionReal);
+      map.setZoom(16);
+
+      actualizarCirculo();
+      actualizarBusquedaActiva();
+      renderizarFavoritos();
+
+      document.getElementById("status").innerText = "";
+    },
+
+    (err) => {
+      console.error(err);
+      document.getElementById("status").innerText = "No se pudo obtener la ubicación";
+    },
+
+    { enableHighAccuracy: true }
+  );
+}
+
+// 🔘 Crea un botón flotante en el mapa para obtener ubicación GPS
+function agregarBotonUbicacionAlMapa() {
+  const controlDiv = document.createElement("div");
+  controlDiv.style.backgroundColor = "#fff";
+  controlDiv.style.border = "2px solid #fff";
+  controlDiv.style.borderRadius = "3px";
+  controlDiv.style.boxShadow = "0 2px 6px rgba(0,0,0,.3)";
+  controlDiv.style.cursor = "pointer";
+  controlDiv.style.margin = "10px";
+  controlDiv.style.padding = "5px 10px";
+  controlDiv.style.fontSize = "20px";
+  controlDiv.innerText = "📍";
+
+  controlDiv.title = "Obtener ubicación real";
+  controlDiv.addEventListener("click", actualizarUbicacionReal);
+
+  // Insertar el botón en el mapa
+  map.controls[google.maps.ControlPosition.TOP_RIGHT].push(controlDiv);
+}
+
+//================= ACTUALIZACIÓN EN TIEMPO REAL Y UBICACIÓN GPS 👆 =================//
