@@ -134,7 +134,14 @@ results.forEach(function (place) {
 
   const tiempoCoche = Math.round((distanciaKm / 60) * 60);
   const tiempoPie = Math.round((distanciaKm / 5) * 60);
-
+console.log("DEBUG:", {
+  name,
+  coords,
+  mapsLink,
+  searchLink,
+  exactSearchLink,
+  yaEsFavorito
+});
 const popupHTML = `
   <div class="popup-personalizado normal">
     <b>${name}</b><br>

@@ -397,7 +397,9 @@ b {
   background-color: rgba(0, 255, 234, 0.11) !important;
   backdrop-filter: blur(6px) !important;
 }
-
+.gm-style-iw-chr{
+  display: none !important;
+}
 
 /* Aplica tu diseño dentro del contenedor del InfoWindow */
 .popup-personalizado {
