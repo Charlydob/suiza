@@ -443,6 +443,14 @@ b {
 .gm-style-iw {
   display: none !important;
 }
+.gm-style-iw,
+.gm-style-iw-c {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
 
 
 .leaflet-popup-content-wrapper {
