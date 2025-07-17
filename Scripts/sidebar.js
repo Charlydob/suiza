@@ -62,3 +62,38 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 //================= EVENTOS DE CARGA Y MANEJO DE SIDEBAR 👆 =================//
+//✅======== BUSCAR UN LUGAR POR NOMBRE (input de texto) 👇 ======== //
+// 🧭 Busca una ciudad o dirección por nombre (con Nominatim)
+function buscarLugar() {
+  const lugar = document.getElementById("locationSearch").value;
+  if (!lugar) return;
+
+  fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(lugar)}`)
+    .then(res => res.json())
+    .then(data => {
+      if (data.length === 0) {
+        alert("Lugar no encontrado");
+        return;
+      }
+
+      const lat = parseFloat(data[0].lat);
+      const lon = parseFloat(data[0].lon);
+      currentCoords = [lat, lon];
+
+      // Mueve el marcador principal
+      userMarker.setPosition({ lat, lng: lon });
+
+      // Centra el mapa
+      map.setCenter({ lat, lng: lon });
+      map.setZoom(14);
+
+      // Actualiza el círculo y la búsqueda activa
+      actualizarCirculo();
+      actualizarBusquedaActiva();
+    })
+    .catch(err => {
+      console.error(err);
+      alert("Error al buscar el lugar");
+    });
+}
+//✅======== BUSCAR UN LUGAR POR NOMBRE (input de texto) 👆 ======== //
