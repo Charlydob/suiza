@@ -29,7 +29,7 @@ async function buscar(tipo) {
       },
       luggage: {
         type: "",
-        keyword: "locker in the city"
+        keyword: "locker in the city locker lockers luggage storage consigna equipaje baggage left luggage bag drop"
       },
       parking: {
         type: "parking",
@@ -44,7 +44,7 @@ async function buscar(tipo) {
         keyword: ""
       },
       tourism: {
-        type: "tourist_attraction",
+        type: "",
         keyword: "viewpoint museum gallery monument church historic ruins castle colosseum templo"
       },
       restaurant: {
