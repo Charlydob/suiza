@@ -135,33 +135,15 @@
   <button id="toggleMenu">›</button>
 
   <div id="map"></div>
-  <!-- 1. Logger de errores global -->
+
+  <!-- Script logger -->
 <script src="Scripts/logger.js"></script>
 
-<!-- 1. Google Maps -->
-<script async
-  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA8KhfGc61uBT3DHS1hiCEl7HgnFYaWySI&libraries=places&callback=initMap">
-</script>
-
-<!-- 2. Logger de errores global -->
-<script>
-  window.onerror = function (msg, url, lineNo, columnNo, error) {
-    console.error("🛑 Error capturado:");
-    console.log("Mensaje:", msg);
-    console.log("Archivo:", url);
-    console.log("Línea:", lineNo);
-    console.log("Columna:", columnNo);
-    console.log("Error:", error);
-    alert("Se ha producido un error. Revisa la consola para más detalles.");
-    return false;
-  };
-</script>
-
-<!-- 3. Firebase SDKs -->
+<!-- Firebase SDKs -->
 <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database-compat.js"></script>
 
-<!-- 4. Configuración Firebase -->
+<!-- Configuración Firebase -->
 <script>
   const firebaseConfig = {
     apiKey: "AIzaSyAIRkX0m-qORww2kcYl_mbXm6IKh7j02dc",
@@ -178,9 +160,12 @@
   const rutaFavoritos = "favoritos/charlyylaura";
 </script>
 
-<!-- 5. Script principal -->
-<script src="Scripts/script.js"></script>
+<!-- Script variables -->
+<script src="Scripts/variables.js"></script>
 
-
+<!-- Google Maps -->
+<script async
+  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA8KhfGc61uBT3DHS1hiCEl7HgnFYaWySI&libraries=places&callback=initMap">
+</script>
 </body>
 </html>
