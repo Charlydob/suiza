@@ -4,25 +4,47 @@ errorBox.id = "errorBox";
 errorBox.style.position = "fixed";
 errorBox.style.bottom = "10px";
 errorBox.style.left = "10px";
-errorBox.style.padding = "15px";
-errorBox.style.backgroundColor = "#000000ff";
+errorBox.style.maxWidth = "400px";
+errorBox.style.maxHeight = "300px";
+errorBox.style.overflowY = "auto";
+errorBox.style.padding = "10px";
+errorBox.style.backgroundColor = "#000000ee";
 errorBox.style.color = "white";
 errorBox.style.borderRadius = "8px";
-errorBox.style.boxShadow = "0 0 10px rgba(0,0,0,0.3)";
-errorBox.style.fontSize = "14px";
+errorBox.style.boxShadow = "0 0 10px rgba(0,0,0,0.6)";
+errorBox.style.fontSize = "13px";
 errorBox.style.zIndex = "9999";
 errorBox.style.display = "none";
 document.body.appendChild(errorBox);
 
-// Función para mostrar errores en pantalla
-function mostrarErrorVisual(mensaje) {
-  errorBox.innerText = mensaje;
-  errorBox.style.display = "block";
+// Botón de cerrar
+const closeButton = document.createElement("button");
+closeButton.innerText = "✖";
+closeButton.style.position = "absolute";
+closeButton.style.top = "5px";
+closeButton.style.right = "10px";
+closeButton.style.background = "transparent";
+closeButton.style.border = "none";
+closeButton.style.color = "white";
+closeButton.style.cursor = "pointer";
+closeButton.style.fontSize = "16px";
+closeButton.onclick = () => errorBox.style.display = "none";
+errorBox.appendChild(closeButton);
 
-  // Se oculta después de 10 segundos
-  setTimeout(() => {
-    errorBox.style.display = "none";
-  }, 10000);
+// Contenedor interno de mensajes
+const errorList = document.createElement("div");
+errorList.id = "errorList";
+errorBox.appendChild(errorList);
+
+// Función para mostrar errores en pantalla (acumulativo y persistente)
+function mostrarErrorVisual(mensaje) {
+  const entry = document.createElement("div");
+  entry.innerText = mensaje;
+  entry.style.marginBottom = "8px";
+  entry.style.borderBottom = "1px solid #555";
+  entry.style.paddingBottom = "4px";
+  errorList.appendChild(entry);
+  errorBox.style.display = "block";
 }
 
 // Captura errores globales
@@ -33,13 +55,13 @@ window.onerror = function (msg, url, lineNo, columnNo, error) {
   console.log("Línea:", lineNo);
   console.log("Columna:", columnNo);
   console.log("Error:", error);
-  mostrarErrorVisual("⚠️ Error: " + msg);
+  mostrarErrorVisual(`⚠️ ${msg} [${url}:${lineNo}]`);
   return false;
 };
 
 // Reportador manual de errores desde try/catch
 function reportarError(error) {
   const msg = error.message || "Error desconocido";
-  mostrarErrorVisual("⚠️ " + msg);
+  mostrarErrorVisual(`⚠️ ${msg}`);
   window.onerror(msg, error.fileName || "desconocido", error.lineNumber || 0, 0, error);
 }
