@@ -26,9 +26,13 @@ async function buscar(tipo) {
     if (!currentCoords) return;
     const configTipo = tipoGooglePlaces[tipo];
     if (!configTipo) {
-      document.getElementById("status").innerText = `Este tipo no está disponible con Google Maps`;
-      return;
-    }
+  console.warn("Tipo no encontrado en tipoGooglePlaces:", tipo);
+  console.log("tipoGooglePlaces disponible:", tipoGooglePlaces);
+  document.getElementById("status").innerText = `Este tipo no está disponible con Google Maps`;
+  document.getElementById("idiomaBusqueda").innerText = "";
+  return;
+}
+
 
     const centro = window.getCentroBusqueda?.() || { lat: currentCoords[0], lng: currentCoords[1] };
     const radius = parseInt(document.getElementById("radiusSlider").value);
@@ -37,7 +41,25 @@ async function buscar(tipo) {
     // Solo idioma local
     const idiomaLocal = obtenerIdiomaLocal(); // debe devolver por ejemplo 'es'
     document.getElementById("idiomaBusqueda").innerText = `Buscando en: ${idiomaLocal.toUpperCase()}`;
-    const keywordsCombinados = construirKeywords(configTipo.keyword, idiomaLocal);
+const palabras = configTipo.keyword.split(/\s+/);
+const resultado = [];
+
+for (let i = 0; i < palabras.length; i++) {
+  let palabra = palabras[i];
+  let tieneGuion = palabra.startsWith("-");
+  let clave = tieneGuion ? palabra.substring(1) : palabra;
+
+  let traducciones = diccionarioKeywords[clave];
+  if (traducciones && traducciones[idiomaLocal]) {
+    let traducida = traducciones[idiomaLocal];
+    if (tieneGuion) traducida = "-" + traducida;
+    resultado.push(traducida);
+  }
+}
+
+// Solo traducciones al idioma local
+const keywordsCombinados = resultado.join(" ");
+
 
     const request = {
       location: centro,
