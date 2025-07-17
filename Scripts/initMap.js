@@ -2,26 +2,26 @@
 import {
   map, userMarker, searchCircle,
   currentCoords, iconoUbicacion
-} from './variablesGlobales.js'; //✅
+} from './variablesGlobales.js';
 
-import { crearCirculo, actualizarCirculo } from './circuloBusqueda.js'; //✅
-import { actualizarBusquedaActiva } from './searchManager.js'; //✅
+import { crearCirculo, actualizarCirculo } from './circuloBusqueda.js';
+import { actualizarBusquedaActiva } from './searchManager.js';
 
 let infoWindow;
 
-function initMap(lat, lon) {
-  const centro = { lat, lng: lon };
+function initMap(lat, lng) {
+  const centro = { lat, lng };
 
   // Crear el mapa en el div #map
   const mapa = new google.maps.Map(document.getElementById("map"), {
     center: centro,
     zoom: 14,
-    mapId: "Sigueme_Illoo!!" // opcional, para mapas personalizados
+    mapId: "Sigueme_Illoo!!"
   });
 
   // Guardar referencia global
   window.map = mapa;
-  window.currentCoords = [lat, lon];
+  window.currentCoords = [lat, lng];
 
   // 📍 Crear marcador arrastrable en la ubicación real
   const marker = new google.maps.Marker({
