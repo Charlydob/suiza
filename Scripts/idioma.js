@@ -93,3 +93,26 @@ function traducirKeyword(keyword, idioma) {
     })
     .join(" ");
 }
+function construirKeywords(texto, idioma) {
+  var palabras = texto.split(/\s+/);
+  var resultado = new Set();
+
+  for (var i = 0; i < palabras.length; i++) {
+    var palabra = palabras[i];
+    var tieneGuion = palabra.startsWith('-');
+    var clave = tieneGuion ? palabra.substring(1) : palabra;
+
+    // Añadir original
+    resultado.add(palabra);
+
+    // Añadir traducción si existe
+    var traducciones = diccionarioKeywords[clave];
+    if (traducciones && traducciones[idioma]) {
+      var traducida = traducciones[idioma];
+      if (tieneGuion) traducida = '-' + traducida;
+      resultado.add(traducida);
+    }
+  }
+
+  return Array.from(resultado).join(' ');
+}

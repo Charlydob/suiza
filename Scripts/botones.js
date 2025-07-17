@@ -35,7 +35,7 @@ async function buscar(tipo) {
 
 
 const idiomas = obtenerIdiomasParaBusqueda(); // de idioma.js
-const keywordsCombinados = idiomas.map(id => traducirKeyword(configTipo.keyword, id)).join(" ");
+const keywordsCombinados = construirKeywords(configTipo.keyword, obtenerIdiomaLocal()); // solo el idioma local
 
 const request = {
   location: centro,
