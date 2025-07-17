@@ -402,9 +402,7 @@ b {
 }
 /*contenedor del InfoWindow */
 .gm-style-iw-d {
-  display: flex !important; 
-  justify-content: center   !important;
-  align-items: center !important;
+  position:  relative !important;
   padding: 0% !important;
 
 }
