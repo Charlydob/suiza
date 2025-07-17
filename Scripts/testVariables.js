@@ -18,6 +18,6 @@ try {
     reportarError(error);
   } else {
     console.error("❌ Error en variables.js:", error.message);
-    alert("⚠️ Error al cargar variables.js:\n" + error.message);
+    alert("⚠️ pito variables.js:\n" + error.message);
   }
 }
