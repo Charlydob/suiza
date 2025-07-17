@@ -58,3 +58,24 @@ function determinarIdioma(pais, canton) {
 function obtenerIdiomasParaBusqueda() {
   return [idiomaBusqueda, "en"];
 }
+let diccionarioKeyword = {};
+
+fetch('json/traducciones.json')
+  .then(response => response.json())
+  .then(data => {
+    diccionarioKeyword = data;
+  })
+  .catch(error => {
+    console.error("Error cargando traducciones:", error);
+  });
+
+function traducirKeyword(keyword, idioma) {
+  return keyword
+    .split(" ")
+    .map(palabra => {
+      const limpio = palabra.replace(/^-/, ""); // quita guiones
+      const traducido = diccionarioKeywords[limpio]?.[idioma];
+      return palabra.startsWith("-") ? `-${traducido || limpio}` : (traducido || limpio);
+    })
+    .join(" ");
+}
