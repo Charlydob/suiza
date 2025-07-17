@@ -29,11 +29,11 @@ async function buscar(tipo) {
       },
       luggage: {
         type: "",
-        keyword: "locker in the city locker lockers luggage storage consigna equipaje baggage left luggage bag drop"
+        keyword: "locker in the city Lockerpoint BagStop luggage storage consigna Luggage Storage Europe LuggageHero Bounce Stasher City Locker BagsAway Nannybag Radical Storage Bagbnb"
       },
       parking: {
         type: "parking",
-        keyword: "-bicycle -bike -garage privado -moto"
+        keyword: "car car public"
       },
       airport: {
         type: "airport",
