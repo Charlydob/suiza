@@ -28,8 +28,8 @@ async function buscar(tipo) {
     if (!configTipo) {
   console.warn("Tipo no encontrado en tipoGooglePlaces:", tipo);
   console.log("tipoGooglePlaces disponible:", tipoGooglePlaces);
-  document.getElementById("status").innerText = `Este tipo no está disponible con Google Maps`;
-  document.getElementById("idiomaBusqueda").innerText = "";
+const status = document.getElementById("status");
+if (status) status.innerText = `Este tipo no está disponible con Google Maps`;
   return;
 }
 
@@ -37,9 +37,6 @@ async function buscar(tipo) {
     const centro = window.getCentroBusqueda?.() || { lat: currentCoords[0], lng: currentCoords[1] };
     const radius = parseInt(document.getElementById("radiusSlider").value);
     const service = new google.maps.places.PlacesService(map);
-
-    // Solo idioma local
-    const idiomaLocal = obtenerIdiomaLocal(); // debe devolver por ejemplo 'es'
 
 
 const keywordsCombinados = configTipo.keyword;
@@ -54,7 +51,8 @@ const keywordsCombinados = configTipo.keyword;
     service.nearbySearch(request, (results, status) => {
       try {
         if (status !== google.maps.places.PlacesServiceStatus.OK || !results) {
-          document.getElementById("status").innerText = `No se encontraron resultados para ${tipo}`;
+          const status = document.getElementById("status");
+if (status) status.innerText = `No se encontraron resultados para ${tipo}`;
           return;
         }
 
@@ -99,7 +97,8 @@ const keywordsCombinados = configTipo.keyword;
           markersPorTipo[tipo].push(marker);
         });
 
-        document.getElementById("status").innerText = `Mostrando ${markersPorTipo[tipo].length} resultados para ${tipo}`;
+        const status = document.getElementById("status");
+if (status) status.innerText = `Mostrando ${markersPorTipo[tipo].length} resultados para ${tipo}`;
       } catch (err) {
         reportarError(err);
       }
@@ -108,7 +107,8 @@ const keywordsCombinados = configTipo.keyword;
   } catch (error) {
   console.error("🔥 Error real al buscar:", error);
   reportarError(error);
-  document.getElementById("status").innerText = `Hubo un error al buscar ${tipo}`;
+  const status = document.getElementById("status");
+if (status) status.innerText = `Hubo un error al buscar ${tipo}`;
 }
 
 }
