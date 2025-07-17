@@ -10,69 +10,29 @@ function calcularDistancia(lat1, lon1, lat2, lon2) {
   return R * c;
 }
 //❌======== CALCULAR DISTANCIAS 👆 ======== //
+let tipoGooglePlaces = {};
+
+function cargarTipoGooglePlaces() {
+  return fetch('json/tipoGooglePlaces.json')
+    .then(res => res.json())
+    .then(data => {
+      tipoGooglePlaces = data;
+    });
+}
 
 //🔎 Busca lugares de un tipo concreto cerca del usuario usando Google Maps Places API
 async function buscar(tipo) {
   try {
-    const tipoGooglePlaces = {
-      sitios_bonitos: {
-        type: "tourist_attraction",
-        keyword: "mountain lake river viewpoint hiking nature natural park forest mirador cascada"
-      },
-      hotel: {
-        type: "lodging",
-        keyword: "hotel"
-      },
-      airbnb: {
-        type: "lodging",
-        keyword: "apartment airbnb homestay guesthouse"
-      },
-      luggage: {
-        type: "store",
-        keyword: "locker luggage storage consigna equipaje left luggage bag drop deposit equipajes lockers"
-      },
-      parking: {
-        type: "parking",
-        keyword: "-bicycle -bike -garage privado -moto"
-      },
-      airport: {
-        type: "airport",
-        keyword: ""
-      },
-      gasolinera: {
-        type: "gas_station",
-        keyword: ""
-      },
-      tourism: {
-        type: "tourist_attraction",
-        keyword: "viewpoint museum gallery monument church historic ruins castle colosseum templo"
-      },
-      restaurant: {
-        type: "restaurant",
-        keyword: "fast food burger pizza mcdonalds kebab tacos comida rápida"
-      },
-      cafe: {
-        type: "cafe",
-        keyword: "-starbucks coffee tea cozy breakfast "
-      },
-      hospital: {
-        type: "hospital",
-        keyword: ""
-      }
-    };
-
-
     if (!currentCoords) return;
-
-    const centro = window.getCentroBusqueda?.() || { lat: currentCoords[0], lng: currentCoords[1] };
-    const radius = parseInt(document.getElementById("radiusSlider").value);
-    const service = new google.maps.places.PlacesService(map);
     const configTipo = tipoGooglePlaces[tipo];
-
     if (!configTipo) {
       document.getElementById("status").innerText = `Este tipo no está disponible con Google Maps`;
       return;
     }
+    const centro = window.getCentroBusqueda?.() || { lat: currentCoords[0], lng: currentCoords[1] };
+    const radius = parseInt(document.getElementById("radiusSlider").value);
+    const service = new google.maps.places.PlacesService(map);
+
 
 const idiomas = obtenerIdiomasParaBusqueda(); // de idioma.js
 const keywordsCombinados = idiomas.map(id => traducirKeyword(configTipo.keyword, id)).join(" ");
