@@ -10,91 +10,80 @@ function calcularDistancia(lat1, lon1, lat2, lon2) {
   return R * c;
 }
 //❌======== CALCULAR DISTANCIAS 👆 ======== //
-let tipoGooglePlaces = {};
-
-function cargarTipoGooglePlaces() {
-  tipoGooglePlaces = {
-    "sitios_bonitos": {
-      "type": "tourist_attraction",
-      "keyword": "mountain lake river viewpoint hiking nature natural park forest mirador cascada"
-    },
-    "hotel": {
-      "type": "lodging",
-      "keyword": "hotel"
-    },
-    "airbnb": {
-      "type": "lodging",
-      "keyword": "apartment airbnb homestay guesthouse"
-    },
-    "luggage": {
-      "type": "store",
-      "keyword": "locker luggage storage consigna equipaje left luggage bag drop deposit equipajes lockers"
-    },
-    "parking": {
-      "type": "parking",
-      "keyword": "-bicycle -bike -garage privado -moto"
-    },
-    "airport": {
-      "type": "airport",
-      "keyword": ""
-    },
-    "gasolinera": {
-      "type": "gas_station",
-      "keyword": ""
-    },
-    "tourism": {
-      "type": "tourist_attraction",
-      "keyword": "viewpoint museum gallery monument church historic ruins castle colosseum templo"
-    },
-    "restaurant": {
-      "type": "restaurant",
-      "keyword": "fast food burger pizza mcdonalds kebab tacos comida rápida"
-    },
-    "cafe": {
-      "type": "cafe",
-      "keyword": "-starbucks coffee tea cozy breakfast"
-    },
-    "hospital": {
-      "type": "hospital",
-      "keyword": ""
-    }
-  };
-}
-
 
 //🔎 Busca lugares de un tipo concreto cerca del usuario usando Google Maps Places API
 async function buscar(tipo) {
   try {
-    if (!currentCoords) return;
-    const configTipo = tipoGooglePlaces[tipo];
-    if (!configTipo) {
-  console.warn("Tipo no encontrado en tipoGooglePlaces:", tipo);
-  console.log("tipoGooglePlaces disponible:", tipoGooglePlaces);
-const status = document.getElementById("status");
-if (status) status.innerText = `Este tipo no está disponible con Google Maps`;
-  return;
-}
+    const tipoGooglePlaces = {
+      sitios_bonitos: {
+        type: "tourist_attraction",
+        keyword: "mountain lake river viewpoint hiking nature natural park forest mirador cascada"
+      },
+      hotel: {
+        type: "lodging",
+        keyword: "hotel"
+      },
+      airbnb: {
+        type: "lodging",
+        keyword: "apartment airbnb homestay guesthouse"
+      },
+      luggage: {
+        type: "store",
+        keyword: "locker luggage storage consigna equipaje left luggage bag drop deposit equipajes lockers"
+      },
+      parking: {
+        type: "parking",
+        keyword: "-bicycle -bike -garage privado -moto"
+      },
+      airport: {
+        type: "airport",
+        keyword: ""
+      },
+      gasolinera: {
+        type: "gas_station",
+        keyword: ""
+      },
+      tourism: {
+        type: "tourist_attraction",
+        keyword: "viewpoint museum gallery monument church historic ruins castle colosseum templo"
+      },
+      restaurant: {
+        type: "restaurant",
+        keyword: "fast food burger pizza mcdonalds kebab tacos comida rápida"
+      },
+      cafe: {
+        type: "cafe",
+        keyword: "-starbucks coffee tea cozy breakfast "
+      },
+      hospital: {
+        type: "hospital",
+        keyword: ""
+      }
+    };
 
+    if (!currentCoords) return;
 
     const centro = window.getCentroBusqueda?.() || { lat: currentCoords[0], lng: currentCoords[1] };
     const radius = parseInt(document.getElementById("radiusSlider").value);
     const service = new google.maps.places.PlacesService(map);
+    const configTipo = tipoGooglePlaces[tipo];
 
-
-const keywordsCombinados = configTipo.keyword;
+    if (!configTipo) {
+      document.getElementById("status").innerText = `Este tipo no está disponible con Google Maps`;
+      return;
+    }
 
     const request = {
       location: centro,
       radius: radius,
       type: configTipo.type,
-      keyword: keywordsCombinados
+      keyword: configTipo.keyword
     };
 
     service.nearbySearch(request, (results, status) => {
       try {
         if (status !== google.maps.places.PlacesServiceStatus.OK || !results) {
-          const status = document.getElementById("status");
-if (status) status.innerText = `No se encontraron resultados para ${tipo}`;
+          document.getElementById("status").innerText = `No se encontraron resultados para ${tipo}`;
           return;
         }
 
@@ -139,27 +128,19 @@ if (status) status.innerText = `No se encontraron resultados para ${tipo}`;
           markersPorTipo[tipo].push(marker);
         });
 
-        const status = document.getElementById("status");
-if (status) status.innerText = `Mostrando ${markersPorTipo[tipo].length} resultados para ${tipo}`;
+        document.getElementById("status").innerText = `Mostrando ${markersPorTipo[tipo].length} resultados para ${tipo}`;
       } catch (err) {
         reportarError(err);
       }
     });
 
   } catch (error) {
-  console.error("🔥 Error real al buscar:", error);
-  reportarError(error);
-  const status = document.getElementById("status");
-if (status) status.innerText = `Hubo un error al buscar ${tipo}`;
+    reportarError(error);
+    document.getElementById("status").innerText = `Hubo un error al buscar ${tipo}`;
+  }
 }
-
-}
-
-
-
 
 //✅======== INTERFAZ: BOTONES DE FILTRADO 👇 ======== //
-// 🎚️ Activa o desactiva un tipo de lugar (botones de filtros)
 function toggleTipo(tipo) {
   tipoActivo[tipo] = !tipoActivo[tipo];
   const boton = document.getElementById(`btn-${tipo}`);
@@ -181,7 +162,7 @@ function toggleTipo(tipo) {
       marcadoresFavoritos.forEach(m => m.setMap(null));
       marcadoresFavoritos = [];
     } else {
-      (markersPorTipo[tipo] || []).forEach(m => m.setMap(null));
+      markersPorTipo[tipo].forEach(m => m.setMap(null));
       markersPorTipo[tipo] = [];
     }
 
@@ -189,4 +170,3 @@ function toggleTipo(tipo) {
   }
 }
 //✅======== INTERFAZ: BOTONES DE FILTRADO 👆 ======== //
-
