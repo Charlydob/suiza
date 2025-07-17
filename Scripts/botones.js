@@ -10,6 +10,7 @@ function calcularDistancia(lat1, lon1, lat2, lon2) {
   return R * c;
 }
 //❌======== CALCULAR DISTANCIAS 👆 ======== //
+
 //🔎 Busca lugares de un tipo concreto cerca del usuario usando Google Maps Places API
 async function buscar(tipo) {
   try {
@@ -59,6 +60,29 @@ async function buscar(tipo) {
         keyword: ""
       }
     };
+    const diccionarioKeywords = {
+  "mountain": { de: "berg", fr: "montagne", it: "montagna" },
+  "lake":     { de: "see", fr: "lac", it: "lago" },
+  "river":    { de: "fluss", fr: "rivière", it: "fiume" },
+  "viewpoint":{ de: "aussichtspunkt", fr: "belvédère", it: "belvedere" },
+  "hiking":   { de: "wandern", fr: "randonnée", it: "escursione" },
+  "nature":   { de: "natur", fr: "nature", it: "natura" },
+  "natural":  { de: "natürlich", fr: "naturel", it: "naturale" },
+  "park":     { de: "park", fr: "parc", it: "parco" },
+  "forest":   { de: "wald", fr: "forêt", it: "foresta" },
+  "mirador":  { de: "aussicht", fr: "point de vue", it: "panorama" },
+  "cascada":  { de: "wasserfall", fr: "cascade", it: "cascata" }
+};
+function traducirKeyword(keyword, idioma) {
+  return keyword
+    .split(" ")
+    .map(palabra => {
+      const limpio = palabra.replace(/^-/, ""); // quita guiones
+      const traducido = diccionarioKeywords[limpio]?.[idioma];
+      return palabra.startsWith("-") ? `-${traducido || limpio}` : (traducido || limpio);
+    })
+    .join(" ");
+}
 
     if (!currentCoords) return;
 
@@ -71,13 +95,17 @@ async function buscar(tipo) {
       document.getElementById("status").innerText = `Este tipo no está disponible con Google Maps`;
       return;
     }
+    
+const idiomas = obtenerIdiomasParaBusqueda(); // de idioma.js
+const keywordsCombinados = idiomas.map(id => traducirKeyword(configTipo.keyword, id)).join(" ");
 
-    const request = {
-      location: centro,
-      radius: radius,
-      type: configTipo.type,
-      keyword: configTipo.keyword
-    };
+const request = {
+  location: centro,
+  radius: radius,
+  type: configTipo.type,
+  keyword: keywordsCombinados
+};
+
 
 service.nearbySearch(request, (results, status) => {
   try {
