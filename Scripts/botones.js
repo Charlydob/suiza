@@ -154,7 +154,7 @@ function toggleTipo(tipo) {
       marcadoresFavoritos.forEach(m => m.setMap(null));
       marcadoresFavoritos = [];
     } else {
-      markersPorTipo[tipo].forEach(m => m.setMap(null));
+      (markersPorTipo[tipo] || []).forEach(m => m.setMap(null));
       markersPorTipo[tipo] = [];
     }
 
