@@ -243,7 +243,7 @@ botonUbicacion.onAdd = function () {
 
 //❌======== ACTUALIZACIÓN EN TIEMPO REAL Y OBTENCIÓN DE UBICACIÓN 👆 ======== //
 */
-//❌======== CALCULAR DISTANCIAS 👇 ======== //
+/*//❌======== CALCULAR DISTANCIAS 👇 ======== //
 function calcularDistancia(lat1, lon1, lat2, lon2) {
   const R = 6371; // km
   const dLat = (lat2 - lat1) * Math.PI / 180;
@@ -254,7 +254,7 @@ function calcularDistancia(lat1, lon1, lat2, lon2) {
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   return R * c;
 }
-//❌======== CALCULAR DISTANCIAS 👆 ======== //
+//❌======== CALCULAR DISTANCIAS 👆 ======== //*/
 /*//✅======== CONSULTA A OVERPASS API (OpenStreetMap) 👇 ======== //
 // 🔎 Busca lugares de un tipo concreto cerca del usuario usando Overpass API
 async function buscar(tipo) {
