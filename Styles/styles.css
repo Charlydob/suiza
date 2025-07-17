@@ -391,60 +391,53 @@ b {
   
 }
 
+.popup-personalizado {
+  font-family: 'Segoe UI', sans-serif;
+  font-size: 14px;
+  color: #222;
+  padding: 12px;
+  max-width: 240px;
+  line-height: 1.4;
+}
+
+/* Botones en la parte superior (si los usás) */
 .popup-personalizado .grupo-botones-arriba {
   display: grid;
-  grid-template-columns: 1fr 1fr; /* dos columnas iguales */
+  grid-template-columns: 1fr 1fr;
   gap: 6px;
   width: 100%;
-  padding: 0px;
-  margin-top: 5px;
-  margin-bottom: 5px;
+  margin: 5px 0;
+  padding: 0;
 }
+
+/* Botones en la parte inferior */
 .popup-personalizado .grupo-botones-abajo {
   display: grid;
-  grid-template-columns: 1fr 1fr; /* dos columnas iguales */
+  grid-template-columns: 1fr 1fr;
   gap: 6px;
   width: 100%;
-  padding: 0px;
   margin-top: 5px;
+  padding: 0;
 }
-.grupo-botones button {
-  padding: 6px;
-  font-size: 13px;
-  background-color: #f0f0f0;
-  border: none;
-  border-radius: 10px;
-  cursor: pointer;
-  text-align: center;
-  width: 100%;
-}
+
+/* Estilo base para botones */
 .popup-personalizado button {
-  flex: auto;
   padding: 6px;
   font-size: 13px;
-  background-color: #fefeff4f;
+  background-color: #fefeff4f; /* translúcido suave */
   color: #333;
   border: none;
   border-radius: 10px;
   cursor: pointer;
   text-align: center;
   width: 100%;
+  transition: background-color 0.2s ease;
 }
-.leaflet-popup-content {
-  margin: 0 !important;
-  padding: 10px !important;
-  width: auto !important;
-  max-width: none !important;
-  color: white;
-  text-shadow: #000000 1px 1px 2px;
-
-}
-
-
 
 .popup-personalizado button:hover {
-  background-color: #ddd;
+  background-color: #e0e0e080;
 }
+
 .leaflet-popup-content-wrapper {
   border-radius: 10px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
