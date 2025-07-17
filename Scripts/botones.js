@@ -193,3 +193,4 @@ function clearAll() {
   document.getElementById("status").innerText = "Mapa limpio";
 }
 //✅======== LIMPIEZA DEL MAPA 👆 ======== //
+window.clearAll = clearAll;
