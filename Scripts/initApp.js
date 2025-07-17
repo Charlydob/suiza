@@ -52,18 +52,31 @@ export function initApp() {
   getLocation();
 
   // 🧩 Inicializa sidebar y filtros
-  initSidebar();
-// crea el cir
-  crearCirculo();
-
+  try {
+    initSidebar();
+    log("initSidebar ejecutado correctamente ")
+  } catch (e) {
+    log("❌INITSIDEBAR❌", e.message);
+  }
+    // crea el circulo
+try {
+    crearCirculo();
+    log("crearCirculo ejecutado correctamente ")
+  } catch (e) {
+    log("❌❌CREARCIRCULO❌❌", e.message);
+  }
   // 🧠 Restaura filtros guardados
   document.getElementById("buscadorFavoritos").value = localStorage.getItem("filtroTextoFavoritos") || "";
   document.getElementById("filtroTipoFavoritos").value = localStorage.getItem("filtroTipoFavoritos") || "";
   document.getElementById("ordenFavoritos").value = localStorage.getItem("ordenFavoritos") || "distanciaAsc";
 
   // 🎯 Renderiza favoritos filtrados
-  renderizarFavoritos();
-
+try {
+    renderizarFavoritos();
+    log("renderizarFavoritos ejecutado correctamente ")
+  } catch (e) {
+    log("❌❌❌FAVORITOS❌❌❌", e.message);
+  }
   // 🔄 Actualiza radio de búsqueda
   actualizarCirculo();
   actualizarBusquedaActiva();
