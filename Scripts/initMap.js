@@ -4,7 +4,7 @@ import {
   currentCoords, iconoUbicacion
 } from './variablesGlobales.js';
 
-import { crearCirculo, actualizarCirculo } from './circuloBusqueda.js';
+import { crearCirculo, actualizarCirculo } from './centrarFavorito.js';
 import { actualizarBusquedaActiva } from './searchManager.js';
 
 let infoWindow;

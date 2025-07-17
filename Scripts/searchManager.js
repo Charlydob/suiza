@@ -1,7 +1,7 @@
 // Scripts/searchManager.js
 import { map, currentCoords, tipoActivo } from './variablesGlobales.js';//✅
 import { buscar } from './busquedaLugares.js';// ✅
-import { actualizarCirculo } from './circuloBusqueda.js';//✅
+import { actualizarCirculo } from './centrarFavorito.js';//✅
 import { renderizarFavoritos } from './favoritesManager.js'; //✅
 
 let ubicacionReal = null;

@@ -32,7 +32,7 @@ import { initMap } from './initMap.js';
 import { getLocation } from './centrarFavorito.js';
 import { renderizarFavoritos } from './favoritesManager.js';
 import { actualizarBusquedaActiva } from './searchManager.js';
-import { crearCirculo, actualizarCirculo } from './circuloBusqueda.js';
+import { crearCirculo, actualizarCirculo } from './centrarFavorito.js';
 import { initSidebar } from './sidebar.js';
 import { buscarLugar } from './buscar.js';
 import { clearAll } from './limpiarMapa.js';

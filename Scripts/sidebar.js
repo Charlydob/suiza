@@ -1,6 +1,6 @@
 // ✅ sidebar.js (módulo ES6)
 
-import { actualizarCirculo } from "./circuloBusqueda.js";// ✅
+import { actualizarCirculo } from "./centrarFavorito.js";// ✅
 import { actualizarBusquedaActiva } from "./searchManager.js";// ✅
 import { renderizarFavoritos } from "./favoritesManager.js";// ✅
 import { getLocation } from "./centrarFavorito.js"; // ✅
