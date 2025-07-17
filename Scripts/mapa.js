@@ -169,3 +169,25 @@ function agregarBotonUbicacionAlMapa() {
 }
 
 //================= ACTUALIZACIÓN EN TIEMPO REAL Y UBICACIÓN GPS 👆 =================//
+//================= OBTENER UBICACIÓN AL CARGAR 👇 =================//
+
+function getLocation() {
+  if (!navigator.geolocation) {
+    alert("Tu navegador no permite geolocalización");
+    initMap(40.4168, -3.7038); // 🧭 Coordenadas por defecto: Madrid
+    return;
+  }
+
+  navigator.geolocation.getCurrentPosition(
+    (pos) => {
+      const lat = pos.coords.latitude;
+      const lon = pos.coords.longitude;
+      initMap(lat, lon);
+    },
+    (err) => {
+      console.warn("No se pudo obtener la ubicación. Usando ubicación por defecto.");
+      initMap(40.4168, -3.7038); // 🧭 Madrid como fallback
+    },
+    { enableHighAccuracy: true }
+  );
+}
