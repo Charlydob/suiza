@@ -437,7 +437,13 @@ b {
 
 .popup-personalizado button:hover {
   background-color: #e0e0e080;
+
 }
+
+.gm-style-iw {
+  display: none !important;
+}
+
 
 .leaflet-popup-content-wrapper {
   border-radius: 10px;
