@@ -5,6 +5,8 @@ function PopupPersonalizado(position, contentHTML) {
   this.container.innerHTML = contentHTML;
   this.container.style.position = 'absolute';
   this.container.style.transform = 'translate(-50%, -100%)';
+    // Llama al constructor base
+  google.maps.OverlayView.call(this);
 }
 
 PopupPersonalizado.prototype = Object.create(google.maps.OverlayView.prototype);
