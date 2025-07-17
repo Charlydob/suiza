@@ -106,9 +106,11 @@ const keywordsCombinados = configTipo.keyword;
     });
 
   } catch (error) {
-    reportarError(error);
-    document.getElementById("status").innerText = `Hubo un error al buscar ${tipo}`;
-  }
+  console.error("🔥 Error real al buscar:", error);
+  reportarError(error);
+  document.getElementById("status").innerText = `Hubo un error al buscar ${tipo}`;
+}
+
 }
 
 
