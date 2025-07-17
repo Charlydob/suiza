@@ -28,7 +28,7 @@ async function buscar(tipo) {
         keyword: "apartment airbnb homestay guesthouse"
       },
       luggage: {
-        type: "store",
+        type: "",
         keyword: "locker in the city"
       },
       parking: {
