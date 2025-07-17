@@ -1,4 +1,4 @@
-//✅================= VARIABLES GLOBALES 👇 ================= //
+/*//✅================= VARIABLES GLOBALES 👇 ================= //
 // 🌍 Variables principales del mapa
 let map;
 let userMarker;
@@ -110,8 +110,10 @@ function guardarListas() {
 
 
 //✅================= VARIABLES GLOBALES 👆 ================= //
-//✅======== INICIALIZACIÓN DEL MAPA Y MARCADOR DEL USUARIO 👇 ======== //
+// */
+/*//✅======== INICIALIZACIÓN DEL MAPA Y MARCADOR DEL USUARIO 👇 ======== //
 // 🚀 Inicializa el mapa con la ubicación dada
+
 function initMap(lat, lon) {
   map = L.map("map").setView([lat, lon], 14);
   L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -142,8 +144,8 @@ function initMap(lat, lon) {
   document.getElementById("status").innerText = "Ubicación cargada";
 }
 //✅======== INICIALIZACIÓN DEL MAPA Y MARCADOR DEL USUARIO 👆 ======== //
-
-//✅======== GESTIÓN DEL CÍRCULO DE BÚSQUEDA 👇 ======== //
+*/
+/*//✅======== GESTIÓN DEL CÍRCULO DE BÚSQUEDA 👇 ======== //
 // 🔵 Crea el círculo de búsqueda alrededor del usuario
 function crearCirculo() {
   const radius = parseInt(document.getElementById("radiusSlider").value);
@@ -162,7 +164,8 @@ function actualizarCirculo() {
   searchCircle.setRadius(radius);
 }
 //✅======== GESTIÓN DEL CÍRCULO DE BÚSQUEDA  👆 ======== // 
-// ❌======== ACTUALIZACIÓN EN TIEMPO REAL Y OBTENCIÓN DE UBICACIÓN 👇 ======== //
+*/
+/*// ✅======== ACTUALIZACIÓN EN TIEMPO REAL Y OBTENCIÓN DE UBICACIÓN 👇 ======== //
 
 // 🔁 Re-busca automáticamente lugares activos si cambia la ubicación
 function actualizarBusquedaActiva() {
@@ -239,6 +242,7 @@ botonUbicacion.onAdd = function () {
 };
 
 //❌======== ACTUALIZACIÓN EN TIEMPO REAL Y OBTENCIÓN DE UBICACIÓN 👆 ======== //
+*/
 //❌======== CALCULAR DISTANCIAS 👇 ======== //
 function calcularDistancia(lat1, lon1, lat2, lon2) {
   const R = 6371; // km
@@ -251,7 +255,7 @@ function calcularDistancia(lat1, lon1, lat2, lon2) {
   return R * c;
 }
 //❌======== CALCULAR DISTANCIAS 👆 ======== //
-//✅======== CONSULTA A OVERPASS API (OpenStreetMap) 👇 ======== //
+/*//✅======== CONSULTA A OVERPASS API (OpenStreetMap) 👇 ======== //
 // 🔎 Busca lugares de un tipo concreto cerca del usuario usando Overpass API
 async function buscar(tipo) {
   if (!currentCoords) return;
@@ -476,8 +480,8 @@ async function buscar(tipo) {
     document.getElementById("status").innerText = "Error de búsqueda";
   }
 }
-
-//✅======== CONSULTA A OVERPASS API (OpenStreetMap) 👆 ======== //
+*/
+/*//✅======== CONSULTA A OVERPASS API (OpenStreetMap) 👆 ======== //
 //======== INTERFAZ: BOTONES DE FILTRADO 👇 ======== //
 // 🎚️ Activa o desactiva un tipo de lugar (botones de filtros)
 function toggleTipo(tipo) {
@@ -509,7 +513,7 @@ function toggleTipo(tipo) {
   }
 }
 
-//✅======== INTERFAZ: BOTONES DE FILTRADO 👆 ======== // 
+//✅======== INTERFAZ: BOTONES DE FILTRADO 👆 ======== // */
 //✅======== LIMPIEZA DEL MAPA 👇 ======== //
 // 🧼 Limpia todos los marcadores y resetea el estado
 function clearAll() {
@@ -526,7 +530,7 @@ function clearAll() {
   document.getElementById("status").innerText = "Mapa limpio";
 }
 //✅======== LIMPIEZA DEL MAPA  👆 ======== // 
-//✅======== BUSCAR UN LUGAR POR NOMBRE (input de texto) 👇 ======== //
+/*//✅======== BUSCAR UN LUGAR POR NOMBRE (input de texto) 👇 ======== //
 // 🧭 Busca una ciudad o dirección por nombre (con Nominatim)
 function buscarLugar() {
   const lugar = document.getElementById("locationSearch").value;
@@ -552,7 +556,7 @@ function buscarLugar() {
       alert("Error al buscar el lugar");
     });
 }
-//✅======== BUSCAR UN LUGAR POR NOMBRE (input de texto) 👆 ======== // 
+//✅======== BUSCAR UN LUGAR POR NOMBRE (input de texto) 👆 ======== // */
 //❌======== GESTIÓN DE FAVORITOS 👇 ======== //
 // RENDERIZA FAVORITOS EN MAPA
 function renderizarFavoritos() {
@@ -826,7 +830,7 @@ function ignorarLugar(id) {
   }
 }
 //❌======== GESTION DE IGNORADOS 👆 ======== //
-function getLocation() {
+/*function getLocation() {
   if (!navigator.geolocation) {
     alert("Tu navegador no permite geolocalización");
     initMap(40.4168, -3.7038); // 🧭 Coordenadas por defecto: Madrid
@@ -846,6 +850,7 @@ function getLocation() {
     { enableHighAccuracy: true }
   );
 }
+*/
 function establecerCentroDesdeFavorito(lat, lon) {
   const nuevaPosicion = [lat, lon];
 
@@ -860,7 +865,7 @@ function establecerCentroDesdeFavorito(lat, lon) {
 }
 
 
-//✅======== EVENTOS DE CARGA Y MANEJO DE SIDEBAR 👇 ======== //
+/*//✅======== EVENTOS DE CARGA Y MANEJO DE SIDEBAR 👇 ======== //
 // 📲 Manejo de eventos una vez el DOM esté cargado
 document.addEventListener("DOMContentLoaded", () => {
   const toggleBtn = document.getElementById("toggleMenu");
@@ -919,4 +924,4 @@ document.getElementById("ordenFavoritos").value = localStorage.getItem("ordenFav
   renderizarFavoritos();
 });
 
-//✅======== EVENTOS DE CARGA Y MANEJO DE SIDEBAR 👆 ======== // 
+//✅======== EVENTOS DE CARGA Y MANEJO DE SIDEBAR 👆 ======== // */
