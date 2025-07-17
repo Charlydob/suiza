@@ -1,3 +1,34 @@
+function cargarFavoritosDesdeFirebase() {
+  if (navigator.onLine && typeof db !== "undefined") {
+    db.ref(rutaFavoritos).once('value', snapshot => {
+      const data = snapshot.val();
+      if (data) {
+        favoritos = Object.values(data);
+        guardarListas(); // opcional: sincroniza con local
+        renderizarFavoritos();
+        mostrarMarcadoresFavoritos();
+      } else {
+        console.log("📂 No hay favoritos en Firebase, usando localStorage...");
+        cargarListas(); // por si tienes algún favorito local
+        renderizarFavoritos();
+        mostrarMarcadoresFavoritos();
+      }
+    }, err => {
+      console.error("Error cargando favoritos desde Firebase:", err);
+      cargarListas(); // fallback
+      renderizarFavoritos();
+      mostrarMarcadoresFavoritos();
+    });
+  } else {
+    console.warn("📡 Sin conexión: cargando favoritos desde localStorage");
+    cargarListas();
+    renderizarFavoritos();
+    mostrarMarcadoresFavoritos();
+  }
+}
+
+
+
 function renderizarFavoritos() {
   const listaDiv = document.getElementById("listaFavoritos");
   const contenedor = document.getElementById("contenedorFavoritos");
@@ -79,8 +110,8 @@ function toggleFavorito(id, tipo, coords, name, btn) {
   const index = favoritos.findIndex(f => f.id === id);
 
   if (index === -1) {
-    // Si no está, lo añade como objeto completo
-    favoritos.push({
+    // Añadir nuevo favorito
+    const nuevoFavorito = {
       id,
       tipo,
       lat: coords[0],
@@ -91,19 +122,37 @@ function toggleFavorito(id, tipo, coords, name, btn) {
         horario: '',
         notas: ''
       }
-    });
+    };
+    favoritos.push(nuevoFavorito);
     btn.innerText = "⭐ Favorito";
+
+    // 🟢 También guardar en Firebase
+    if (navigator.onLine && typeof db !== "undefined") {
+      db.ref(`${rutaFavoritos}/${id}`).set(nuevoFavorito)
+        .then(() => console.log("✅ Favorito guardado en Firebase"))
+        .catch(err => console.error("Error guardando en Firebase:", err));
+    }
+
   } else {
-    // Si ya está, lo elimina
+    // Eliminar favorito existente
+    const favoritoEliminado = favoritos[index];
     favoritos.splice(index, 1);
     btn.innerText = "☆ Favorito";
+
+    // 🔴 También eliminar de Firebase
+    if (navigator.onLine && typeof db !== "undefined") {
+      db.ref(`${rutaFavoritos}/${favoritoEliminado.id}`).remove()
+        .then(() => console.log("🗑️ Favorito eliminado de Firebase"))
+        .catch(err => console.error("Error eliminando de Firebase:", err));
+    }
   }
 
-  // Guarda la lista actualizada en localStorage
   guardarListas();
   renderizarFavoritos();
   mostrarMarcadoresFavoritos();
 }
+
+
 
 let favoritoEditandoId = null;
 function mostrarMarcadoresFavoritos() {
@@ -269,3 +318,7 @@ window.cerrarEditorFavorito = cerrarEditorFavorito;
 window.toggleFavorito = toggleFavorito;
 window.renderizarFavoritos = renderizarFavoritos;
 window.editarFavoritoDesdeMapa = editarFavoritoDesdeMapa;
+
+window.onload = function () {
+  cargarFavoritosDesdeFirebase();
+};
