@@ -5,9 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Viajecito con Laura</title>
   <link rel="stylesheet" href="Styles/styles.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">  
-  <link rel="icon" type="image/x-icon" href="/favicon.ico">
-
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <link rel="apple-touch-icon" href="Recursos/icono.png" />
 </head>
 
@@ -19,75 +17,77 @@
   <h2>Viajecito con Laura</h2>
 
       <div id="location-controls">
-        <button  id="btnUbicacion" class="action-button">📍 Ver mi ubicación</button>
+        <button onclick="getLocation()" class="action-button">📍 Ver mi ubicación</button>
         <div class="search-group">
           <input type="text" id="locationSearch" placeholder="Buscar lugar..." />
-          <button id="btnBuscar">🔍</button>
+          <button onclick="buscarLugar()">🔍</button>
         </div>
         <label for="radiusSlider" class="slider-label">Radio búsqueda: <span id="radiusValue">5000</span>m</label>
         <input type="range" id="radiusSlider" min="0" max="10000" value="5000" step="100">
       </div>
 
       <div class="filter-grid">
-            <div class="filter-card" id="btn-camping" >
+            <div class="filter-card" id="btn-camping" onclick="toggleTipo('camping')">
               <img src="Recursos/img/camping.png" alt="camping">
               <span>Campings</span>
             </div>
-            <div class="filter-card" id="btn-fuel" >
+            <div class="filter-card" id="btn-fuel" onclick="toggleTipo('fuel')">
               <img src="Recursos/img/gasolinera.png" alt="gasolinera">
               <span>Gasolineras</span>
             </div>
-            <div class="filter-card" id="btn-parking" >
+            <div class="filter-card" id="btn-parking" onclick="toggleTipo('parking')">
               <img src="Recursos/img/parking.png" alt="parking">
               <span>Parkings</span>
             </div>
-            <div class="filter-card inactivo" id="btn-hotel" >
+            <div class="filter-card inactivo" id="btn-hotel" onclick="toggleTipo('hotel')">
               <img src="Recursos/img/hotel.png" alt="hotel">
               <span>Hoteles</span>
             </div>
-            <div class="filter-card inactivo" id="btn-airbnb" >
+            <div class="filter-card inactivo" id="btn-airbnb" onclick="toggleTipo('airbnb')">
               <img src="Recursos/img/airbnb.png" alt="airbnb">
               <span>Airbnb</span>
             </div>
-            <div class="filter-card inactivo" id="btn-luggage">
+            <div class="filter-card inactivo" id="btn-luggage" onclick="toggleTipo('luggage')">
               <img src="Recursos/img/maleta.png" alt="maleta">
               <span>Consigna</span>
             </div>
-            <div class="filter-card inactivo" id="btn-airport">
+            <div class="filter-card inactivo" id="btn-airport" onclick="toggleTipo('airport')">
               <img src="Recursos/img/aeropuerto.png" alt="aeropuerto">
               <span>Aeropuertos</span>
             </div>
-              <div class="filter-card inactivo" id="btn-tourism" >
+              <div class="filter-card inactivo" id="btn-tourism" onclick="toggleTipo('tourism')">
                 <img src="Recursos/img/turismo.png" alt="punto turístico">
             <span>Turismo</span>
             </div>
-            <div class="filter-card inactivo" id="btn-restaurant" >
+            <div class="filter-card inactivo" id="btn-restaurant" onclick="toggleTipo('restaurant')">
               <img src="Recursos/img/restaurante.png" alt="restaurante">
               <span>Restaurantes</span>
             </div>
             
-            <div class="filter-card inactivo" id="btn-cafe" >
+            <div class="filter-card inactivo" id="btn-cafe" onclick="toggleTipo('cafe')">
               <img src="Recursos/img/cafeteria.png" alt="cafetería">
               <span>Cafeterías</span>
             </div>
             
-            <div class="filter-card inactivo" id="btn-hospital" >
+            <div class="filter-card inactivo" id="btn-hospital" onclick="toggleTipo('hospital')">
           <img src="Recursos/img/hospital.png" alt="hospital">
           <span>Hospitales</span>
             </div>
 
-            <div class="filter-card inactivo" id="btn-favoritos" >
+            <div class="filter-card inactivo" id="btn-favoritos" onclick="toggleTipo('favoritos')">
           <img src="Recursos/img/favorito.png" alt="favoritos">
           <span>Favoritos</span>
             </div>
+
+             
       </div>
-            <button id="btnLimpiar" class="clear-button">🧹 Limpiar</button>
+            <button onclick="clearAll()" class="clear-button">🧹 Limpiar</button>
             <div id="status">Esperando ubicación...</div>
   <!-- ⭐ Lista de Favoritos en el Sidebar -->
           <div id="listaFavoritos">
             <h3>⭐ Favoritos</h3>
-            <div id="filtrosFavoritos">
-              <input type="text" id="buscadorFavoritos" placeholder="🔍 Buscar...">
+            <div id="filtrosFavoritos"">
+              <input type="text" id="buscadorFavoritos" placeholder="🔍 Buscar..."">
               
               <select id="filtroTipoFavoritos">
                 <option value="">Todos los tipos</option>
@@ -125,9 +125,9 @@
   <input type="text" id="editHorario"><br><br>
   <label>Observaciones:</label>
   <textarea id="editNotas" rows="3"></textarea><br><br>
-  <button id="btnGuardarFavorito">💾 Guardar</button>
-  <button id="btnBorrarFavorito">🗑️ Eliminar</button>
-  <button id="btnCancelarEdicion">❌ Cancelar</button>
+  <button onclick="guardarEdicionFavorito()">💾 Guardar</button>
+  <button onclick="borrarFavorito()">🗑️ Eliminar</button>
+  <button onclick="cerrarEditorFavorito()">❌ Cancelar</button>
 </div>
   <button id="closeSidebar">‹</button>
 
@@ -135,32 +135,49 @@
   <button id="toggleMenu">›</button>
 
   <div id="map"></div>
-
-<script type="module">
-  import { initApp } from "./Scripts/initApp.js";
-  window.initApp = initApp;
+<!-- 1. Google Maps -->
+<script async
+  src="https://maps.googleapis.com/maps/api/js?key=TU_API_KEY&libraries=places&callback=initMap">
 </script>
 
-
-
-  <!-- 2. Google Maps con callback -->
-  <script 
-  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA8KhfGc61uBT3DHS1hiCEl7HgnFYaWySI&libraries=places&callback=initApp"
-  async 
-  defer
-  ></script>
-  </script>
-    <!-- 3. Tu script principal como módulo -->
-  <script type="module" src="Scripts/script.js"></script>
-
-<div id="debug" style="white-space: pre-wrap; font-size: 10px; background: #000; color: lime; padding: 10px;"></div>
+<!-- 2. Logger de errores global -->
 <script>
-  const log = (...args) => {
-    const el = document.getElementById('debug');
-    el.textContent += args.map(a => typeof a === 'object' ? JSON.stringify(a) : a).join(' ') + '\n';
+  window.onerror = function (msg, url, lineNo, columnNo, error) {
+    console.error("🛑 Error capturado:");
+    console.log("Mensaje:", msg);
+    console.log("Archivo:", url);
+    console.log("Línea:", lineNo);
+    console.log("Columna:", columnNo);
+    console.log("Error:", error);
+    alert("Se ha producido un error. Revisa la consola para más detalles.");
+    return false;
   };
-  window.log = log;
 </script>
+
+<!-- 3. Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database-compat.js"></script>
+
+<!-- 4. Configuración Firebase -->
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyAIRkX0m-qORww2kcYl_mbXm6IKh7j02dc",
+    authDomain: "suizaapp.firebaseapp.com",
+    databaseURL: "https://suizaapp-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "suizaapp",
+    storageBucket: "suizaapp.firebasestorage.app",
+    messagingSenderId: "780629642721",
+    appId: "1:780629642721:web:f8d2c33e1766b293ab96a0"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+  const rutaFavoritos = "favoritos/charlyylaura";
+</script>
+
+<!-- 5. Script principal -->
+<script src="Scripts/script.js"></script>
+
 
 </body>
 </html>
