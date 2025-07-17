@@ -394,15 +394,21 @@ b {
 /* Elimina el padding interno del InfoWindow */
 .gm-style-iw {
   padding: 0 !important;
-  background-color: transparent !important;
+  background-color: rgba(0, 255, 234, 0.11) !important;
+  backdrop-filter: blur(6px) !important;
 }
-
+.gm-style-iw-chr {
+  display: none !important;
+}
+.gm-style-iw-d {
+  padding: 0% !important;
+}
 /* Aplica tu diseño dentro del contenedor del InfoWindow */
 .popup-personalizado {
   width: 90%;
   height: 100%;
   margin: 0;
-  background: rgb(255, 255, 255);
+  background-color: rgba(0, 255, 234, 0.11);
   backdrop-filter: blur(6px);
   border-radius: 10px;
   padding: 10px;

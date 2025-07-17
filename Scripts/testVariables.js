@@ -1,4 +1,4 @@
-//VERIFICACIÓN EN LOG
+/*//VERIFICACIÓN EN LOG
 try {
   // Test de existencia de variables clave
   if (typeof map === "undefined") throw new Error("❌ Variable 'map' no está definida.");
@@ -20,4 +20,4 @@ try {
     console.error("❌ Error en variables.js:", error.message);
     alert("⚠️ pito variables.js:\n" + error.message);
   }
-}
+}*/
