@@ -400,18 +400,18 @@ b {
 .gm-style-iw-chr {
   display: none !important;
 }
+/*contenedor del InfoWindow */
 .gm-style-iw-d {
+  display: flex !important; 
+  justify-content: center   !important;
+  align-items: center !important;
   padding: 0% !important;
-  position: relative !important;
 
 }
 /* Aplica tu diseño dentro del contenedor del InfoWindow */
 .popup-personalizado {
   width: 100%;
-  height: 100%;
-  position: absolute;
-  top: 0;
-  left: 0;
+  
   background-color: rgba(0, 255, 234, 0.11);
   backdrop-filter: blur(6px);
   border-radius: 10px;
