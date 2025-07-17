@@ -29,7 +29,7 @@ async function buscar(tipo) {
       },
       luggage: {
         type: "store",
-        keyword: "locker lockers luggage storage baggage storage consigna equipaje left luggage"
+        keyword: "locker in the city"
       },
       parking: {
         type: "parking",
