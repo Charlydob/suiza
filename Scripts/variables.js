@@ -14,8 +14,8 @@ let marcadorUbicacionReal = null;
 
 // 📍 Marcadores agrupados por tipo de lugar
 const markersPorTipo = {
-  camping: [],
-  fuel: [],
+  sitios_bonitos: [],
+  gasolinera: [],
   parking: [],
   hotel: [],
   airbnb: [],
@@ -30,8 +30,8 @@ const markersPorTipo = {
 
 // 🖼️ Iconos: URLs de iconos personalizados (se usarán en mapa.js)
 const iconos = {
-  camping: 'Recursos/img/campingmapa.png',
-  fuel: 'Recursos/img/gasolineramapa.png',
+  sitios_bonitos: 'Recursos/img/campingmapa.png',
+  gasolinera: 'Recursos/img/gasolineramapa.png',
   parking: 'Recursos/img/parkingmapa.png',
   hotel: 'Recursos/img/hotelmapa.png',
   airbnb: 'Recursos/img/airbnbmapa.png',
@@ -48,8 +48,8 @@ const iconoUbicacion = 'Recursos/img/yo.png';
 
 // ✅ Estado de activación de cada tipo
 const tipoActivo = {
-  camping: false,
-  fuel: false,
+  sitios_bonitos: false,
+  gasolinera: false,
   parking: false,
   hotel: false,
   airbnb: false,

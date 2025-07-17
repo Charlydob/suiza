@@ -40,26 +40,9 @@ async function buscar(tipo) {
 
     // Solo idioma local
     const idiomaLocal = obtenerIdiomaLocal(); // debe devolver por ejemplo 'es'
-    document.getElementById("idiomaBusqueda").innerText = `Buscando en: ${idiomaLocal.toUpperCase()}`;
-const palabras = configTipo.keyword.split(/\s+/);
-const resultado = [];
 
-for (let i = 0; i < palabras.length; i++) {
-  let palabra = palabras[i];
-  let tieneGuion = palabra.startsWith("-");
-  let clave = tieneGuion ? palabra.substring(1) : palabra;
 
-  let traducciones = diccionarioKeywords[clave];
-  if (traducciones && traducciones[idiomaLocal]) {
-    let traducida = traducciones[idiomaLocal];
-    if (tieneGuion) traducida = "-" + traducida;
-    resultado.push(traducida);
-  }
-}
-
-// Solo traducciones al idioma local
-const keywordsCombinados = resultado.join(" ");
-
+const keywordsCombinados = configTipo.keyword;
 
     const request = {
       location: centro,
