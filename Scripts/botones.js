@@ -1,13 +1,39 @@
-function PopupPersonalizado(position, contentHTML) {
-  this.position = position;
-  this.container = document.createElement('div');
-  this.container.className = 'popup-personalizado';
+function PopupPersonalizado(latLng, contentHTML) {
+  this.latLng = latLng;
+  this.container = document.createElement("div");
+  this.container.className = "popup-personalizado";
   this.container.innerHTML = contentHTML;
-  this.container.style.position = 'absolute';
-  this.container.style.transform = 'translate(-50%, -100%)';
-    // Llama al constructor base
-  google.maps.OverlayView.call(this);
+
+  // Estilo básico y posicionamiento inicial
+  this.container.style.position = "absolute";
+  this.container.style.transform = "translate(-50%, -100%)";
+
+  document.getElementById("map").appendChild(this.container); // O el contenedor absoluto de tu mapa
+
+  this.updatePosition();
 }
+
+PopupPersonalizado.prototype.updatePosition = function () {
+  const projection = map.getProjection();
+  if (!projection) return;
+
+  const point = projection.fromLatLngToPoint(this.latLng);
+  const scale = Math.pow(2, map.getZoom());
+  const worldCoordinate = new google.maps.Point(
+    point.x * scale,
+    point.y * scale
+  );
+
+  this.container.style.left = `${worldCoordinate.x}px`;
+  this.container.style.top = `${worldCoordinate.y}px`;
+};
+
+PopupPersonalizado.prototype.remove = function () {
+  if (this.container && this.container.parentNode) {
+    this.container.parentNode.removeChild(this.container);
+  }
+};
+
 
 PopupPersonalizado.prototype = Object.create(google.maps.OverlayView.prototype);
 PopupPersonalizado.prototype.constructor = PopupPersonalizado;
@@ -171,14 +197,15 @@ const popupHTML = `
     icon: iconos[tipo] || undefined
   });
 
-  marker.addListener("click", function () {
-    if (popupActual) {
-      popupActual.setMap(null);
-      popupActual = null;
-    }
-    popupActual = new PopupPersonalizado(pos, popupHTML);
-    popupActual.setMap(map);
-  });
+marker.addListener("click", function () {
+  if (popupActual) {
+    popupActual.remove();
+    popupActual = null;
+  }
+
+  popupActual = new PopupPersonalizado(pos, popupHTML);
+});
+
 
   markersPorTipo[tipo].push(marker);
 });
@@ -197,10 +224,11 @@ const popupHTML = `
 }
 google.maps.event.addListener(map, 'click', function () {
   if (popupActual) {
-    popupActual.setMap(null);
+    popupActual.remove();
     popupActual = null;
   }
 });
+
 
 //✅======== INTERFAZ: BOTONES DE FILTRADO 👇 ======== //
 function toggleTipo(tipo) {

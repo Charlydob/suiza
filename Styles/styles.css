@@ -390,7 +390,9 @@ b {
   width: 80%;
   
 }
-
+#map {
+  position: relative;
+}
 /* Elimina el padding interno del InfoWindow */
 .gm-style-iw {
   padding: 0 !important;
