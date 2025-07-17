@@ -1,3 +1,36 @@
+function PopupPersonalizado(position, contentHTML) {
+  this.position = position;
+  this.container = document.createElement('div');
+  this.container.className = 'popup-personalizado';
+  this.container.innerHTML = contentHTML;
+  this.container.style.position = 'absolute';
+  this.container.style.transform = 'translate(-50%, -100%)';
+}
+
+PopupPersonalizado.prototype = Object.create(google.maps.OverlayView.prototype);
+PopupPersonalizado.prototype.constructor = PopupPersonalizado;
+
+PopupPersonalizado.prototype.onAdd = function () {
+  this.getPanes().floatPane.appendChild(this.container);
+};
+
+PopupPersonalizado.prototype.draw = function () {
+  const projection = this.getProjection();
+  const point = projection.fromLatLngToDivPixel(this.position);
+  if (point) {
+    this.container.style.left = point.x + 'px';
+    this.container.style.top = point.y + 'px';
+  }
+};
+
+PopupPersonalizado.prototype.onRemove = function () {
+  if (this.container.parentNode) {
+    this.container.parentNode.removeChild(this.container);
+  }
+};
+
+var popupActual = null;
+
 //❌======== CALCULAR DISTANCIAS 👇 ======== //
 function calcularDistancia(lat1, lon1, lat2, lon2) {
   const R = 6371; // km
@@ -90,43 +123,51 @@ async function buscar(tipo) {
         (markersPorTipo[tipo] ||= []).forEach(m => m.setMap(null));
         markersPorTipo[tipo] = [];
 
-        results.forEach(place => {
-          const pos = place.geometry.location;
-          const name = place.name;
-          const idUnico = `${tipo}_${pos.lat().toFixed(5)}_${pos.lng().toFixed(5)}`;
-          if (ignorados.includes(idUnico)) return;
+results.forEach(function (place) {
+  const pos = place.geometry.location;
+  const name = place.name;
+  const idUnico = tipo + "_" + pos.lat().toFixed(5) + "_" + pos.lng().toFixed(5);
+  if (ignorados.indexOf(idUnico) !== -1) return;
 
-          const distanciaKm = calcularDistancia(currentCoords[0], currentCoords[1], pos.lat(), pos.lng());
-          if (distanciaKm > radius / 1000) return;
+  const distanciaKm = calcularDistancia(currentCoords[0], currentCoords[1], pos.lat(), pos.lng());
+  if (distanciaKm > radius / 1000) return;
 
-          const tiempoCoche = Math.round((distanciaKm / 60) * 60);
-          const tiempoPie = Math.round((distanciaKm / 5) * 60);
+  const tiempoCoche = Math.round((distanciaKm / 60) * 60);
+  const tiempoPie = Math.round((distanciaKm / 5) * 60);
 
-          const popupHTML = `
-            <div class="popup-personalizado">
-              <b>${name}</b><br>
-              Distancia: ${distanciaKm.toFixed(1)} km<br>
-              ${tiempoCoche} min en coche | ${tiempoPie} min a pie<br>
-              <div class="grupo-botones-abajo">
-                <button onclick="toggleFavorito('${idUnico}', '${tipo}', [${pos.lat()}, ${pos.lng()}], '${name.replace(/'/g, "\\'")}', this)">
-                  ${favoritos.includes(idUnico) ? "⭐" : "☆"} Favorito
-                </button>
-                <button onclick="ignorarLugar('${idUnico}')">🗑️ Ignorar</button>
-              </div>
-            </div>
-          `;
+  const popupHTML = `
+    <div class="popup-personalizado">
+      <b>${name}</b><br>
+      Distancia: ${distanciaKm.toFixed(1)} km<br>
+      ${tiempoCoche} min en coche | ${tiempoPie} min a pie<br>
+      <div class="grupo-botones-abajo">
+        <button onclick="toggleFavorito('${idUnico}', '${tipo}', [${pos.lat()}, ${pos.lng()}], '${name.replace(/'/g, "\\'")}', this)">
+          ${favoritos.indexOf(idUnico) !== -1 ? "⭐" : "☆"} Favorito
+        </button>
+        <button onclick="ignorarLugar('${idUnico}')">🗑️ Ignorar</button>
+      </div>
+    </div>
+  `;
 
-          const marker = new google.maps.Marker({
-            position: pos,
-            map,
-            title: name,
-            icon: iconos[tipo] || undefined
-          });
+  const marker = new google.maps.Marker({
+    position: pos,
+    map: map,
+    title: name,
+    icon: iconos[tipo] || undefined
+  });
 
-          const infowindow = new google.maps.InfoWindow({ content: popupHTML });
-          marker.addListener("click", () => infowindow.open(map, marker));
-          markersPorTipo[tipo].push(marker);
-        });
+  marker.addListener("click", function () {
+    if (popupActual) {
+      popupActual.setMap(null);
+      popupActual = null;
+    }
+    popupActual = new PopupPersonalizado(pos, popupHTML);
+    popupActual.setMap(map);
+  });
+
+  markersPorTipo[tipo].push(marker);
+});
+
 
         document.getElementById("status").innerText = `Mostrando ${markersPorTipo[tipo].length} resultados para ${tipo}`;
       } catch (err) {
@@ -139,6 +180,12 @@ async function buscar(tipo) {
     document.getElementById("status").innerText = `Hubo un error al buscar ${tipo}`;
   }
 }
+google.maps.event.addListener(map, 'click', function () {
+  if (popupActual) {
+    popupActual.setMap(null);
+    popupActual = null;
+  }
+});
 
 //✅======== INTERFAZ: BOTONES DE FILTRADO 👇 ======== //
 function toggleTipo(tipo) {
