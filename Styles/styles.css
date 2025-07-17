@@ -391,41 +391,32 @@ b {
   
 }
 
+/* Elimina el padding interno del InfoWindow */
+.gm-style-iw > div {
+  padding: 0 !important;
+}
+
+/* Aplica tu diseño dentro del contenedor del InfoWindow */
 .popup-personalizado {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  background: rgba(255, 0, 242, 0.089);
+  backdrop-filter: blur(6px);
   border-radius: 10px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25) !important;
-  background-color: rgba(255, 0, 242, 0.089) !important;
-  backdrop-filter: blur(6px) !important;
   padding: 10px;
-  border: 1px solid #ccc;
-  width: 230px;
+  box-shadow: none;
+  border: none;
+  color: white;
+  font-size: 15px;
+  text-shadow: #333 1px 1px 2px;
 }
 
-/* Botones en la parte superior (si los usás) */
-.popup-personalizado .grupo-botones-arriba {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 6px;
-  width: 100%;
-  margin: 5px 0;
-  padding: 0;
-}
-
-/* Botones en la parte inferior */
-.popup-personalizado .grupo-botones-abajo {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 6px;
-  width: 100%;
-  margin-top: 5px;
-  padding: 0;
-}
-
-/* Estilo base para botones */
+/* Botones adaptados */
 .popup-personalizado button {
   padding: 6px;
   font-size: 13px;
-  background-color: #fefeff4f; /* translúcido suave */
+  background-color: #fefeff4f;
   color: #333;
   border: none;
   border-radius: 10px;
@@ -437,9 +428,21 @@ b {
 
 .popup-personalizado button:hover {
   background-color: #e0e0e080;
-
 }
 
+.popup-personalizado .grupo-botones-abajo,
+.popup-personalizado .grupo-botones-arriba {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  margin-top: 5px;
+}
+
+.popup-personalizado .boton-medio {
+  margin: 10px 0;
+  font-size: 13px;
+  color: white;
+}
 
 
 
