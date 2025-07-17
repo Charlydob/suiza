@@ -514,7 +514,7 @@ function toggleTipo(tipo) {
 }
 
 //✅======== INTERFAZ: BOTONES DE FILTRADO 👆 ======== // */
-//✅======== LIMPIEZA DEL MAPA 👇 ======== //
+/*//✅======== LIMPIEZA DEL MAPA 👇 ======== //
 // 🧼 Limpia todos los marcadores y resetea el estado
 function clearAll() {
   Object.keys(markersPorTipo).forEach(tipo => {
@@ -529,7 +529,7 @@ function clearAll() {
   });
   document.getElementById("status").innerText = "Mapa limpio";
 }
-//✅======== LIMPIEZA DEL MAPA  👆 ======== // 
+//✅======== LIMPIEZA DEL MAPA  👆 ======== // */
 /*//✅======== BUSCAR UN LUGAR POR NOMBRE (input de texto) 👇 ======== //
 // 🧭 Busca una ciudad o dirección por nombre (con Nominatim)
 function buscarLugar() {
@@ -559,7 +559,7 @@ function buscarLugar() {
 //✅======== BUSCAR UN LUGAR POR NOMBRE (input de texto) 👆 ======== // */
 //❌======== GESTIÓN DE FAVORITOS 👇 ======== //
 // RENDERIZA FAVORITOS EN MAPA
-function renderizarFavoritos() {
+/*function renderizarFavoritos() {
   const listaDiv = document.getElementById("listaFavoritos");
   const contenedor = document.getElementById("contenedorFavoritos");
   const filtroTexto = document.getElementById("buscadorFavoritos")?.value.toLowerCase() || "";
@@ -633,11 +633,11 @@ function renderizarFavoritos() {
 
     contenedor.appendChild(div);
   });
-}
+}*/
 
 
 // ⭐ Alterna entre marcar o desmarcar un lugar como favorito
-function toggleFavorito(id, tipo, coords, name, btn) {
+/*function toggleFavorito(id, tipo, coords, name, btn) {
   const index = favoritos.findIndex(f => f.id === id);
 
   if (index === -1) {
@@ -665,9 +665,9 @@ function toggleFavorito(id, tipo, coords, name, btn) {
   renderizarFavoritos();
   mostrarMarcadoresFavoritos();
 }
-let favoritoEditandoId = null;
+let favoritoEditandoId = null;*/
 
-function mostrarEditorFavorito(id) {
+/*function mostrarEditorFavorito(id) {
   const favorito = favoritos.find(f => f.id === id);
   if (!favorito) return;
 
@@ -732,8 +732,8 @@ function cerrarEditorFavorito() {
   favoritoEditandoId = null;
   document.getElementById("editorFavorito").style.display = "none";
   document.getElementById("sidebarContenido").style.display = "block";
-}
-function mostrarMarcadoresFavoritos() {
+}*/
+/*function mostrarMarcadoresFavoritos() {
   // Borra marcadores anteriores
   marcadoresFavoritos.forEach(m => map.removeLayer(m));
   marcadoresFavoritos = [];
@@ -803,9 +803,9 @@ const exactSearchLink = `https://www.google.com/maps/search/?api=1&query=${coord
   marcadoresFavoritos.push(marcador);
 });
 
-}
+}*/
 
-function editarFavoritoDesdeMapa(id) {
+/*function editarFavoritoDesdeMapa(id) {
   const favorito = favoritos.find(f => f.id === id);
   if (!favorito) return;
 
@@ -816,7 +816,7 @@ function editarFavoritoDesdeMapa(id) {
 
   // Abre el editor del favorito
   mostrarEditorFavorito(id); // asegúrate de tener esta función
-}
+}*/
 
 
 //❌======== GESTION DE FAVORITOS 👆 ======== //
