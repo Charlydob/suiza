@@ -1,3 +1,39 @@
+//================= GESTIÓN DEL CÍRCULO DE BÚSQUEDA 👇 =================//
+
+// 🔵 Crea el círculo de búsqueda alrededor del usuario
+function crearCirculo() {
+  const radius = parseInt(document.getElementById("radiusSlider").value);
+
+  // Si ya existe, eliminar el círculo anterior
+  if (searchCircle) {
+    searchCircle.setMap(null);
+  }
+
+  // Crear nuevo círculo con Google Maps
+  searchCircle = new google.maps.Circle({
+    strokeColor: "#0000FF",
+    strokeOpacity: 0.6,
+    strokeWeight: 2,
+    fillColor: "#5fa",
+    fillOpacity: 0.2,
+    map: map,
+    center: { lat: currentCoords[0], lng: currentCoords[1] },
+    radius: radius,
+  });
+}
+
+// 🔁 Actualiza el círculo cuando cambia la ubicación o el radio
+function actualizarCirculo() {
+  const radius = parseInt(document.getElementById("radiusSlider").value);
+  if (searchCircle) {
+    searchCircle.setCenter({ lat: currentCoords[0], lng: currentCoords[1] });
+    searchCircle.setRadius(radius);
+  }
+}
+
+//================= GESTIÓN DEL CÍRCULO DE BÚSQUEDA 👆 =================//
+
+
 //================= INICIALIZACIÓN DEL MAPA Y MARCADOR DEL USUARIO 👇 =================//
 
 function initMap(lat = 46.8182, lon = 8.2275) {
