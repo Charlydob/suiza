@@ -76,3 +76,35 @@ function renderizarFavoritos() {
 
 // 👇 Necesario para que sea accesible desde otros scripts o HTML:
 window.renderizarFavoritos = renderizarFavoritos;
+function toggleFavorito(id, tipo, coords, name, btn) {
+  const index = favoritos.findIndex(f => f.id === id);
+
+  if (index === -1) {
+    // Si no está, lo añade como objeto completo
+    favoritos.push({
+      id,
+      tipo,
+      lat: coords[0],
+      lon: coords[1],
+      datosPersonalizados: {
+        nombre: name,
+        precio: '',
+        horario: '',
+        notas: ''
+      }
+    });
+    btn.innerText = "⭐ Favorito";
+  } else {
+    // Si ya está, lo elimina
+    favoritos.splice(index, 1);
+    btn.innerText = "☆ Favorito";
+  }
+
+  // Guarda la lista actualizada en localStorage
+  guardarListas();
+  renderizarFavoritos();
+  mostrarMarcadoresFavoritos();
+}
+
+let favoritoEditandoId = null;
+window.toggleFavorito = toggleFavorito;
