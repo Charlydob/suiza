@@ -13,12 +13,54 @@ function calcularDistancia(lat1, lon1, lat2, lon2) {
 let tipoGooglePlaces = {};
 
 function cargarTipoGooglePlaces() {
-  return fetch('json/tipoGooglePlaces.json')
-    .then(res => res.json())
-    .then(data => {
-      tipoGooglePlaces = data;
-    });
+  tipoGooglePlaces = {
+    "sitios_bonitos": {
+      "type": "tourist_attraction",
+      "keyword": "mountain lake river viewpoint hiking nature natural park forest mirador cascada"
+    },
+    "hotel": {
+      "type": "lodging",
+      "keyword": "hotel"
+    },
+    "airbnb": {
+      "type": "lodging",
+      "keyword": "apartment airbnb homestay guesthouse"
+    },
+    "luggage": {
+      "type": "store",
+      "keyword": "locker luggage storage consigna equipaje left luggage bag drop deposit equipajes lockers"
+    },
+    "parking": {
+      "type": "parking",
+      "keyword": "-bicycle -bike -garage privado -moto"
+    },
+    "airport": {
+      "type": "airport",
+      "keyword": ""
+    },
+    "gasolinera": {
+      "type": "gas_station",
+      "keyword": ""
+    },
+    "tourism": {
+      "type": "tourist_attraction",
+      "keyword": "viewpoint museum gallery monument church historic ruins castle colosseum templo"
+    },
+    "restaurant": {
+      "type": "restaurant",
+      "keyword": "fast food burger pizza mcdonalds kebab tacos comida rápida"
+    },
+    "cafe": {
+      "type": "cafe",
+      "keyword": "-starbucks coffee tea cozy breakfast"
+    },
+    "hospital": {
+      "type": "hospital",
+      "keyword": ""
+    }
+  };
 }
+
 
 //🔎 Busca lugares de un tipo concreto cerca del usuario usando Google Maps Places API
 async function buscar(tipo) {
