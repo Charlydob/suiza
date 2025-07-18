@@ -413,7 +413,11 @@ br {
   backdrop-filter: blur(6px) !important;
 }
 .gm-style-iw-chr{
-display: flex !important;
+  padding: 0 !important;
+  background-color: rgba(0, 255, 234, 0.11) !important;
+  backdrop-filter: blur(6px) !important;
+  height: 1% !important;
+  
 }
 
 /* Aplica tu diseño dentro del contenedor del InfoWindow */
