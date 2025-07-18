@@ -146,12 +146,14 @@ function toggleFavorito(id, tipo, coords, name, btn) {
       }
     };
 
-    btn.innerText = "⭐ Favorito";
+
 
     if (navigator.onLine && typeof db !== "undefined") {
       db.ref(`${rutaFavoritos}/${id}`).set(nuevoFavorito)
         .then(() => {
           favoritos.push(nuevoFavorito);
+              btn.innerText = "⭐ Favorito";
+              mostrarEditorFavorito(id);
           guardarListas();
           renderizarFavoritos();
           mostrarMarcadoresFavoritos();
