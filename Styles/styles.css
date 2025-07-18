@@ -419,7 +419,12 @@ br {
   height: 1px !important;
 
 }
-.gm-style-iw-chr button{
+.gm-ui-hover-effect button{
+    padding: 0 !important;
+  height: 1px !important;
+
+}
+.gm-ui-hover-effect{
     padding: 0 !important;
   height: 1px !important;
 
