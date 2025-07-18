@@ -200,6 +200,7 @@ function toggleFavorito(id, tipo, coords, name, btn) {
   renderizarFavoritos();
   mostrarMarcadoresFavoritos();
 }
+window.toggleFavorito = toggleFavorito;
 
 
 
@@ -386,6 +387,5 @@ window.mostrarEditorFavorito = mostrarEditorFavorito;
 window.guardarEdicionFavorito = guardarEdicionFavorito;
 window.borrarFavorito = borrarFavorito;
 window.cerrarEditorFavorito = cerrarEditorFavorito;
-window.toggleFavorito = toggleFavorito;
 window.renderizarFavoritos = renderizarFavoritos;
 window.editarFavoritoDesdeMapa = editarFavoritoDesdeMapa;
