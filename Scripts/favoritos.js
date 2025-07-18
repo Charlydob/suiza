@@ -171,6 +171,29 @@ function renderizarFavoritos() {
   });
 
 }
+function renderizarFavoritosEnSidebar() {
+  const contenedor = document.getElementById("contenedorFavoritosSidebar");
+  contenedor.innerHTML = "";
+
+  favoritos.forEach(f => {
+    const div = document.createElement("div");
+    div.className = "favorito-item";
+
+    const nombre = f.datosPersonalizados?.nombre || f.id;
+
+    div.innerHTML = `
+      <h3>${nombre}</h3>
+      <p>${f.datosPersonalizados?.notas || ""}</p>
+    `;
+
+    div.onclick = () => {
+      establecerCentroDesdeFavorito(f.lat, f.lon);
+      mostrarEditorFavorito(f.id);
+    };
+
+    contenedor.appendChild(div);
+  });
+}
 
 // 👇 Necesario para que sea accesible desde otros scripts o HTML:
 
