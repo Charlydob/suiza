@@ -137,21 +137,64 @@
         <button onclick="guardarEdicionFavorito()">💾 Guardar</button>
         <button onclick="borrarFavorito()">🗑️ Eliminar</button>
         <button onclick="cerrarEditorFavorito()">❌ Cancelar</button>
-              </div>
-                <button id="closeSidebar">‹</button>
-              </div>
+      </div>
+    </div>
+
+      <button id="closeSidebar">‹</button>
       <button id="toggleMenu">›</button>
 
         <div id="map"></div>
     </section>
+
     <section id="pagina-itinerario" class="pagina" style="display: none;">
       <h2>🗓️ Itinerario</h2>
       <p>Aquí puedes planificar día por día lo que haréis en Suiza.</p>
     </section>
-    <section id="pagina-favoritos" class="pagina" style="display: none;">
-      <h2>⭐ Favoritos</h2>
-      <p>Guarda los lugares que más te gusten.</p>
-    </section>
+
+<section id="pagina-favoritos" class="pagina" style="display: none;">
+  <h2>⭐ Favoritos</h2>
+  <p>Guarda los lugares que más te gusten y accede fácilmente a ellos.</p>
+
+  <div id="listaFavoritos">
+    <div id="contenedorFavoritos" class="lista-favoritos">
+      <!-- Aquí se renderizan las tarjetas -->
+    </div>
+  </div>
+
+  <!-- Plantilla de tarjeta individual -->
+  <template id="template-favorito">
+    <div class="favorito-tarjeta">
+      <!-- Imagen del lugar -->
+      <div class="favorito-imagen">
+        <img src="" alt="Imagen del lugar">
+      </div>
+
+      <!-- Contenedor de la info -->
+      <div class="favorito-info">
+        <!-- Checkbox de visitado -->
+        <input type="checkbox" class="favorito-visitado" title="Marcar como visitado">
+
+        <!-- Texto superpuesto -->
+        <div class="favorito-detalles">
+          <h3 class="favorito-nombre">Nombre del lugar</h3>
+          <p class="favorito-ubicacion">Ciudad, País</p>
+          <p class="favorito-direccion">Dirección exacta</p>
+          <p class="favorito-notas">📝 Notas personales</p>
+          <p class="favorito-precio">💰 Precio estimado</p>
+          <p class="favorito-horario">🕒 Horario</p>
+        </div>
+
+        <!-- Botones -->
+        <div class="favorito-botones">
+          <button class="btn-ver">📍 Ver en el mapa</button>
+          <button class="btn-eliminar">🗑️ Eliminar</button>
+        </div>
+      </div>
+    </div>
+  </template>
+</section>
+
+
     <section id="pagina-gastos" class="pagina" style="display: none;">
       <h2>💰 Gastos</h2>
       <p>Lleva un registro de cada gasto del viaje.</p>
@@ -222,5 +265,7 @@
 </script>
 <!-- Script testeo de variables -->
 <script src="Scripts/testVariables.js"></script>
+<!-- Lógica del menú inferior de navegación -->
+<script src="Scripts/menuInferior.js"></script>
 </body>
 </html>

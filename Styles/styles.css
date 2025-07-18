@@ -117,7 +117,7 @@ html, body {
   position: fixed;
   top: 0;
   left: 0;
-  height: 95%;
+  height: calc(100vh - 57px); /* AJUSTA aquí si tu menú inferior mide más o menos */
   width: 280px;
   background: transparent;
   backdrop-filter: blur(5px); 
@@ -133,6 +133,7 @@ html, body {
   overflow-y: auto;
   overscroll-behavior: contain;
 }
+
 #sidebarContenido {
   margin-top:  0px;
   margin-bottom: 200px;
@@ -144,7 +145,7 @@ html, body {
 }
 #closeSidebar {
   position: absolute;
-  top: 605px;
+  top: 320px;
   right: 10px;
   width: 36px;
   height: 36px;

@@ -5,15 +5,27 @@ document.addEventListener("DOMContentLoaded", () => {
   const sidebar = document.getElementById("sidebar");
 
   const closeBtn = document.getElementById("closeSidebar");
-  closeBtn.addEventListener("click", () => {
-    sidebar.classList.remove("open");
-    toggleBtn.style.display = "block";
-  });
+  // Estado inicial: solo mostrar el botón que tenga sentido según el estado del sidebar
+if (sidebar.classList.contains("open")) {
+  toggleBtn.style.display = "none";
+  closeBtn.style.display = "block";
+} else {
+  toggleBtn.style.display = "block";
+  closeBtn.style.display = "none";
+}
 
-  toggleBtn.addEventListener("click", () => {
-    sidebar.classList.toggle("open");
-    toggleBtn.style.display = sidebar.classList.contains("open") ? "none" : "block";
-  });
+closeBtn.addEventListener("click", () => {
+  sidebar.classList.remove("open");
+  toggleBtn.style.display = "block";
+  closeBtn.style.display = "none";
+});
+
+toggleBtn.addEventListener("click", () => {
+  sidebar.classList.toggle("open");
+  const isOpen = sidebar.classList.contains("open");
+  toggleBtn.style.display = isOpen ? "none" : "block";
+  closeBtn.style.display = isOpen ? "block" : "none";
+});
 
   // 🎚️ Deslizador de radio
   document.getElementById("radiusSlider").addEventListener("input", () => {
