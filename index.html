@@ -14,6 +14,7 @@
 <body>
   <main id="contenedor-paginas">
     <!-- 🌍 PÁGINAS -->
+<!--🟨🟨🟨🟨 MAPA 🟨🟨🟨🟨-->
     <section id="pagina-mapa" class="pagina">
       <div id="sidebar">
         <div id="sidebarContenido">
@@ -93,7 +94,7 @@
                   <button onclick="clearAll()" class="clear-button">🧹 Limpiar</button>
                   <div id="status">Esperando ubicación...</div>
         <!-- ⭐ Lista de Favoritos en el Sidebar -->
-                <div id="listaFavoritos">
+                <div id="listaFavoritosSidebar">
                   <h3>⭐ Favoritos</h3>
                   <div id="filtrosFavoritos"">
                     <input type="text" id="buscadorFavoritos" placeholder="🔍 Buscar..."">
@@ -145,12 +146,12 @@
 
         <div id="map"></div>
     </section>
-
+<!--🟨🟨🟨🟨 ITINERARIO 🟨🟨🟨🟨-->
     <section id="pagina-itinerario" class="pagina" style="display: none;">
       <h2>🗓️ Itinerario</h2>
       <p>Aquí puedes planificar día por día lo que haréis en Suiza.</p>
     </section>
-
+<!--🟨🟨🟨🟨 FAVORITOS 🟨🟨🟨🟨-->
     <section id="pagina-favoritos" class="pagina" style="display: none;">
       <h2>⭐ Favoritos</h2>
       <p>Guarda los lugares que más te gusten y accede fácilmente a ellos.</p>
@@ -193,12 +194,12 @@
         </div>
       </template>
     </section>
-
-
+<!--🟨🟨🟨🟨 GASTOS 🟨🟨🟨🟨-->
     <section id="pagina-gastos" class="pagina" style="display: none;">
       <h2>💰 Gastos</h2>
       <p>Lleva un registro de cada gasto del viaje.</p>
     </section>
+<!--🟨🟨🟨🟨 NOTAS 🟨🟨🟨🟨-->
     <section id="pagina-notas" class="pagina-app" style="display: none;">
       <h2>📝 Notas</h2>
       <p>Guarda ideas, fotos de reservas, números importantes…</p>

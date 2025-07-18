@@ -75,7 +75,58 @@ function cargarIgnoradosDesdeFirebase() {
     ignorados.push(...local);
   }
 }
+function crearTarjetaFavorito(f) {
+  const clon = document.getElementById("template-favorito").content.cloneNode(true);
 
+  const tarjeta = clon.querySelector(".favorito-tarjeta");
+  const imagen = clon.querySelector("img");
+  const nombreEl = clon.querySelector(".favorito-nombre");
+  const ubicacionEl = clon.querySelector(".favorito-ubicacion");
+  const direccionEl = clon.querySelector(".favorito-direccion");
+  const notasEl = clon.querySelector(".favorito-notas");
+  const precioEl = clon.querySelector(".favorito-precio");
+  const horarioEl = clon.querySelector(".favorito-horario");
+  const btnVer = clon.querySelector(".btn-ver");
+  const btnEliminar = clon.querySelector(".btn-eliminar");
+  const checkbox = clon.querySelector(".favorito-visitado");
+
+  const nombre = f.datosPersonalizados?.nombre || f.id;
+  const ciudadPais = f.ubicacion || "Ubicación desconocida";
+  const direccion = f.direccion || "Dirección no disponible";
+  const notas = f.datosPersonalizados?.notas || "";
+  const precio = f.datosPersonalizados?.precio || "";
+  const horario = f.datosPersonalizados?.horario || "";
+
+  const imagenURL = f.imagen || `https://maps.googleapis.com/maps/api/staticmap?center=${f.lat},${f.lon}&zoom=15&size=300x200&maptype=roadmap&markers=color:red%7C${f.lat},${f.lon}&key=TU_API_KEY`;
+  imagen.src = imagenURL;
+
+  nombreEl.textContent = nombre;
+  ubicacionEl.textContent = ciudadPais;
+  direccionEl.textContent = direccion;
+  notasEl.textContent = notas ? `📝 ${notas}` : "";
+  precioEl.textContent = precio ? `💰 ${precio}` : "";
+  horarioEl.textContent = horario ? `🕒 ${horario}` : "";
+
+  btnVer.addEventListener("click", e => {
+    e.stopPropagation();
+    establecerCentroDesdeFavorito(f.lat, f.lon);
+  });
+
+  btnEliminar.addEventListener("click", e => {
+    e.stopPropagation();
+    toggleFavorito(f.id, f.tipo, [f.lat, f.lon], nombre, { innerText: "☆ Favorito" });
+  });
+
+  checkbox.addEventListener("change", () => {
+    tarjeta.classList.toggle("visitado", checkbox.checked);
+  });
+
+  tarjeta.addEventListener("click", () => {
+    mostrarEditorFavorito(f.id);
+  });
+
+  return clon;
+}
 
 
 function renderizarFavoritos() {
@@ -99,10 +150,7 @@ function renderizarFavoritos() {
   const lon1 = Array.isArray(userPos) ? userPos[1] : userPos.lng;
 
   let favoritosFiltrados = favoritos
-    .map(f => {
-      const distanciaKm = calcularDistancia(lat1, lon1, f.lat, f.lon);
-      return { ...f, distanciaKm };
-    })
+    .map(f => ({ ...f, distanciaKm: calcularDistancia(lat1, lon1, f.lat, f.lon) }))
     .filter(f => {
       const texto = `${f.datosPersonalizados?.nombre || ""} ${f.datosPersonalizados?.notas || ""}`.toLowerCase();
       const coincideTexto = texto.includes(filtroTexto);
@@ -117,6 +165,16 @@ function renderizarFavoritos() {
   }
 
   favoritosFiltrados.forEach(f => {
+    contenedor.appendChild(crearTarjetaFavorito(f));
+  });
+}
+
+
+function renderizarFavoritosEnSidebar() {
+  const contenedor = document.getElementById("contenedorFavoritosSidebar");
+  contenedor.innerHTML = "";
+
+  favoritos.forEach(f => {
     const clon = document.getElementById("template-favorito").content.cloneNode(true);
 
     const tarjeta = clon.querySelector(".favorito-tarjeta");
@@ -162,38 +220,14 @@ function renderizarFavoritos() {
       tarjeta.classList.toggle("visitado", checkbox.checked);
     });
 
-    // Haz clic en la tarjeta para abrir el editor
     tarjeta.addEventListener("click", () => {
       mostrarEditorFavorito(f.id);
     });
 
     contenedor.appendChild(clon);
   });
-
 }
-function renderizarFavoritosEnSidebar() {
-  const contenedor = document.getElementById("contenedorFavoritosSidebar");
-  contenedor.innerHTML = "";
 
-  favoritos.forEach(f => {
-    const div = document.createElement("div");
-    div.className = "favorito-item";
-
-    const nombre = f.datosPersonalizados?.nombre || f.id;
-
-    div.innerHTML = `
-      <h3>${nombre}</h3>
-      <p>${f.datosPersonalizados?.notas || ""}</p>
-    `;
-
-    div.onclick = () => {
-      establecerCentroDesdeFavorito(f.lat, f.lon);
-      mostrarEditorFavorito(f.id);
-    };
-
-    contenedor.appendChild(div);
-  });
-}
 
 // 👇 Necesario para que sea accesible desde otros scripts o HTML:
 
