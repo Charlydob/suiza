@@ -423,7 +423,7 @@ br {
 /* Aplica tu diseño dentro del contenedor del InfoWindow */
 .popup-personalizado {
   width: 90%;
-  height: 100%;
+  height: 90%;
   margin: 0;
   background-color: transparent;
   backdrop-filter: blur(6px);
@@ -435,14 +435,20 @@ br {
   font-size: 15px;
   text-shadow: #333 1px 1px 2px;
 }
-.boton-medio{
+.boton-medio {
   color: white !important;
+  font-weight: bold !important;
   text-shadow:
-    -1px -1px 0 black,
-     1px -1px 0 black,
-    -1px  1px 0 black,
-     1px  1px 0 black  !important;
-};
+    -2px -2px 0 black,
+     2px -2px 0 black,
+    -2px  2px 0 black,
+     2px  2px 0 black,
+    -2px  0px 0 black,
+     2px  0px 0 black,
+     0px -2px 0 black,
+     0px  2px 0 black !important;
+}
+
 
 
 
