@@ -175,6 +175,7 @@ function toggleFavorito(id, tipo, coords, name, btn) {
 }
 
 
+let popupActual = null;
 
 let favoritoEditandoId = null;
 function mostrarMarcadoresFavoritos() {
@@ -246,8 +247,25 @@ function mostrarMarcadoresFavoritos() {
       }
     });
 
-    const infoWindow = new google.maps.InfoWindow({ content: popupHTML });
-    marcador.addListener("click", () => infoWindow.open(map, marcador));
+const infoWindow = new google.maps.InfoWindow({ content: popupHTML });
+
+marcador.addListener("click", () => {
+  // Si ya hay un popup abierto en este mismo marcador, ciérralo
+  if (popupActual && popupActual.__vinculado === marcador) {
+    popupActual.close();
+    popupActual = null;
+    return;
+  }
+
+  // Si había otro popup abierto, ciérralo
+  if (popupActual) popupActual.close();
+
+  // Abrir el nuevo popup
+  infoWindow.open(map, marcador);
+  infoWindow.__vinculado = marcador;
+  popupActual = infoWindow;
+});
+
 
     marcadoresFavoritos.push(marcador);
   });
