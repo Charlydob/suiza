@@ -6,141 +6,180 @@
   <title>Viajecito con Laura</title>
   <link rel="stylesheet" href="Styles/styles.css" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="Styles/menuInferior.css" />
   <link rel="apple-touch-icon" href="Recursos/icono.png" />
 </head>
 
-<!--SIDEBAR-->
 
 <body>
-<div id="sidebar">
-  <div id="sidebarContenido">
-  <h2>Viajecito con Laura</h2>
+  <main id="contenedor-paginas">
+    <!-- 🌍 PÁGINAS -->
+    <section id="pagina-mapa" class="pagina">
+      <div id="sidebar">
+        <div id="sidebarContenido">
+        <h2>Viajecito con Laura</h2>
 
-      <div id="location-controls">
-        <button onclick="getLocation()" class="action-button">📍 Ver mi ubicación</button>
-        <div class="search-group">
-          <input type="text" id="locationSearch" placeholder="Buscar lugar..." />
-          <button onclick="buscarLugar()">🔍</button>
-        </div>
-        <label>v1.2.24</label>
-        <label for="radiusSlider" class="slider-label">Radio búsqueda: <span id="radiusValue">1000</span>m</label>
-        <input type="range" id="radiusSlider" min="0" max="10000" value="1000" step="100">
+            <div id="location-controls">
+              <button onclick="getLocation()" class="action-button">📍 Ver mi ubicación</button>
+              <div class="search-group">
+                <input type="text" id="locationSearch" placeholder="Buscar lugar..." />
+                <button onclick="buscarLugar()">🔍</button>
+              </div>
+              <label>v1.2.24</label>
+              <label for="radiusSlider" class="slider-label">Radio búsqueda: <span id="radiusValue">1000</span>m</label>
+              <input type="range" id="radiusSlider" min="0" max="10000" value="1000" step="100">
+            </div>
+
+            <div class="filter-grid">
+                  <div class="filter-card" id="btn-sitios_bonitos" onclick="toggleTipo('sitios_bonitos')">
+                    <img src="Recursos/img/camping.png" alt="sitios_bonitos">
+                    <span>Campings</span>
+                  </div>
+                  <div class="filter-card" id="btn-gasolinera" onclick="toggleTipo('gasolinera')">
+                    <img src="Recursos/img/gasolinera.png" alt="gasolinera">
+                    <span>Gasolineras</span>
+                  </div>
+                  <div class="filter-card" id="btn-parking" onclick="toggleTipo('parking')">
+                    <img src="Recursos/img/parking.png" alt="parking">
+                    <span>Parkings</span>
+                  </div>
+                  <div class="filter-card inactivo" id="btn-hotel" onclick="toggleTipo('hotel')">
+                    <img src="Recursos/img/hotel.png" alt="hotel">
+                    <span>Hoteles</span>
+                  </div>
+                  <div class="filter-card inactivo" id="btn-airbnb" onclick="toggleTipo('airbnb')">
+                    <img src="Recursos/img/airbnb.png" alt="airbnb">
+                    <span>Airbnb</span>
+                  </div>
+                  <div class="filter-card inactivo" id="btn-luggage" onclick="toggleTipo('luggage')">
+                    <img src="Recursos/img/maleta.png" alt="maleta">
+                    <span>Consigna</span>
+                  </div>
+                  <div class="filter-card inactivo" id="btn-airport" onclick="toggleTipo('airport')">
+                    <img src="Recursos/img/aeropuerto.png" alt="aeropuerto">
+                    <span>Aeropuertos</span>
+                  </div>
+                    <div class="filter-card inactivo" id="btn-tourism" onclick="toggleTipo('tourism')">
+                      <img src="Recursos/img/turismo.png" alt="punto turístico">
+                  <span>Turismo</span>
+                  </div>
+                  <div class="filter-card inactivo" id="btn-restaurant" onclick="toggleTipo('restaurant')">
+                    <img src="Recursos/img/restaurante.png" alt="restaurante">
+                    <span>Restaurantes</span>
+                  </div>
+                  
+                  <div class="filter-card inactivo" id="btn-cafe" onclick="toggleTipo('cafe')">
+                    <img src="Recursos/img/cafeteria.png" alt="cafetería">
+                    <span>Cafeterías</span>
+                  </div>
+                  
+                  <div class="filter-card inactivo" id="btn-hospital" onclick="toggleTipo('hospital')">
+                <img src="Recursos/img/hospital.png" alt="hospital">
+                <span>Hospitales</span>
+                  </div>
+
+                  <div class="filter-card inactivo" id="btn-favoritos" onclick="toggleTipo('favoritos')">
+                <img src="Recursos/img/favorito.png" alt="favoritos">
+                <span>Favoritos</span>
+                  </div>
+
+                  
+            </div>
+                  <button onclick="clearAll()" class="clear-button">🧹 Limpiar</button>
+                  <div id="status">Esperando ubicación...</div>
+        <!-- ⭐ Lista de Favoritos en el Sidebar -->
+                <div id="listaFavoritos">
+                  <h3>⭐ Favoritos</h3>
+                  <div id="filtrosFavoritos"">
+                    <input type="text" id="buscadorFavoritos" placeholder="🔍 Buscar..."">
+                    
+                    <select id="filtroTipoFavoritos">
+                      <option value="">Todos los tipos</option>
+                      <option value="sitios_bonitos">sitios_bonitos</option>
+                      <option value="gasolinera">Gasolinera</option>
+                      <option value="parking">Parking</option>
+                      <option value="hotel">Hotel</option>
+                      <option value="airbnb">Airbnb</option>
+                      <option value="luggage">Consigna</option>
+                      <option value="airport">Aeropuerto</option>
+                      <option value="tourism">Turismo</option>
+                      <option value="restaurant">Restaurante</option>
+                      <option value="cafe">Cafetería</option>
+                      <option value="hospital">Hospital</option>
+                    </select>
+
+                    <select id="ordenFavoritos" style="width: 100%;">
+                      <option value="distanciaAsc">🔽 Distancia (cerca primero)</option>
+                      <option value="distanciaDesc">🔼 Distancia (lejos primero)</option>
+                    </select>
+                  </div>
+
+                  <div id="contenedorFavoritos"></div>
+                </div>
+
       </div>
-
-      <div class="filter-grid">
-            <div class="filter-card" id="btn-sitios_bonitos" onclick="toggleTipo('sitios_bonitos')">
-              <img src="Recursos/img/camping.png" alt="sitios_bonitos">
-              <span>Campings</span>
-            </div>
-            <div class="filter-card" id="btn-gasolinera" onclick="toggleTipo('gasolinera')">
-              <img src="Recursos/img/gasolinera.png" alt="gasolinera">
-              <span>Gasolineras</span>
-            </div>
-            <div class="filter-card" id="btn-parking" onclick="toggleTipo('parking')">
-              <img src="Recursos/img/parking.png" alt="parking">
-              <span>Parkings</span>
-            </div>
-            <div class="filter-card inactivo" id="btn-hotel" onclick="toggleTipo('hotel')">
-              <img src="Recursos/img/hotel.png" alt="hotel">
-              <span>Hoteles</span>
-            </div>
-            <div class="filter-card inactivo" id="btn-airbnb" onclick="toggleTipo('airbnb')">
-              <img src="Recursos/img/airbnb.png" alt="airbnb">
-              <span>Airbnb</span>
-            </div>
-            <div class="filter-card inactivo" id="btn-luggage" onclick="toggleTipo('luggage')">
-              <img src="Recursos/img/maleta.png" alt="maleta">
-              <span>Consigna</span>
-            </div>
-            <div class="filter-card inactivo" id="btn-airport" onclick="toggleTipo('airport')">
-              <img src="Recursos/img/aeropuerto.png" alt="aeropuerto">
-              <span>Aeropuertos</span>
-            </div>
-              <div class="filter-card inactivo" id="btn-tourism" onclick="toggleTipo('tourism')">
-                <img src="Recursos/img/turismo.png" alt="punto turístico">
-            <span>Turismo</span>
-            </div>
-            <div class="filter-card inactivo" id="btn-restaurant" onclick="toggleTipo('restaurant')">
-              <img src="Recursos/img/restaurante.png" alt="restaurante">
-              <span>Restaurantes</span>
-            </div>
-            
-            <div class="filter-card inactivo" id="btn-cafe" onclick="toggleTipo('cafe')">
-              <img src="Recursos/img/cafeteria.png" alt="cafetería">
-              <span>Cafeterías</span>
-            </div>
-            
-            <div class="filter-card inactivo" id="btn-hospital" onclick="toggleTipo('hospital')">
-          <img src="Recursos/img/hospital.png" alt="hospital">
-          <span>Hospitales</span>
-            </div>
-
-            <div class="filter-card inactivo" id="btn-favoritos" onclick="toggleTipo('favoritos')">
-          <img src="Recursos/img/favorito.png" alt="favoritos">
-          <span>Favoritos</span>
-            </div>
-
-             
-      </div>
-            <button onclick="clearAll()" class="clear-button">🧹 Limpiar</button>
-            <div id="status">Esperando ubicación...</div>
-  <!-- ⭐ Lista de Favoritos en el Sidebar -->
-          <div id="listaFavoritos">
-            <h3>⭐ Favoritos</h3>
-            <div id="filtrosFavoritos"">
-              <input type="text" id="buscadorFavoritos" placeholder="🔍 Buscar..."">
-              
-              <select id="filtroTipoFavoritos">
-                <option value="">Todos los tipos</option>
-                <option value="sitios_bonitos">sitios_bonitos</option>
-                <option value="gasolinera">Gasolinera</option>
-                <option value="parking">Parking</option>
-                <option value="hotel">Hotel</option>
-                <option value="airbnb">Airbnb</option>
-                <option value="luggage">Consigna</option>
-                <option value="airport">Aeropuerto</option>
-                <option value="tourism">Turismo</option>
-                <option value="restaurant">Restaurante</option>
-                <option value="cafe">Cafetería</option>
-                <option value="hospital">Hospital</option>
-              </select>
-
-              <select id="ordenFavoritos" style="width: 100%;">
-                <option value="distanciaAsc">🔽 Distancia (cerca primero)</option>
-                <option value="distanciaDesc">🔼 Distancia (lejos primero)</option>
-              </select>
-            </div>
-
-            <div id="contenedorFavoritos"></div>
-          </div>
-
-</div>
-<!-- 📝 Editor de Favorito -->
-<div id="editorFavorito" style="display: none; padding: 10px;">
-  <h3>Editar lugar</h3>
-  <label>Nombre personalizado:</label>
-  <input type="text" id="editNombre"><br><br>
-  <label>Precio:</label>
-  <input type="text" id="editPrecio"><br><br>
-  <label>Horario:</label>
-  <input type="text" id="editHorario"><br><br>
-  <label>Observaciones:</label>
-  <textarea id="editNotas" rows="3"></textarea><br><br>
-  <button onclick="guardarEdicionFavorito()">💾 Guardar</button>
-  <button onclick="borrarFavorito()">🗑️ Eliminar</button>
-  <button onclick="cerrarEditorFavorito()">❌ Cancelar</button>
-
-      <button id="closeSidebar">‹</button>
+      <!-- 📝 Editor de Favorito -->
+      <div id="editorFavorito" style="display: none; padding: 10px;">
+        <h3>Editar lugar</h3>
+        <label>Nombre personalizado:</label>
+        <input type="text" id="editNombre"><br><br>
+        <label>Precio:</label>
+        <input type="text" id="editPrecio"><br><br>
+        <label>Horario:</label>
+        <input type="text" id="editHorario"><br><br>
+        <label>Observaciones:</label>
+        <textarea id="editNotas" rows="3"></textarea><br><br>
+        <button onclick="guardarEdicionFavorito()">💾 Guardar</button>
+        <button onclick="borrarFavorito()">🗑️ Eliminar</button>
+        <button onclick="cerrarEditorFavorito()">❌ Cancelar</button>
+              </div>
+                <button id="closeSidebar">‹</button>
+              </div>
       <button id="toggleMenu">›</button>
 
-  <div id="map"></div>
-  <div id="menuInferior">
-  <button class="nav-btn activo" data-page="mapa"><span>🗺️</span><br>Mapa</button>
-  <button class="nav-btn" data-page="itinerario"><span>📅</span><br>Itinerario</button>
-  <button class="nav-btn" data-page="gastos"><span>💰</span><br>Gastos</button>
-  <button class="nav-btn" data-page="notas"><span>📝</span><br>Notas</button>
+        <div id="map"></div>
+    </section>
+    <section id="pagina-itinerario" class="pagina" style="display: none;">
+      <h2>🗓️ Itinerario</h2>
+      <p>Aquí puedes planificar día por día lo que haréis en Suiza.</p>
+    </section>
+    <section id="pagina-favoritos" class="pagina" style="display: none;">
+      <h2>⭐ Favoritos</h2>
+      <p>Guarda los lugares que más te gusten.</p>
+    </section>
+    <section id="pagina-gastos" class="pagina" style="display: none;">
+      <h2>💰 Gastos</h2>
+      <p>Lleva un registro de cada gasto del viaje.</p>
+    </section>
+    <section id="pagina-notas" class="pagina-app" style="display: none;">
+      <h2>📝 Notas</h2>
+      <p>Guarda ideas, fotos de reservas, números importantes…</p>
+    </section>
+<!-- 🌟 MENÚ INFERIOR -->
+<div id="menuInferior">
+  <button class="nav-btn" data-page="itinerario">
+    <img src="Recursos/img/itinerario.png" alt="Itinerario">
+    <span>Itinerario</span>
+  </button>
+  <button class="nav-btn" data-page="favoritos">
+    <img src="Recursos/img/favoritos.png" alt="Favoritos">
+    <span>Favs</span>
+  </button>
+  <button class="nav-btn activo" data-page="mapa">
+    <img src="Recursos/img/mapa.png" alt="Mapa">
+    <span>Mapa</span>
+  </button>
+  <button class="nav-btn" data-page="gastos">
+    <img src="Recursos/img/gastos.png" alt="gastos">
+    <span>Gastos</span>
+  </button>
+  <button class="nav-btn" data-page="notas">
+    <img src="Recursos/img/notas.png" alt="Notas">
+    <span>Notas</span>
+  </button>
 </div>
-
+</main>
+</body>
   <!-- Script logger USAR SOLO PARA DESARROLLO PARA BUSCAR ERRORES
 <script src="Scripts/logger.js"></script>
 -->
@@ -158,7 +197,6 @@
     messagingSenderId: "780629642721",
     appId: "1:780629642721:web:f8d2c33e1766b293ab96a0"
   };
-
   firebase.initializeApp(firebaseConfig);
   const db = firebase.database();
   const rutaFavoritos = "favoritos/charlyylaura";

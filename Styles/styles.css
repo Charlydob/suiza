@@ -129,6 +129,7 @@ html, body {
 }
 #sidebarContenido {
   margin-top:  0px;
+  margin-bottom: 200px;
   padding: 0px;
 }
 
@@ -454,7 +455,6 @@ br {
 
 
 
-
 /* Botones adaptados */
 .popup-personalizado button {
   padding: 6px;
@@ -542,3 +542,4 @@ br {
   width: 10%;
   justify-content: center;
 }
+
