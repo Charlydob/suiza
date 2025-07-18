@@ -91,6 +91,8 @@ window.ignorarLugar = ignorarLugar;
 
 //🔎 Busca lugares de un tipo concreto cerca del usuario usando Google Maps Places API
 async function buscar(tipo) {
+  window.idsYaMostrados = new Set();
+
   const usarTextSearchDirecto = ["tourism", "sitios_bonitos", "hotel", "airbnb", "restaurant", "cafe"];
 
   try {
@@ -174,74 +176,45 @@ cafe: [
       document.getElementById("status").innerText = `Este tipo no está disponible con Google Maps`;
       return;
     }
+if (!idsYaMostrados) window.idsYaMostrados = new Set();
 
 const mostrarResultados = (tipo, results, centroBusqueda) => {
-if (!markersPorTipo[tipo]) markersPorTipo[tipo] = [];
+  if (!markersPorTipo[tipo]) markersPorTipo[tipo] = [];
 
+  const idsMostrados = new Set();
+  const radiusKm = parseInt(document.getElementById("radiusSlider").value) / 1000; // ✅ convertimos a km
 
   results.forEach(function (place) {
     const pos = place.geometry.location;
     const name = place.name;
-    const idUnico = tipo + "_" + pos.lat().toFixed(5) + "_" + pos.lng().toFixed(5);
-    if (ignorados.indexOf(idUnico) !== -1) return;
+    const lat = pos.lat();
+    const lng = pos.lng();
 
-const distanciaKm = calcularDistancia(centroBusqueda.lat, centroBusqueda.lng, pos.lat(), pos.lng());
-    if (distanciaKm > radius / 1000) return;
+    // ID único para evitar duplicados
+    const idUnico = tipo + "_" + lat.toFixed(5) + "_" + lng.toFixed(5);
+    if (ignorados.includes(idUnico) || idsMostrados.has(idUnico)) return;
+    idsMostrados.add(idUnico);
 
-    const tiempoCocheMin = Math.round((distanciaKm / 60) * 60);
-    const tiempoPieMin = Math.round((distanciaKm / 5) * 60);
+    // Cálculo de distancia desde el centro
+    const distanciaKm = calcularDistancia(centroBusqueda.lat, centroBusqueda.lng, lat, lng);
+    const dentroDelRango = distanciaKm <= radiusKm;
 
-    const tiempoCoche = tiempoCocheMin >= 60
-      ? `${(tiempoCocheMin / 60).toFixed(1)} h en coche`
-      : `${tiempoCocheMin} min en coche`;
-
-    const tiempoPie = tiempoPieMin >= 60
-      ? `${(tiempoPieMin / 60).toFixed(1)} h a pie`
-      : `${tiempoPieMin} min a pie`;
+    // Solo mostramos si está dentro del círculo
+    if (!dentroDelRango) return;
 
     const marker = new google.maps.Marker({
       position: pos,
       map: map,
-      title: name,
-      icon: iconos[tipo] || undefined
-    });
-
-    const popupHTML = `
-      <div class="popup-personalizado">
-        <b>${name}</b><br>
-        Distancia: ${distanciaKm.toFixed(1)} km<br>
-        ${tiempoCoche} | ${tiempoPie}<br>
-
-        <div class="grupo-botones-arriba">
-          <button onclick="window.open('https://www.google.com/maps/dir/?api=1&destination=${pos.lat()},${pos.lng()}&travelmode=driving', '_blank')">🧭 Cómo llegar</button>
-          <button onclick="window.open('https://www.google.com/maps/search/?api=1&query=${pos.lat()},${pos.lng()}', '_blank')">🔍 Ver este sitio</button>
-        </div>
-
-        <div class="grupo-botones-abajo">
-          <button onclick="toggleFavorito('${idUnico}', '${tipo}', [${pos.lat()}, ${pos.lng()}], '${name.replace(/'/g, "\\'")}', this)">☆ Añadir a favoritos</button>
-          <button onclick="ignorarLugar('${idUnico}', window.__marcadorActivo)">✘ Ignorar</button>
-        </div>
-      </div>
-    `;
-
-    const infoWindow = new google.maps.InfoWindow({ content: popupHTML });
-
-    marker.addListener("click", () => {
-      if (popupActual && popupActual.__vinculado === marker) {
-        popupActual.close();
-        popupActual = null;
-        return;
-      }
-      if (popupActual) popupActual.close();
-
-      infoWindow.open(map, marker);
-      infoWindow.__vinculado = marker;
-      popupActual = infoWindow;
+      title: name
     });
 
     markersPorTipo[tipo].push(marker);
   });
+
+  console.log(`✅ Resultados mostrados para '${tipo}': ${markersPorTipo[tipo].length}`);
 };
+
+
 
 const ejecutarBusqueda = (subTipo) => {
   return new Promise((resolve) => {
