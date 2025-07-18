@@ -240,9 +240,7 @@ marker.addListener("click", () => {
   if (popupActual) popupActual.close();
 
   // Abrimos este
-  const infoWindow = new google.maps.InfoWindow({
-    content: popupHTML
-  });
+
 
   infoWindow.open(map, marker);
   infoWindow.__vinculado = marker; // marcamos a qué marcador pertenece
