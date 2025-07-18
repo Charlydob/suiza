@@ -67,8 +67,6 @@ let favoritos = [];
 let ignorados = JSON.parse(localStorage.getItem("ignorados")) || [];
 let marcadoresFavoritos = [];
 
-// 🔄 Cargar favoritos desde Firebase
-cargarFavoritosDesdeFirebase();
 
 
 // 💾 Guardar listas en Firebase y localStorage

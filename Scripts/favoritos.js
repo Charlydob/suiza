@@ -1,4 +1,4 @@
-let favoritos = [];
+
 
 function guardarListas() {
   try {

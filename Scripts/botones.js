@@ -380,3 +380,4 @@ function clearAll() {
 }
 //✅======== LIMPIEZA DEL MAPA 👆 ======== //
 window.clearAll = clearAll;
+window.toggleTipo = toggleTipo;

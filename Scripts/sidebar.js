@@ -51,14 +51,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // 📍 Cargar mapa con ubicación inicial
   getLocation();
+// 🔄 Cargar favoritos desde Firebase
+cargarFavoritosDesdeFirebase();
+  // ⭐ Cargar favoritos al iniciar
+  renderizarFavoritos();
 
   // 🔁 Recuperar filtros guardados
   document.getElementById("buscadorFavoritos").value = localStorage.getItem("filtroTextoFavoritos") || "";
   document.getElementById("filtroTipoFavoritos").value = localStorage.getItem("filtroTipoFavoritos") || "";
   document.getElementById("ordenFavoritos").value = localStorage.getItem("ordenFavoritos") || "distanciaAsc";
 
-  // ⭐ Cargar favoritos al iniciar
-  renderizarFavoritos();
+
 });
 
 //================= EVENTOS DE CARGA Y MANEJO DE SIDEBAR 👆 =================//
