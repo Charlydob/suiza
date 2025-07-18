@@ -226,7 +226,6 @@ function mostrarMarcadoresFavoritos() {
 
         <div class="grupo-botones-abajo">
           <button onclick="editarFavoritoDesdeMapa('${idUnico}')">✏️ Editar favorito</button>
-          <button onclick="establecerCentroDesdeFavorito(${f.lat}, ${f.lon})">📌 Establecer como centro</button>
           <button onclick="toggleFavorito('${idUnico}', '${tipo}', [${f.lat}, ${f.lon}], '${nombre.replace(/'/g, "\\'")}', this)">🗑️ Eliminar</button>
         </div>
       </div>
