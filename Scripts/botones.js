@@ -93,10 +93,18 @@ window.ignorarLugar = ignorarLugar;
 async function buscar(tipo) {
   try {
     const tipoGooglePlaces = {
-      sitios_bonitos: {
-        type: "tourist_attraction",
-        keyword: "mountain lake river viewpoint hiking nature natural park forest mirador cascada"
-      },
+      sitios_bonitos: [
+  { type: "tourist_attraction", keyword: "mountain" },
+  { type: "tourist_attraction", keyword: "lake" },
+  { type: "tourist_attraction", keyword: "river" },
+  { type: "tourist_attraction", keyword: "viewpoint mirador" },
+  { type: "tourist_attraction", keyword: "natural park" },
+  { type: "park", keyword: "" },
+  { type: "tourist_attraction", keyword: "forest" },
+  { type: "tourist_attraction", keyword: "cascada waterfall" },
+  { type: "tourist_attraction", keyword: "nature hiking campo paisaje" }
+]
+,
       hotel: {
         type: "lodging",
         keyword: "hotel"
@@ -121,10 +129,12 @@ async function buscar(tipo) {
         type: "gas_station",
         keyword: ""
       },
-      tourism: {
-        type: "",
-        keyword: "viewpoint museum gallery monument church historic ruins castle colosseum templo"
-      },
+      tourism: [
+  { type: "museum", keyword: "" },
+  { type: "art_gallery", keyword: "" },
+  { type: "point_of_interest", keyword: "monument church historic ruins castle colosseum templo" }
+]
+,
       restaurant: {
         type: "restaurant",
         keyword: "restaurant food fast food pizza burger mcdonalds subway kfc burger king tacos comida rápida coop restaurant migros restaurant tibits vapiano nordsee spiga"
