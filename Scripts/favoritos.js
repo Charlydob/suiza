@@ -1,3 +1,5 @@
+let favoritos = [];
+
 function guardarListas() {
   try {
     localStorage.setItem("listaFavoritos", JSON.stringify(favoritos));
