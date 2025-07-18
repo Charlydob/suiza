@@ -91,6 +91,8 @@ window.ignorarLugar = ignorarLugar;
 
 //🔎 Busca lugares de un tipo concreto cerca del usuario usando Google Maps Places API
 async function buscar(tipo) {
+  const usarTextSearchDirecto = ["tourism", "sitios_bonitos"];
+
   try {
     const tipoGooglePlaces = {
     sitios_bonitos: [
@@ -237,34 +239,48 @@ const mostrarResultados = (tipo, results) => {
 
 const ejecutarBusqueda = (subTipo) => {
   return new Promise((resolve) => {
-    const request = {
-      location: centro,
-      radius: radius,
-      keyword: subTipo.keyword
-    };
+    const usarSoloTextSearch = usarTextSearchDirecto.includes(tipo);
 
-    if (subTipo.type) request.type = subTipo.type;
+    if (usarSoloTextSearch && subTipo.keyword) {
+      // 🔁 Forzamos textSearch directamente
+      service.textSearch({ location: centro, radius: radius, query: subTipo.keyword }, (results, status) => {
+        if (status === google.maps.places.PlacesServiceStatus.OK && results?.length) {
+          mostrarResultados(tipo, results);
+          resolve(true);
+        } else {
+          resolve(false);
+        }
+      });
+    } else {
+      // 🧪 Primero nearbySearch, luego fallback a textSearch si falla
+      const request = {
+        location: centro,
+        radius: radius,
+        keyword: subTipo.keyword
+      };
+      if (subTipo.type) request.type = subTipo.type;
 
-    service.nearbySearch(request, (results, status) => {
-      if (status === google.maps.places.PlacesServiceStatus.OK && results?.length) {
-        mostrarResultados(tipo, results);
-        resolve(true);
-      } else if (subTipo.keyword) {
-        // Reintentar con textSearch si nearby falla
-        service.textSearch({ location: centro, radius: radius, query: subTipo.keyword }, (results2, status2) => {
-          if (status2 === google.maps.places.PlacesServiceStatus.OK && results2?.length) {
-            mostrarResultados(tipo, results2);
-            resolve(true);
-          } else {
-            resolve(false);
-          }
-        });
-      } else {
-        resolve(false);
-      }
-    });
+      service.nearbySearch(request, (results, status) => {
+        if (status === google.maps.places.PlacesServiceStatus.OK && results?.length) {
+          mostrarResultados(tipo, results);
+          resolve(true);
+        } else if (subTipo.keyword) {
+          service.textSearch({ location: centro, radius: radius, query: subTipo.keyword }, (results2, status2) => {
+            if (status2 === google.maps.places.PlacesServiceStatus.OK && results2?.length) {
+              mostrarResultados(tipo, results2);
+              resolve(true);
+            } else {
+              resolve(false);
+            }
+          });
+        } else {
+          resolve(false);
+        }
+      });
+    }
   });
 };
+
 
 if (Array.isArray(configTipo)) {
   const promesas = configTipo.map(sub => ejecutarBusqueda(sub));
