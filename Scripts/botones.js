@@ -175,7 +175,7 @@ cafe: [
       return;
     }
 
-const mostrarResultados = (tipo, results) => {
+const mostrarResultados = (tipo, results, centroBusqueda) => {
 if (!markersPorTipo[tipo]) markersPorTipo[tipo] = [];
 
 
@@ -185,7 +185,7 @@ if (!markersPorTipo[tipo]) markersPorTipo[tipo] = [];
     const idUnico = tipo + "_" + pos.lat().toFixed(5) + "_" + pos.lng().toFixed(5);
     if (ignorados.indexOf(idUnico) !== -1) return;
 
-const distanciaKm = calcularDistancia(centro.lat, centro.lng, pos.lat(), pos.lng());
+const distanciaKm = calcularDistancia(centroBusqueda.lat, centroBusqueda.lng, pos.lat(), pos.lng());
     if (distanciaKm > radius / 1000) return;
 
     const tiempoCocheMin = Math.round((distanciaKm / 60) * 60);
@@ -251,7 +251,7 @@ const ejecutarBusqueda = (subTipo) => {
       // 🔁 Forzamos textSearch directamente
       service.textSearch({ location: centro, radius: radius, query: subTipo.keyword }, (results, status) => {
         if (status === google.maps.places.PlacesServiceStatus.OK && results?.length) {
-          mostrarResultados(tipo, results);
+          mostrarResultados(tipo, results, centro);
           resolve(true);
         } else {
           resolve(false);
@@ -268,12 +268,12 @@ const ejecutarBusqueda = (subTipo) => {
 
       service.nearbySearch(request, (results, status) => {
         if (status === google.maps.places.PlacesServiceStatus.OK && results?.length) {
-          mostrarResultados(tipo, results);
+          mostrarResultados(tipo, results, centro);
           resolve(true);
         } else if (subTipo.keyword) {
           service.textSearch({ location: centro, radius: radius, query: subTipo.keyword }, (results2, status2) => {
             if (status2 === google.maps.places.PlacesServiceStatus.OK && results2?.length) {
-              mostrarResultados(tipo, results2);
+              mostrarResultados(tipo, results2, centro);
               resolve(true);
             } else {
               resolve(false);
