@@ -90,7 +90,7 @@ async function buscar(tipo) {
       },
       luggage: {
         type: "",
-  keyword: "locker in the city Lockerpoint BagStop luggage storage consigna Luggage Storage Europe LuggageHero Bounce Stasher City Locker BagsAway Nannybag Radical Storage Bagbnb BAGGAGE NANNY Lock&Go SBB lockers Eelway Schliessfächer consigne à bagages guardaroba"
+        keyword: "locker in the city Lockerpoint BagStop luggage storage consigna Luggage Storage Europe LuggageHero Bounce Stasher City Locker BagsAway Nannybag Radical Storage Bagbnb BAGGAGE NANNY Lock&Go SBB lockers Eelway Schliessfächer consigne à bagages guardaroba"
       },
       parking: {
         type: "parking",
@@ -110,11 +110,11 @@ async function buscar(tipo) {
       },
       restaurant: {
         type: "restaurant",
-  keyword: "restaurant food fast food pizza burger mcdonalds subway kfc burger king tacos comida rápida coop restaurant migros restaurant tibits vapiano nordsee spiga"
+        keyword: "restaurant food fast food pizza burger mcdonalds subway kfc burger king tacos comida rápida coop restaurant migros restaurant tibits vapiano nordsee spiga"
       },
       cafe: {
         type: "cafe",
-  keyword: "coffee tea breakfast brunch espresso café coffeehouse sprüngli vicafe bachmann schwarz coffee grindel bohnenblust trestle café henrici blackbird"
+        keyword: "coffee tea breakfast brunch espresso café coffeehouse sprüngli vicafe bachmann schwarz coffee grindel bohnenblust trestle café henrici blackbird"
       },
       hospital: {
         type: "hospital",
@@ -151,65 +151,61 @@ async function buscar(tipo) {
         (markersPorTipo[tipo] ||= []).forEach(m => m.setMap(null));
         markersPorTipo[tipo] = [];
 
-results.forEach(function (place) {
-  const pos = place.geometry.location;
-  const name = place.name;
-  const idUnico = tipo + "_" + pos.lat().toFixed(5) + "_" + pos.lng().toFixed(5);
-  if (ignorados.indexOf(idUnico) !== -1) return;
+        results.forEach(function (place) {
+          const pos = place.geometry.location;
+          const name = place.name;
+          const idUnico = tipo + "_" + pos.lat().toFixed(5) + "_" + pos.lng().toFixed(5);
+          if (ignorados.indexOf(idUnico) !== -1) return;
 
-  const distanciaKm = calcularDistancia(currentCoords[0], currentCoords[1], pos.lat(), pos.lng());
-  if (distanciaKm > radius / 1000) return;
+          const distanciaKm = calcularDistancia(currentCoords[0], currentCoords[1], pos.lat(), pos.lng());
+          if (distanciaKm > radius / 1000) return;
 
-  const tiempoCoche = Math.round((distanciaKm / 60) * 60);
-  const tiempoPie = Math.round((distanciaKm / 5) * 60);
+          const tiempoCocheMin = Math.round((distanciaKm / 60) * 60);
+          const tiempoPieMin = Math.round((distanciaKm / 5) * 60);
 
-const coords = `${pos.lat()},${pos.lng()}`;
-const popupHTML = `
-  <div class="popup-personalizado normal">
-    <b>${name}</b><br>
-    Distancia: ${distanciaKm.toFixed(1)} km<br>
-    ${tiempoCoche} | ${tiempoPie}<br>
+          const tiempoCoche = tiempoCocheMin >= 60
+            ? `${(tiempoCocheMin / 60).toFixed(1)} h en coche`
+            : `${tiempoCocheMin} min en coche`;
 
-    <div class="grupo-botones-arriba">
-      <button onclick="window.open('https://www.google.com/maps/dir/?api=1&destination=${coords}', '_blank')">🧭 Cómo llegar</button>
-      <button onclick="window.open('https://www.google.com/maps/search/${tipo} cerca de ${coords}', '_blank')">🔎 Similares</button>
-    </div>
+          const tiempoPie = tiempoPieMin >= 60
+            ? `${(tiempoPieMin / 60).toFixed(1)} h a pie`
+            : `${tiempoPieMin} min a pie`;
 
-    <div class="boton-medio">
-      <button onclick="window.open('https://www.google.com/maps/search/${encodeURIComponent(name)} cerca de ${coords}', '_blank')">🔍 Ver este sitio</button>
-    </div>
+          const marker = new google.maps.Marker({
+            position: pos,
+            map: map,
+            title: name,
+            icon: iconos[tipo] || undefined
+          });
 
-    <div class="grupo-botones-abajo">
-      <button onclick="toggleFavorito('${idUnico}', '${tipo}', [${pos.lat()}, ${pos.lng()}], '${name.replace(/'/g, "\\'")}', this)">
-        ${favoritos.indexOf(idUnico) !== -1 ? "⭐" : "☆"} Favorito
-      </button>
-      <button onclick="ignorarLugar('${idUnico}')">🗑️ Ignorar</button>
-    </div>
-  </div>
-`;
+          const popupHTML = `
+            <div class="popup-personalizado">
+              <b>${name}</b><br>
+              Distancia: ${distanciaKm.toFixed(1)} km<br>
+              ${tiempoCoche} | ${tiempoPie}<br>
 
+              <div class="grupo-botones-arriba">
+                <button onclick="window.open('https://www.google.com/maps/dir/?api=1&destination=${pos.lat()},${pos.lng()}&travelmode=driving', '_blank')">🧭 Cómo llegar</button>
+                <button onclick="window.open('https://www.google.com/maps/search/?api=1&query=${pos.lat()},${pos.lng()}', '_blank')">🔍 Ver este sitio</button>
+              </div>
 
+              <div class="grupo-botones-abajo">
+                <button onclick="toggleFavorito('${idUnico}', '${tipo}', [${pos.lat()}, ${pos.lng()}], '${name.replace(/'/g, "\\'")}', this)">☆ Añadir a favoritos</button>
+              </div>
+            </div>
+          `;
 
-  const marker = new google.maps.Marker({
-    position: pos,
-    map: map,
-    title: name,
-    icon: iconos[tipo] || undefined
-  });
+          marker.addListener("click", function () {
+            if (popupActual) {
+              popupActual.remove();
+              popupActual = null;
+            }
 
-marker.addListener("click", function () {
-  if (popupActual) {
-    popupActual.remove();
-    popupActual = null;
-  }
+            popupActual = new PopupPersonalizado(pos, popupHTML);
+          });
 
-  popupActual = new PopupPersonalizado(pos, popupHTML);
-});
-
-
-  markersPorTipo[tipo].push(marker);
-});
-
+          markersPorTipo[tipo].push(marker);
+        });
 
         document.getElementById("status").innerText = `Mostrando ${markersPorTipo[tipo].length} resultados para ${tipo}`;
       } catch (err) {
@@ -222,6 +218,7 @@ marker.addListener("click", function () {
     document.getElementById("status").innerText = `Hubo un error al buscar ${tipo}`;
   }
 }
+
 google.maps.event.addListener(map, 'click', function () {
   if (popupActual) {
     popupActual.remove();
