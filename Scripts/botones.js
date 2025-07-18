@@ -219,10 +219,26 @@ async function buscar(tipo) {
 });
 
 marker.addListener("click", () => {
+  // Si ya está abierto en este mismo marcador, ciérralo
+  if (popupActual && popupActual.__vinculado === marker) {
+    popupActual.close();
+    popupActual = null;
+    return;
+  }
+
+  // Si había otro popup, ciérralo
   if (popupActual) popupActual.close();
+
+  // Abrimos este
+  const infoWindow = new google.maps.InfoWindow({
+    content: popupHTML
+  });
+
   infoWindow.open(map, marker);
+  infoWindow.__vinculado = marker; // marcamos a qué marcador pertenece
   popupActual = infoWindow;
 });
+
 
 
           markersPorTipo[tipo].push(marker);
@@ -248,20 +264,22 @@ google.maps.event.addListener(map, 'click', function () {
 });
 
 // ignorados
-const usuarioId = "default"; // o tu sistema de usuario real
-const rutaIgnorados = `usuarios/${usuarioId}/ignorados`;
-
 function guardarIgnorados() {
+  // 🔄 Guardar en localStorage
   localStorage.setItem("lugaresIgnorados", JSON.stringify(ignorados));
 
+  // 🔁 Actualizar visualmente si es necesario (opcional)
+  renderizarIgnorados?.();
+
+  // 🔄 Guardar también en Firebase si hay conexión
   if (navigator.onLine && typeof db !== "undefined") {
-  const ref = db.ref(rutaIgnorados);
-  ref.set(ignorados)
-    .then(() => console.log("✅ Lista de ignorados guardada en Firebase"))
-    .catch(err => console.error("Error guardando ignorados en Firebase:", err));
+    const ref = db.ref(rutaIgnorados);
+    ref.set(ignorados)
+      .then(() => console.log("✅ Lista de ignorados actualizada en Firebase"))
+      .catch(err => console.error("Error guardando ignorados en Firebase:", err));
+  }
 }
 
-}
 //✅======== INTERFAZ: BOTONES DE FILTRADO 👇 ======== //
 function toggleTipo(tipo) {
   tipoActivo[tipo] = !tipoActivo[tipo];
