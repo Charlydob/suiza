@@ -413,13 +413,13 @@ br {
   backdrop-filter: blur(6px) !important;
 }
 .gm-style-iw-chr{
-display: none !important;
+display: flex !important;
 }
 
 /* Aplica tu diseño dentro del contenedor del InfoWindow */
 .popup-personalizado {
-  width: auto;
-  height: auto;
+  width: 90%;
+  height: 100%;
   margin: 0;
   background-color: transparent;
   backdrop-filter: blur(6px);
