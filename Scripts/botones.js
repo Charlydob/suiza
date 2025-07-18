@@ -266,12 +266,6 @@ marker.addListener("click", () => {
   }
 }
 
-google.maps.event.addListener(map, 'click', function () {
-  if (popupActual) {
-    popupActual.remove();
-    popupActual = null;
-  }
-});
 
 // ignorados
 function guardarIgnorados() {
