@@ -146,17 +146,16 @@ function toggleFavorito(id, tipo, coords, name, btn) {
       }
     };
 
-
+    btn.innerText = "⭐ Favorito";
 
     if (navigator.onLine && typeof db !== "undefined") {
       db.ref(`${rutaFavoritos}/${id}`).set(nuevoFavorito)
         .then(() => {
           favoritos.push(nuevoFavorito);
-              btn.innerText = "⭐ Favorito";
-              mostrarEditorFavorito(id);
           guardarListas();
           renderizarFavoritos();
           mostrarMarcadoresFavoritos();
+          editarFavoritoDesdeMapa(id); // 👈 Abre el editor tras guardar
           console.log("✅ Favorito guardado en Firebase");
         })
         .catch(err => {
@@ -168,6 +167,7 @@ function toggleFavorito(id, tipo, coords, name, btn) {
       guardarListas();
       renderizarFavoritos();
       mostrarMarcadoresFavoritos();
+      editarFavoritoDesdeMapa(id); // 👈 Abre el editor si sin conexión
     }
 
   } else {
@@ -195,6 +195,8 @@ function toggleFavorito(id, tipo, coords, name, btn) {
     }
   }
 }
+
+
 
 
 
@@ -297,6 +299,7 @@ function mostrarEditorFavorito(id) {
   document.getElementById("editPrecio").value = favorito.datosPersonalizados.precio || "";
   document.getElementById("editHorario").value = favorito.datosPersonalizados.horario || "";
   document.getElementById("editNotas").value = favorito.datosPersonalizados.notas || "";
+document.getElementById("editorFavorito").scrollIntoView({ behavior: "smooth" });
 
   document.getElementById("sidebarContenido").style.display = "none";
   document.getElementById("editorFavorito").style.display = "block";
