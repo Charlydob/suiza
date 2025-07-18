@@ -268,8 +268,7 @@ function guardarIgnorados() {
   // 🔄 Guardar en localStorage
   localStorage.setItem("lugaresIgnorados", JSON.stringify(ignorados));
 
-  // 🔁 Actualizar visualmente si es necesario (opcional)
-  renderizarIgnorados?.();
+
 
   // 🔄 Guardar también en Firebase si hay conexión
   if (navigator.onLine && typeof db !== "undefined") {
