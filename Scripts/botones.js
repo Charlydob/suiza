@@ -195,14 +195,16 @@ async function buscar(tipo) {
             </div>
           `;
 
-          marker.addListener("click", function () {
-            if (popupActual) {
-              popupActual.remove();
-              popupActual = null;
-            }
+          const infoWindow = new google.maps.InfoWindow({
+  content: popupHTML
+});
 
-            popupActual = new PopupPersonalizado(pos, popupHTML);
-          });
+marker.addListener("click", () => {
+  if (popupActual) popupActual.close();
+  infoWindow.open(map, marker);
+  popupActual = infoWindow;
+});
+
 
           markersPorTipo[tipo].push(marker);
         });
