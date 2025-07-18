@@ -386,14 +386,14 @@ html, body {
 b {
   font-size: 18px;
   color: hsl(244, 100%, 57%);
-  text-shadow: #7a7a7a 1px 1px 2px;
+  text-shadow: #000000 1px 1px 2px;
   margin-left: 0%;
   width: 80%;
   
 }
 br {
   color: hsl(0, 0%, 100%);
-  text-shadow: #4d4d4d 1px 1px 2px;
+  text-shadow: #000000 1px 1px 2px;
 }
 #map {
   position: relative;
@@ -419,12 +419,12 @@ br {
   height: 1px !important;
 
 }
-.gm-ui-hover-effect button{
+.gm-ui-hover-effect button span{
     padding: 0 !important;
   height: 1px !important;
 
 }
-.gm-ui-hover-effect{
+.gm-ui-hover-effect span{
     padding: 0 !important;
   height: 1px !important;
 
@@ -445,7 +445,7 @@ br {
   font-size: 15px;
   text-shadow: #333 1px 1px 2px;
 }
-.boton-medio {
+.boton-medio small{
   color: rgb(0, 0, 0);
   font-weight: bold;
 
