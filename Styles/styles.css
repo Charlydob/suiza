@@ -381,14 +381,7 @@ html, body {
 
 
 /* Estilo para el popup personalizado */
-.gm-style-iw-d{
-  padding-right: 0% !important;
-  padding-bottom:   0% !important;
-  background-color: transparent !important;
-  backdrop-filter: blur(6px) !important;
-  justify-content: center;
-  text-align: center;
-}
+
 
 b {
   font-size: 18px;
@@ -406,13 +399,23 @@ br {
   position: relative;
 }
 /* Elimina el padding interno del InfoWindow */
+.gm-style-iw-d{
+  padding-right: 0% !important;
+  padding-bottom:   0% !important;
+  background-color: transparent !important;
+  backdrop-filter: blur(6px) !important;
+  justify-content: center;
+  text-align: center;
+}
 .gm-style-iw {
   padding: 0 !important;
   background-color: rgba(0, 255, 234, 0.11) !important;
   backdrop-filter: blur(6px) !important;
 }
 .gm-style-iw-chr{
-  display: none !important;
+  padding: 0 !important;
+  background-color: rgba(0, 255, 234, 0.11) !important;
+  backdrop-filter: blur(6px) !important;
 }
 
 /* Aplica tu diseño dentro del contenedor del InfoWindow */
