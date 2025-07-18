@@ -83,7 +83,7 @@ function ignorarLugar(id, marker) {
     popupActual.close();
   }
 }
-const rutaIgnorados = `usuarios/${usuarioId}/ignorados`;
+
 
 // 👇 Esto lo hace visible desde cualquier HTML onclick
 window.ignorarLugar = ignorarLugar;
@@ -248,15 +248,27 @@ google.maps.event.addListener(map, 'click', function () {
 });
 
 // ignorados
+// 🧭 Identificador de usuario y ruta para ignorados
+const usuarioId = "default"; // reemplaza por tu sistema real si lo tienes
+const rutaIgnorados = `usuarios/${usuarioId}/ignorados`;
+
+// 🧱 Lista global de ignorados (se mantiene en memoria)
+const ignorados = JSON.parse(localStorage.getItem("lugaresIgnorados") || "[]");
+
+// 💾 Guardar ignorados en localStorage y Firebase
 function guardarIgnorados() {
+  // 1. Guardar en localStorage
   localStorage.setItem("lugaresIgnorados", JSON.stringify(ignorados));
 
+  // 2. Guardar en Firebase si hay conexión
   if (navigator.onLine && typeof db !== "undefined") {
-    db.ref(rutaIgnorados).set(ignorados)
-      .then(() => console.log("📤 Lista de ignorados guardada en Firebase"))
+    const ref = db.ref(rutaIgnorados);
+    ref.set(ignorados)
+      .then(() => console.log("✅ Lista de ignorados guardada en Firebase"))
       .catch(err => console.error("Error guardando ignorados en Firebase:", err));
   }
 }
+
 //✅======== INTERFAZ: BOTONES DE FILTRADO 👇 ======== //
 function toggleTipo(tipo) {
   tipoActivo[tipo] = !tipoActivo[tipo];
