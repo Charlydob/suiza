@@ -72,6 +72,7 @@ function calcularDistancia(lat1, lon1, lat2, lon2) {
 }
 //❌======== CALCULAR DISTANCIAS 👆 ======== //
 
+
 //🔎 Busca lugares de un tipo concreto cerca del usuario usando Google Maps Places API
 async function buscar(tipo) {
   try {
@@ -191,7 +192,9 @@ async function buscar(tipo) {
 
               <div class="grupo-botones-abajo">
                 <button onclick="toggleFavorito('${idUnico}', '${tipo}', [${pos.lat()}, ${pos.lng()}], '${name.replace(/'/g, "\\'")}', this)">☆ Añadir a favoritos</button>
-              </div>
+              <button onclick="ignorarLugar('${idUnico}', window.__marcadorActivo)">✘ Ignorar</button>
+
+                </div>
             </div>
           `;
 
@@ -228,7 +231,16 @@ google.maps.event.addListener(map, 'click', function () {
   }
 });
 
+// ignorados
+function guardarIgnorados() {
+  localStorage.setItem("lugaresIgnorados", JSON.stringify(ignorados));
 
+  if (navigator.onLine && typeof db !== "undefined") {
+    db.ref(rutaIgnorados).set(ignorados)
+      .then(() => console.log("📤 Lista de ignorados guardada en Firebase"))
+      .catch(err => console.error("Error guardando ignorados en Firebase:", err));
+  }
+}
 //✅======== INTERFAZ: BOTONES DE FILTRADO 👇 ======== //
 function toggleTipo(tipo) {
   tipoActivo[tipo] = !tipoActivo[tipo];

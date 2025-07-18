@@ -26,6 +26,28 @@ function cargarFavoritosDesdeFirebase() {
     mostrarMarcadoresFavoritos();
   }
 }
+function cargarIgnoradosDesdeFirebase() {
+  if (navigator.onLine && typeof db !== "undefined") {
+    db.ref(rutaIgnorados).once('value', snapshot => {
+      const data = snapshot.val();
+      if (Array.isArray(data)) {
+        ignorados.splice(0); // borra todo sin perder referencia
+        ignorados.push(...data);
+        localStorage.setItem("lugaresIgnorados", JSON.stringify(ignorados));
+        console.log("✅ Ignorados cargados desde Firebase");
+      } else {
+        console.log("📂 No hay ignorados en Firebase");
+      }
+    }, err => {
+      console.error("Error cargando ignorados desde Firebase:", err);
+    });
+  } else {
+    console.warn("📡 Sin conexión: usando ignorados desde localStorage");
+    const local = JSON.parse(localStorage.getItem("lugaresIgnorados") || "[]");
+    ignorados.splice(0);
+    ignorados.push(...local);
+  }
+}
 
 
 
@@ -319,4 +341,4 @@ window.toggleFavorito = toggleFavorito;
 window.renderizarFavoritos = renderizarFavoritos;
 window.editarFavoritoDesdeMapa = editarFavoritoDesdeMapa;
 
-window.onload = function () {cargarFavoritosDesdeFirebase();}
+window.onload = function () {cargarFavoritosDesdeFirebase();  cargarIgnoradosDesdeFirebase();}
