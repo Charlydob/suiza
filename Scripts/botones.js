@@ -71,6 +71,21 @@ function calcularDistancia(lat1, lon1, lat2, lon2) {
   return R * c;
 }
 //❌======== CALCULAR DISTANCIAS 👆 ======== //
+function ignorarLugar(id, marker) {
+  if (!ignorados.includes(id)) {
+    ignorados.push(id);
+    guardarIgnorados();
+  }
+  if (marker && typeof marker.setMap === "function") {
+    marker.setMap(null);
+  }
+  if (popupActual && typeof popupActual.close === "function") {
+    popupActual.close();
+  }
+}
+
+// 👇 Esto lo hace visible desde cualquier HTML onclick
+window.ignorarLugar = ignorarLugar;
 
 
 //🔎 Busca lugares de un tipo concreto cerca del usuario usando Google Maps Places API
