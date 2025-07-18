@@ -416,8 +416,11 @@ br {
   padding: 0 !important;
   background-color: rgba(0, 255, 234, 0.11) !important;
   backdrop-filter: blur(6px) !important;
-  height: 1% !important;
-  
+  height: 1px !important;
+
+}
+.ejemplo button {
+display: none;
 }
 
 /* Aplica tu diseño dentro del contenedor del InfoWindow */

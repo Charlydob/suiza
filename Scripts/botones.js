@@ -93,18 +93,18 @@ window.ignorarLugar = ignorarLugar;
 async function buscar(tipo) {
   try {
     const tipoGooglePlaces = {
-      sitios_bonitos: [
+    sitios_bonitos: [
   { type: "tourist_attraction", keyword: "mountain" },
   { type: "tourist_attraction", keyword: "lake" },
   { type: "tourist_attraction", keyword: "river" },
-  { type: "tourist_attraction", keyword: "viewpoint mirador" },
-  { type: "tourist_attraction", keyword: "natural park" },
+  { type: "", keyword: "viewpoint" },
+  { type: "", keyword: "mirador" },
   { type: "park", keyword: "" },
   { type: "tourist_attraction", keyword: "forest" },
-  { type: "tourist_attraction", keyword: "cascada waterfall" },
-  { type: "tourist_attraction", keyword: "nature hiking campo paisaje" }
-]
-,
+  { type: "", keyword: "waterfall" },
+  { type: "", keyword: "hiking trail" },
+  { type: "", keyword: "paisaje" }
+],
       hotel: {
         type: "lodging",
         keyword: "hotel"
@@ -131,10 +131,16 @@ async function buscar(tipo) {
       },
       tourism: [
   { type: "museum", keyword: "" },
-  { type: "art_gallery", keyword: "" },
-  { type: "point_of_interest", keyword: "monument church historic ruins castle colosseum templo" }
-]
-,
+  { type: "", keyword: "museum musée museo museumo museu" },
+{ type: "art_gallery", keyword: "" },
+{ type: "", keyword: "galerie galleria gallery" },
+  { type: "", keyword: "monument" },
+{ type: "", keyword: "church iglesia kirche chiesa église" },
+  { type: "", keyword: "historic site" },
+{ type: "", keyword: "castle château castello schloss" },
+  { type: "", keyword: "colosseum" },
+  { type: "", keyword: "temple" }
+],
       restaurant: {
         type: "restaurant",
         keyword: "restaurant food fast food pizza burger mcdonalds subway kfc burger king tacos comida rápida coop restaurant migros restaurant tibits vapiano nordsee spiga"
@@ -161,102 +167,122 @@ async function buscar(tipo) {
       return;
     }
 
+const mostrarResultados = (tipo, results) => {
+  (markersPorTipo[tipo] ||= []).forEach(m => m.setMap(null));
+  markersPorTipo[tipo] = [];
+
+  results.forEach(function (place) {
+    const pos = place.geometry.location;
+    const name = place.name;
+    const idUnico = tipo + "_" + pos.lat().toFixed(5) + "_" + pos.lng().toFixed(5);
+    if (ignorados.indexOf(idUnico) !== -1) return;
+
+    const distanciaKm = calcularDistancia(currentCoords[0], currentCoords[1], pos.lat(), pos.lng());
+    if (distanciaKm > radius / 1000) return;
+
+    const tiempoCocheMin = Math.round((distanciaKm / 60) * 60);
+    const tiempoPieMin = Math.round((distanciaKm / 5) * 60);
+
+    const tiempoCoche = tiempoCocheMin >= 60
+      ? `${(tiempoCocheMin / 60).toFixed(1)} h en coche`
+      : `${tiempoCocheMin} min en coche`;
+
+    const tiempoPie = tiempoPieMin >= 60
+      ? `${(tiempoPieMin / 60).toFixed(1)} h a pie`
+      : `${tiempoPieMin} min a pie`;
+
+    const marker = new google.maps.Marker({
+      position: pos,
+      map: map,
+      title: name,
+      icon: iconos[tipo] || undefined
+    });
+
+    const popupHTML = `
+      <div class="popup-personalizado">
+        <b>${name}</b><br>
+        Distancia: ${distanciaKm.toFixed(1)} km<br>
+        ${tiempoCoche} | ${tiempoPie}<br>
+
+        <div class="grupo-botones-arriba">
+          <button onclick="window.open('https://www.google.com/maps/dir/?api=1&destination=${pos.lat()},${pos.lng()}&travelmode=driving', '_blank')">🧭 Cómo llegar</button>
+          <button onclick="window.open('https://www.google.com/maps/search/?api=1&query=${pos.lat()},${pos.lng()}', '_blank')">🔍 Ver este sitio</button>
+        </div>
+
+        <div class="grupo-botones-abajo">
+          <button onclick="toggleFavorito('${idUnico}', '${tipo}', [${pos.lat()}, ${pos.lng()}], '${name.replace(/'/g, "\\'")}', this)">☆ Añadir a favoritos</button>
+          <button onclick="ignorarLugar('${idUnico}', window.__marcadorActivo)">✘ Ignorar</button>
+        </div>
+      </div>
+    `;
+
+    const infoWindow = new google.maps.InfoWindow({ content: popupHTML });
+
+    marker.addListener("click", () => {
+      if (popupActual && popupActual.__vinculado === marker) {
+        popupActual.close();
+        popupActual = null;
+        return;
+      }
+      if (popupActual) popupActual.close();
+
+      infoWindow.open(map, marker);
+      infoWindow.__vinculado = marker;
+      popupActual = infoWindow;
+    });
+
+    markersPorTipo[tipo].push(marker);
+  });
+};
+
+const ejecutarBusqueda = (subTipo) => {
+  return new Promise((resolve) => {
     const request = {
       location: centro,
       radius: radius,
-      type: configTipo.type,
-      keyword: configTipo.keyword
+      keyword: subTipo.keyword
     };
 
+    if (subTipo.type) request.type = subTipo.type;
+
     service.nearbySearch(request, (results, status) => {
-      try {
-        if (status !== google.maps.places.PlacesServiceStatus.OK || !results) {
-          document.getElementById("status").innerText = `No se encontraron resultados para ${tipo}`;
-          return;
-        }
-
-        (markersPorTipo[tipo] ||= []).forEach(m => m.setMap(null));
-        markersPorTipo[tipo] = [];
-
-        results.forEach(function (place) {
-          const pos = place.geometry.location;
-          const name = place.name;
-          const idUnico = tipo + "_" + pos.lat().toFixed(5) + "_" + pos.lng().toFixed(5);
-          if (ignorados.indexOf(idUnico) !== -1) return;
-
-          const distanciaKm = calcularDistancia(currentCoords[0], currentCoords[1], pos.lat(), pos.lng());
-          if (distanciaKm > radius / 1000) return;
-
-          const tiempoCocheMin = Math.round((distanciaKm / 60) * 60);
-          const tiempoPieMin = Math.round((distanciaKm / 5) * 60);
-
-          const tiempoCoche = tiempoCocheMin >= 60
-            ? `${(tiempoCocheMin / 60).toFixed(1)} h en coche`
-            : `${tiempoCocheMin} min en coche`;
-
-          const tiempoPie = tiempoPieMin >= 60
-            ? `${(tiempoPieMin / 60).toFixed(1)} h a pie`
-            : `${tiempoPieMin} min a pie`;
-
-          const marker = new google.maps.Marker({
-            position: pos,
-            map: map,
-            title: name,
-            icon: iconos[tipo] || undefined
-          });
-
-          const popupHTML = `
-            <div class="popup-personalizado">
-              <b>${name}</b><br>
-              Distancia: ${distanciaKm.toFixed(1)} km<br>
-              ${tiempoCoche} | ${tiempoPie}<br>
-
-              <div class="grupo-botones-arriba">
-                <button onclick="window.open('https://www.google.com/maps/dir/?api=1&destination=${pos.lat()},${pos.lng()}&travelmode=driving', '_blank')">🧭 Cómo llegar</button>
-                <button onclick="window.open('https://www.google.com/maps/search/?api=1&query=${pos.lat()},${pos.lng()}', '_blank')">🔍 Ver este sitio</button>
-              </div>
-
-              <div class="grupo-botones-abajo">
-                <button onclick="toggleFavorito('${idUnico}', '${tipo}', [${pos.lat()}, ${pos.lng()}], '${name.replace(/'/g, "\\'")}', this)">☆ Añadir a favoritos</button>
-              <button onclick="ignorarLugar('${idUnico}', window.__marcadorActivo)">✘ Ignorar</button>
-
-                </div>
-            </div>
-          `;
-
-          const infoWindow = new google.maps.InfoWindow({
-  content: popupHTML
-});
-
-marker.addListener("click", () => {
-  // Si ya está abierto en este mismo marcador, ciérralo
-  if (popupActual && popupActual.__vinculado === marker) {
-    popupActual.close();
-    popupActual = null;
-    return;
-  }
-
-  // Si había otro popup, ciérralo
-  if (popupActual) popupActual.close();
-
-  // Abrimos este
-
-
-  infoWindow.open(map, marker);
-  infoWindow.__vinculado = marker; // marcamos a qué marcador pertenece
-  popupActual = infoWindow;
-});
-
-
-
-          markersPorTipo[tipo].push(marker);
+      if (status === google.maps.places.PlacesServiceStatus.OK && results?.length) {
+        mostrarResultados(tipo, results);
+        resolve(true);
+      } else if (subTipo.keyword) {
+        // Reintentar con textSearch si nearby falla
+        service.textSearch({ location: centro, radius: radius, query: subTipo.keyword }, (results2, status2) => {
+          if (status2 === google.maps.places.PlacesServiceStatus.OK && results2?.length) {
+            mostrarResultados(tipo, results2);
+            resolve(true);
+          } else {
+            resolve(false);
+          }
         });
-
-        document.getElementById("status").innerText = `Mostrando ${markersPorTipo[tipo].length} resultados para ${tipo}`;
-      } catch (err) {
-        reportarError(err);
+      } else {
+        resolve(false);
       }
     });
+  });
+};
+
+if (Array.isArray(configTipo)) {
+  const promesas = configTipo.map(sub => ejecutarBusqueda(sub));
+  Promise.all(promesas).then(() => {
+    const total = markersPorTipo[tipo]?.length || 0;
+    document.getElementById("status").innerText = total
+      ? `Mostrando ${total} resultados para ${tipo}`
+      : `No se encontraron resultados para ${tipo}`;
+  });
+} else {
+  ejecutarBusqueda(configTipo).then(success => {
+    const total = markersPorTipo[tipo]?.length || 0;
+    document.getElementById("status").innerText = total
+      ? `Mostrando ${total} resultados para ${tipo}`
+      : `No se encontraron resultados para ${tipo}`;
+  });
+}
+
 
   } catch (error) {
     reportarError(error);
