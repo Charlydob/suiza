@@ -267,11 +267,6 @@ google.maps.event.addListener(map, 'click', function () {
 function guardarIgnorados() {
   // 🔄 Guardar en localStorage
   localStorage.setItem("lugaresIgnorados", JSON.stringify(ignorados));
-const usuarioId = "default";
-const rutaIgnorados = `usuarios/${usuarioId}/ignorados`;
-
-
-
   // 🔄 Guardar también en Firebase si hay conexión
   if (navigator.onLine && typeof db !== "undefined") {
     const ref = db.ref(rutaIgnorados);
