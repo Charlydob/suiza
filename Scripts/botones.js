@@ -83,6 +83,7 @@ function ignorarLugar(id, marker) {
     popupActual.close();
   }
 }
+const rutaIgnorados = `usuarios/${usuarioId}/ignorados`;
 
 // 👇 Esto lo hace visible desde cualquier HTML onclick
 window.ignorarLugar = ignorarLugar;
