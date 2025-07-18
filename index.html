@@ -129,17 +129,21 @@
   <button onclick="guardarEdicionFavorito()">💾 Guardar</button>
   <button onclick="borrarFavorito()">🗑️ Eliminar</button>
   <button onclick="cerrarEditorFavorito()">❌ Cancelar</button>
-</div>
-  <button id="closeSidebar">‹</button>
 
-</div>
-  <button id="toggleMenu">›</button>
+      <button id="closeSidebar">‹</button>
+      <button id="toggleMenu">›</button>
 
   <div id="map"></div>
+  <div id="menuInferior">
+  <button class="nav-btn activo" data-page="mapa"><span>🗺️</span><br>Mapa</button>
+  <button class="nav-btn" data-page="itinerario"><span>📅</span><br>Itinerario</button>
+  <button class="nav-btn" data-page="gastos"><span>💰</span><br>Gastos</button>
+  <button class="nav-btn" data-page="notas"><span>📝</span><br>Notas</button>
+</div>
 
-  <!-- Script logger USAR SOLO PARA DESARROLLO PARA BUSCAR ERRORES-->
+  <!-- Script logger USAR SOLO PARA DESARROLLO PARA BUSCAR ERRORES
 <script src="Scripts/logger.js"></script>
-
+-->
 <!-- Firebase SDKs -->
 <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database-compat.js"></script>
@@ -165,11 +169,9 @@
 <!-- Script mapa -->
 <script src="Scripts/mapa.js"></script>
 <!-- Gestion favoritos -->
- <script src="Scripts/favoritos.js"></script>
- <!-- Google Maps -->
+<script src="Scripts/favoritos.js"></script>
 <!-- Script botones -->
 <script src="Scripts/botones.js"></script>
-
 <!-- Script Sidebar -->
 <script src="Scripts/sidebar.js"></script>
 <script async defer
