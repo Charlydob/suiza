@@ -173,6 +173,11 @@ function toggleFavorito(id, tipo, coords, name, btn) {
       }
     };
     favoritos.push(nuevoFavorito);
+    // Mostrar el editor inmediatamente
+mostrarEditorFavorito(id); 
+// O si prefieres abrir el sidebar con todo:
+editarFavoritoDesdeMapa(id);
+
     btn.innerText = "⭐ Favorito";
 
     // 🟢 También guardar en Firebase
@@ -389,3 +394,4 @@ window.borrarFavorito = borrarFavorito;
 window.cerrarEditorFavorito = cerrarEditorFavorito;
 window.renderizarFavoritos = renderizarFavoritos;
 window.editarFavoritoDesdeMapa = editarFavoritoDesdeMapa;
+window.cargarFavoritosDesdeFirebase = cargarFavoritosDesdeFirebase;

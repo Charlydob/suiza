@@ -68,13 +68,8 @@ let ignorados = JSON.parse(localStorage.getItem("ignorados")) || [];
 let marcadoresFavoritos = [];
 
 // 🔄 Cargar favoritos desde Firebase
-db.ref(rutaFavoritos).on("value", snapshot => {
-  const data = snapshot.val();
-  favoritos = data || JSON.parse(localStorage.getItem("favoritos")) || [];
-  if (data) localStorage.setItem("favoritos", JSON.stringify(data));
-  renderizarFavoritos();
-  mostrarMarcadoresFavoritos();
-});
+cargarFavoritosDesdeFirebase();
+
 
 // 💾 Guardar listas en Firebase y localStorage
 function guardarListas() {
