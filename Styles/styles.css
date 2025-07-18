@@ -419,12 +419,6 @@ br {
   height: 1px !important;
 
 }
-.gm-style-iw-tc{
-  padding: 0 !important;
-  background-color: rgba(0, 255, 234, 0.11) !important;
-  backdrop-filter: blur(6px) !important;
-}
-
 
 /* Aplica tu diseño dentro del contenedor del InfoWindow */
 .popup-personalizado {
@@ -442,13 +436,14 @@ br {
   text-shadow: #333 1px 1px 2px;
 }
 .boton-medio{
-  color: white !important;  
+  color: white !important;
   text-shadow:
     -1px -1px 0 black,
      1px -1px 0 black,
     -1px  1px 0 black,
-     1px  1px 0 black !important;
-}
+     1px  1px 0 black  !important;
+};
+
 
 
 /* Botones adaptados */
