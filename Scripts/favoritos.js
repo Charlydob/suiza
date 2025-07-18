@@ -145,34 +145,55 @@ function toggleFavorito(id, tipo, coords, name, btn) {
         notas: ''
       }
     };
-    favoritos.push(nuevoFavorito);
+
     btn.innerText = "⭐ Favorito";
 
-    // 🟢 También guardar en Firebase
     if (navigator.onLine && typeof db !== "undefined") {
       db.ref(`${rutaFavoritos}/${id}`).set(nuevoFavorito)
-        .then(() => console.log("✅ Favorito guardado en Firebase"))
-        .catch(err => console.error("Error guardando en Firebase:", err));
+        .then(() => {
+          favoritos.push(nuevoFavorito);
+          guardarListas();
+          renderizarFavoritos();
+          mostrarMarcadoresFavoritos();
+          console.log("✅ Favorito guardado en Firebase");
+        })
+        .catch(err => {
+          console.error("Error guardando en Firebase:", err);
+          btn.innerText = "☆ Favorito"; // revertir botón si falla
+        });
+    } else {
+      favoritos.push(nuevoFavorito);
+      guardarListas();
+      renderizarFavoritos();
+      mostrarMarcadoresFavoritos();
     }
 
   } else {
-    // Eliminar favorito existente
     const favoritoEliminado = favoritos[index];
-    favoritos.splice(index, 1);
     btn.innerText = "☆ Favorito";
 
-    // 🔴 También eliminar de Firebase
     if (navigator.onLine && typeof db !== "undefined") {
       db.ref(`${rutaFavoritos}/${favoritoEliminado.id}`).remove()
-        .then(() => console.log("🗑️ Favorito eliminado de Firebase"))
-        .catch(err => console.error("Error eliminando de Firebase:", err));
+        .then(() => {
+          favoritos.splice(index, 1);
+          guardarListas();
+          renderizarFavoritos();
+          mostrarMarcadoresFavoritos();
+          console.log("🗑️ Favorito eliminado de Firebase");
+        })
+        .catch(err => {
+          console.error("Error eliminando de Firebase:", err);
+          btn.innerText = "⭐ Favorito"; // revertir si falla
+        });
+    } else {
+      favoritos.splice(index, 1);
+      guardarListas();
+      renderizarFavoritos();
+      mostrarMarcadoresFavoritos();
     }
   }
-
-  guardarListas();
-  renderizarFavoritos();
-  mostrarMarcadoresFavoritos();
 }
+
 
 
 
