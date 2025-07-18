@@ -381,6 +381,12 @@ html, body {
 
 
 /* Estilo para el popup personalizado */
+.gm-style-iw-d{
+  padding-right: 0% !important;
+  padding-bottom:   0% !important;
+  background-color: transparent !important;
+  backdrop-filter: blur(6px) !important;
+}
 
 b {
   font-size: 18px;
@@ -418,7 +424,9 @@ b {
   font-size: 15px;
   text-shadow: #333 1px 1px 2px;
 }
-
+.boton-medio{
+  color: white !important;
+}
 
 
 /* Botones adaptados */
