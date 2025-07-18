@@ -96,9 +96,26 @@
         <!-- ⭐ Lista de Favoritos en el Sidebar -->
                 <div id="listaFavoritosSidebar">
                   <h3>⭐ Favoritos</h3>
-                  <div id="filtrosFavoritos"">
+                  <div id="filtrosFavoritos">
                     <input type="text" id="buscadorFavoritos" placeholder="🔍 Buscar..."">
-                    
+                      <template id="template-favorito-sidebar">
+                        <div class="favorito-sidebar-tarjeta">
+                          <!-- Contenedor de la info -->
+                          <div class="favorito-sidebar-info">
+                            <!-- Texto superpuesto -->
+                            <div class="favorito-sidebar-detalles">
+                              <h3 class="favorito-sidebar-nombre">Nombre del lugar</h3>
+                              <p class="favorito-sidebar-ubicacion">Ciudad, País</p>
+                              <p class="favorito-sidebar-notas">📝 Notas personales</p>
+                            </div>
+                            <!-- Botones -->
+                            <div class="favorito-sidebar-botones">
+                              <button class="btn-ver">📍 Ver en el mapa</button>
+                              <button class="btn-eliminar">🗑️ Eliminar</button>
+                            </div>
+                          </div>
+                        </div>
+                      </template>
                     <select id="filtroTipoFavoritos">
                       <option value="">Todos los tipos</option>
                       <option value="sitios_bonitos">sitios_bonitos</option>

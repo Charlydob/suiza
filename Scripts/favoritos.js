@@ -175,36 +175,22 @@ function renderizarFavoritosEnSidebar() {
   contenedor.innerHTML = "";
 
   favoritos.forEach(f => {
-    const clon = document.getElementById("template-favorito").content.cloneNode(true);
+    const clon = document.getElementById("template-favorito-sidebar").content.cloneNode(true);
 
-    const tarjeta = clon.querySelector(".favorito-tarjeta");
-    const imagen = clon.querySelector("img");
-    const nombreEl = clon.querySelector(".favorito-nombre");
-    const ubicacionEl = clon.querySelector(".favorito-ubicacion");
-    const direccionEl = clon.querySelector(".favorito-direccion");
-    const notasEl = clon.querySelector(".favorito-notas");
-    const precioEl = clon.querySelector(".favorito-precio");
-    const horarioEl = clon.querySelector(".favorito-horario");
+    const item = clon.querySelector(".favorito-sidebar-item");
+    const nombreEl = clon.querySelector(".favorito-sidebar-nombre");
+    const ubicacionEl = clon.querySelector(".favorito-sidebar-ubicacion");
+    const notasEl = clon.querySelector(".favorito-sidebar-notas");
     const btnVer = clon.querySelector(".btn-ver");
     const btnEliminar = clon.querySelector(".btn-eliminar");
-    const checkbox = clon.querySelector(".favorito-visitado");
 
     const nombre = f.datosPersonalizados?.nombre || f.id;
     const ciudadPais = f.ubicacion || "Ubicación desconocida";
-    const direccion = f.direccion || "Dirección no disponible";
     const notas = f.datosPersonalizados?.notas || "";
-    const precio = f.datosPersonalizados?.precio || "";
-    const horario = f.datosPersonalizados?.horario || "";
-
-    const imagenURL = f.imagen || `https://maps.googleapis.com/maps/api/staticmap?center=${f.lat},${f.lon}&zoom=15&size=300x200&maptype=roadmap&markers=color:red%7C${f.lat},${f.lon}&key=TU_API_KEY`;
-    imagen.src = imagenURL;
 
     nombreEl.textContent = nombre;
     ubicacionEl.textContent = ciudadPais;
-    direccionEl.textContent = direccion;
     notasEl.textContent = notas ? `📝 ${notas}` : "";
-    precioEl.textContent = precio ? `💰 ${precio}` : "";
-    horarioEl.textContent = horario ? `🕒 ${horario}` : "";
 
     btnVer.addEventListener("click", e => {
       e.stopPropagation();
@@ -216,17 +202,14 @@ function renderizarFavoritosEnSidebar() {
       toggleFavorito(f.id, f.tipo, [f.lat, f.lon], nombre, { innerText: "☆ Favorito" });
     });
 
-    checkbox.addEventListener("change", () => {
-      tarjeta.classList.toggle("visitado", checkbox.checked);
-    });
-
-    tarjeta.addEventListener("click", () => {
+    item.addEventListener("click", () => {
       mostrarEditorFavorito(f.id);
     });
 
     contenedor.appendChild(clon);
   });
 }
+
 
 
 // 👇 Necesario para que sea accesible desde otros scripts o HTML:
