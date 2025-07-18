@@ -170,8 +170,8 @@ async function buscar(tipo) {
     }
 
 const mostrarResultados = (tipo, results) => {
-  (markersPorTipo[tipo] ||= []).forEach(m => m.setMap(null));
-  markersPorTipo[tipo] = [];
+if (!markersPorTipo[tipo]) markersPorTipo[tipo] = [];
+
 
   results.forEach(function (place) {
     const pos = place.geometry.location;

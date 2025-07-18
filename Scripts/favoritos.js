@@ -247,7 +247,18 @@ function mostrarMarcadoresFavoritos() {
     });
 
     const infoWindow = new google.maps.InfoWindow({ content: popupHTML });
-    marcador.addListener("click", () => infoWindow.open(map, marcador));
+marcador.addListener("click", () => {
+  if (popupActual && popupActual.__vinculado === marcador) {
+    popupActual.close();
+    popupActual = null;
+    return;
+  }
+  if (popupActual) popupActual.close();
+
+  infoWindow.open(map, marcador);
+  infoWindow.__vinculado = marcador;
+  popupActual = infoWindow;
+});
 
     marcadoresFavoritos.push(marcador);
   });
