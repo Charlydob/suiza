@@ -117,40 +117,59 @@ function renderizarFavoritos() {
   }
 
   favoritosFiltrados.forEach(f => {
-    const div = document.createElement("div");
-    div.className = "favorito-item";
-    div.style.borderBottom = "1px solid #ccc";
-    div.style.paddingBottom = "5px";
-    div.style.cursor = "pointer";
+    const clon = document.getElementById("template-favorito").content.cloneNode(true);
 
-    const tiempoCocheMin = Math.round((f.distanciaKm / 60) * 60);
-    const tiempoPieMin = Math.round((f.distanciaKm / 5) * 60);
-
-    const tiempoCoche = tiempoCocheMin >= 60
-      ? `${(tiempoCocheMin / 60).toFixed(1)} h en coche`
-      : `${tiempoCocheMin} min en coche`;
-
-    const tiempoPie = tiempoPieMin >= 60
-      ? `${(tiempoPieMin / 60).toFixed(1)} h a pie`
-      : `${tiempoPieMin} min a pie`;
+    const tarjeta = clon.querySelector(".favorito-tarjeta");
+    const imagen = clon.querySelector("img");
+    const nombreEl = clon.querySelector(".favorito-nombre");
+    const ubicacionEl = clon.querySelector(".favorito-ubicacion");
+    const direccionEl = clon.querySelector(".favorito-direccion");
+    const notasEl = clon.querySelector(".favorito-notas");
+    const precioEl = clon.querySelector(".favorito-precio");
+    const horarioEl = clon.querySelector(".favorito-horario");
+    const btnVer = clon.querySelector(".btn-ver");
+    const btnEliminar = clon.querySelector(".btn-eliminar");
+    const checkbox = clon.querySelector(".favorito-visitado");
 
     const nombre = f.datosPersonalizados?.nombre || f.id;
+    const ciudadPais = f.ubicacion || "Ubicación desconocida";
+    const direccion = f.direccion || "Dirección no disponible";
+    const notas = f.datosPersonalizados?.notas || "";
+    const precio = f.datosPersonalizados?.precio || "";
+    const horario = f.datosPersonalizados?.horario || "";
 
-    div.innerHTML = `
-      <strong>${nombre}</strong><br>
-      Distancia: ${f.distanciaKm.toFixed(1)} km<br>
-      ${tiempoCoche} | ${tiempoPie}<br>
-      <button onclick="window.open('https://www.google.com/maps/dir/?api=1&destination=${f.lat},${f.lon}&travelmode=driving', '_blank')">🧭 Cómo llegar</button>
-    `;
+    const imagenURL = f.imagen || `https://maps.googleapis.com/maps/api/staticmap?center=${f.lat},${f.lon}&zoom=15&size=300x200&maptype=roadmap&markers=color:red%7C${f.lat},${f.lon}&key=TU_API_KEY`;
+    imagen.src = imagenURL;
 
-    div.onclick = () => {
-      map.setCenter({ lat: f.lat, lng: f.lon });
-      map.setZoom(16);
+    nombreEl.textContent = nombre;
+    ubicacionEl.textContent = ciudadPais;
+    direccionEl.textContent = direccion;
+    notasEl.textContent = notas ? `📝 ${notas}` : "";
+    precioEl.textContent = precio ? `💰 ${precio}` : "";
+    horarioEl.textContent = horario ? `🕒 ${horario}` : "";
+
+    btnVer.addEventListener("click", e => {
+      e.stopPropagation();
+      establecerCentroDesdeFavorito(f.lat, f.lon);
+    });
+
+    btnEliminar.addEventListener("click", e => {
+      e.stopPropagation();
+      toggleFavorito(f.id, f.tipo, [f.lat, f.lon], nombre, { innerText: "☆ Favorito" });
+    });
+
+    checkbox.addEventListener("change", () => {
+      tarjeta.classList.toggle("visitado", checkbox.checked);
+    });
+
+    // Haz clic en la tarjeta para abrir el editor
+    tarjeta.addEventListener("click", () => {
       mostrarEditorFavorito(f.id);
-    };
+    });
 
-    contenedor.appendChild(div);
+    contenedor.appendChild(clon);
   });
+
 }
 
 // 👇 Necesario para que sea accesible desde otros scripts o HTML:
