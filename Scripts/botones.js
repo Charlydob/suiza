@@ -91,30 +91,37 @@ window.ignorarLugar = ignorarLugar;
 
 //🔎 Busca lugares de un tipo concreto cerca del usuario usando Google Maps Places API
 async function buscar(tipo) {
-  const usarTextSearchDirecto = ["tourism", "sitios_bonitos"];
+  const usarTextSearchDirecto = ["tourism", "sitios_bonitos", "hotel", "airbnb", "restaurant", "cafe"];
 
   try {
     const tipoGooglePlaces = {
     sitios_bonitos: [
-  { type: "tourist_attraction", keyword: "mountain" },
-  { type: "tourist_attraction", keyword: "lake" },
-  { type: "tourist_attraction", keyword: "river" },
-  { type: "", keyword: "viewpoint" },
-  { type: "", keyword: "mirador" },
+  // 🏔️ Montañas
+  { type: "", keyword: "mountain montagne montaña berg monte" },
+  // 🌊 Lagos
+  { type: "", keyword: "lake lac lago see" },
+  // 🏞️ Ríos
+  { type: "", keyword: "river rivière río fluss" },
+  // 🔭 Miradores y vistas
+  { type: "", keyword: "viewpoint mirador belvédère aussichtspunkt punto panorámico" },
+  // 🌲 Bosques
+  { type: "", keyword: "forest forêt bosque wald foresta" },
+  // 🌳 Parques (sí tiene type específico útil)
   { type: "park", keyword: "" },
-  { type: "tourist_attraction", keyword: "forest" },
-  { type: "", keyword: "waterfall" },
-  { type: "", keyword: "hiking trail" },
-  { type: "", keyword: "paisaje" }
+  // 💧 Cascadas
+  { type: "", keyword: "waterfall cascada wasserfall chute d'eau" },
+  // 🥾 Senderos naturales
+  { type: "", keyword: "hiking trail senderismo randonnée wanderweg percorso escursionistico" },
+  // 🌄 Paisaje bonito / naturaleza
+  { type: "", keyword: "scenic view paisaje natural vista naturaleza landschaft" }
 ],
-      hotel: {
-        type: "lodging",
-        keyword: "hotel"
-      },
-      airbnb: {
-        type: "lodging",
-        keyword: "apartment airbnb homestay guesthouse"
-      },
+
+      hotel: [
+  { type: "", keyword: "hotel hôtel gasthof" }
+],
+airbnb: [
+  { type: "", keyword: "apartment airbnb homestay guesthouse ferienwohnung" }
+],
       luggage: {
         type: "",
         keyword: "locker in the city Lockerpoint BagStop luggage storage consigna Luggage Storage Europe LuggageHero Bounce Stasher City Locker BagsAway Nannybag Radical Storage Bagbnb BAGGAGE NANNY Lock&Go SBB lockers Eelway Schliessfächer consigne à bagages guardaroba"
@@ -137,20 +144,19 @@ async function buscar(tipo) {
 { type: "art_gallery", keyword: "" },
 { type: "", keyword: "galerie galleria gallery" },
   { type: "", keyword: "monument" },
-{ type: "", keyword: "church iglesia kirche chiesa église" },
   { type: "", keyword: "historic site" },
 { type: "", keyword: "castle château castello schloss" },
   { type: "", keyword: "colosseum" },
-  { type: "", keyword: "temple" }
 ],
-      restaurant: {
-        type: "restaurant",
-        keyword: "restaurant food fast food pizza burger mcdonalds subway kfc burger king tacos comida rápida coop restaurant migros restaurant tibits vapiano nordsee spiga"
-      },
-      cafe: {
-        type: "cafe",
-        keyword: "coffee tea breakfast brunch espresso café coffeehouse sprüngli vicafe bachmann schwarz coffee grindel bohnenblust trestle café henrici blackbird"
-      },
+restaurant: [
+  { type: "restaurant", keyword: "restaurant food comida essen fast food pizza burger" },
+  { type: "", keyword: "mcdonalds subway kfc burger king tacos" },
+  { type: "", keyword: "coop migros tibits vapiano nordsee spiga" }
+],
+cafe: [
+  { type: "cafe", keyword: "coffee tea café kaffee breakfast brunch espresso" },
+  { type: "", keyword: "sprüngli vicafe bachmann schwarz grindel bohnenblust trestle henrici blackbird" }
+],
       hospital: {
         type: "hospital",
         keyword: ""
