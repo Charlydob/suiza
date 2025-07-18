@@ -1,3 +1,28 @@
+function guardarListas() {
+  try {
+    localStorage.setItem("listaFavoritos", JSON.stringify(favoritos));
+    console.log("💾 Favoritos guardados en localStorage");
+  } catch (e) {
+    console.error("❌ Error al guardar favoritos en localStorage:", e);
+  }
+}
+function cargarListas() {
+  try {
+    const data = localStorage.getItem("listaFavoritos");
+    if (data) {
+      favoritos = JSON.parse(data);
+      console.log("📥 Favoritos cargados desde localStorage");
+    } else {
+      favoritos = [];
+      console.log("📂 No hay favoritos en localStorage");
+    }
+  } catch (e) {
+    console.error("❌ Error al cargar favoritos desde localStorage:", e);
+    favoritos = [];
+  }
+}
+
+
 function cargarFavoritosDesdeFirebase() {
   if (navigator.onLine && typeof db !== "undefined") {
     db.ref(rutaFavoritos).once('value', snapshot => {
