@@ -91,8 +91,6 @@ window.ignorarLugar = ignorarLugar;
 
 //🔎 Busca lugares de un tipo concreto cerca del usuario usando Google Maps Places API
 async function buscar(tipo) {
-  window.idsYaMostrados = new Set();
-
   const usarTextSearchDirecto = ["tourism", "sitios_bonitos", "hotel", "airbnb", "restaurant", "cafe"];
 
   try {
@@ -176,22 +174,18 @@ cafe: [
       document.getElementById("status").innerText = `Este tipo no está disponible con Google Maps`;
       return;
     }
-if (!idsYaMostrados) window.idsYaMostrados = new Set();
 
-const mostrarResultados = (tipo, results, centroBusqueda) => {
-  if (!markersPorTipo[tipo]) markersPorTipo[tipo] = [];
+const mostrarResultados = (tipo, results) => {
+if (!markersPorTipo[tipo]) markersPorTipo[tipo] = [];
 
-  const radius = parseInt(document.getElementById("radiusSlider").value); // ✅ Añadir esta línea
 
   results.forEach(function (place) {
     const pos = place.geometry.location;
     const name = place.name;
     const idUnico = tipo + "_" + pos.lat().toFixed(5) + "_" + pos.lng().toFixed(5);
-    if (ignorados.includes(idUnico) || idsYaMostrados.has(idUnico)) return;
-    idsYaMostrados.add(idUnico);
     if (ignorados.indexOf(idUnico) !== -1) return;
 
-    const distanciaKm = calcularDistancia(centroBusqueda.lat, centroBusqueda.lng, pos.lat(), pos.lng());
+    const distanciaKm = calcularDistancia(currentCoords[0], currentCoords[1], pos.lat(), pos.lng());
     if (distanciaKm > radius / 1000) return;
 
     const tiempoCocheMin = Math.round((distanciaKm / 60) * 60);
@@ -249,7 +243,6 @@ const mostrarResultados = (tipo, results, centroBusqueda) => {
   });
 };
 
-
 const ejecutarBusqueda = (subTipo) => {
   return new Promise((resolve) => {
     const usarSoloTextSearch = usarTextSearchDirecto.includes(tipo);
@@ -258,7 +251,7 @@ const ejecutarBusqueda = (subTipo) => {
       // 🔁 Forzamos textSearch directamente
       service.textSearch({ location: centro, radius: radius, query: subTipo.keyword }, (results, status) => {
         if (status === google.maps.places.PlacesServiceStatus.OK && results?.length) {
-          mostrarResultados(tipo, results, centro);
+          mostrarResultados(tipo, results);
           resolve(true);
         } else {
           resolve(false);
@@ -275,12 +268,12 @@ const ejecutarBusqueda = (subTipo) => {
 
       service.nearbySearch(request, (results, status) => {
         if (status === google.maps.places.PlacesServiceStatus.OK && results?.length) {
-          mostrarResultados(tipo, results, centro);
+          mostrarResultados(tipo, results);
           resolve(true);
         } else if (subTipo.keyword) {
           service.textSearch({ location: centro, radius: radius, query: subTipo.keyword }, (results2, status2) => {
             if (status2 === google.maps.places.PlacesServiceStatus.OK && results2?.length) {
-              mostrarResultados(tipo, results2, centro);
+              mostrarResultados(tipo, results2);
               resolve(true);
             } else {
               resolve(false);
