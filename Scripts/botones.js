@@ -149,12 +149,12 @@ airbnb: [
   { type: "", keyword: "colosseum" },
 ],
 restaurant: [
-  { type: "restaurant", keyword: "restaurant food comida essen fast food pizza burger" },
-  { type: "", keyword: "mcdonalds subway kfc burger king tacos" },
+  { type: "", keyword: "restaurant food comida essen fast food pizza burger" },
+  { type: "", keyword: "mcdonalds subway kfc burger king" },
   { type: "", keyword: "coop migros tibits vapiano nordsee spiga" }
 ],
 cafe: [
-  { type: "cafe", keyword: "coffee tea café kaffee breakfast brunch espresso" },
+  { type: "", keyword: "coffee tea café kaffee breakfast brunch espresso" },
   { type: "", keyword: "sprüngli vicafe bachmann schwarz grindel bohnenblust trestle henrici blackbird" }
 ],
       hospital: {
@@ -185,7 +185,7 @@ if (!markersPorTipo[tipo]) markersPorTipo[tipo] = [];
     const idUnico = tipo + "_" + pos.lat().toFixed(5) + "_" + pos.lng().toFixed(5);
     if (ignorados.indexOf(idUnico) !== -1) return;
 
-    const distanciaKm = calcularDistancia(currentCoords[0], currentCoords[1], pos.lat(), pos.lng());
+const distanciaKm = calcularDistancia(centro.lat, centro.lng, pos.lat(), pos.lng());
     if (distanciaKm > radius / 1000) return;
 
     const tiempoCocheMin = Math.round((distanciaKm / 60) * 60);
