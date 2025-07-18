@@ -174,16 +174,7 @@ function toggleFavorito(id, tipo, coords, name, btn) {
   mostrarMarcadoresFavoritos();
 }
 
-function establecerCentroDesdeFavorito(lat, lon) {
-  if (map) {
-    const nuevaPos = new google.maps.LatLng(lat, lon);
-    map.setCenter(nuevaPos);
-    map.setZoom(14); // o el nivel de zoom que quieras
-    currentCoords = { lat, lng: lon }; // opcional: actualizar la referencia de centro
-  } else {
-    console.warn("Mapa no inicializado");
-  }
-}
+
 
 
 let favoritoEditandoId = null;
@@ -272,6 +263,16 @@ marcador.addListener("click", () => {
 
     marcadoresFavoritos.push(marcador);
   });
+}
+function establecerCentroDesdeFavorito(lat, lon) {
+  if (map) {
+    const nuevaPos = new google.maps.LatLng(lat, lon);
+    map.setCenter(nuevaPos);
+    map.setZoom(14); // o el nivel de zoom que quieras
+    currentCoords = { lat, lng: lon }; // opcional: actualizar la referencia de centro
+  } else {
+    console.warn("Mapa no inicializado");
+  }
 }
 function mostrarEditorFavorito(id) {
   const favorito = favoritos.find(f => f.id === id);
