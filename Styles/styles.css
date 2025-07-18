@@ -436,18 +436,14 @@ br {
   text-shadow: #333 1px 1px 2px;
 }
 .boton-medio {
-  color: white !important;
-  font-weight: bold !important;
+  color: white;
+  font-weight: bold;
   text-shadow:
-    -2px -2px 0 black,
-     2px -2px 0 black,
-    -2px  2px 0 black,
-     2px  2px 0 black,
-    -2px  0px 0 black,
-     2px  0px 0 black,
-     0px -2px 0 black,
-     0px  2px 0 black !important;
+    0 0 2px black,
+    1px 1px 2px black,
+   -1px -1px 2px black;
 }
+
 
 
 
