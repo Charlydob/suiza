@@ -418,8 +418,8 @@ display: none !important;
 
 /* Aplica tu diseño dentro del contenedor del InfoWindow */
 .popup-personalizado {
-  width: 90%;
-  height: 80%;
+  width: auto;
+  height: auto;
   margin: 0;
   background-color: transparent;
   backdrop-filter: blur(6px);
