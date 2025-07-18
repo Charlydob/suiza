@@ -20,11 +20,16 @@
         <h2>Viajecito con Laura</h2>
 
             <div id="location-controls">
-              <button onclick="getLocation()" class="action-button">📍 Ver mi ubicación</button>
+              <button onclick="getLocation()" class="action-button">Ver mi ubicación</button>
               <div class="search-group">
-                <input type="text" id="locationSearch" placeholder="Buscar lugar..." />
-                <button onclick="buscarLugar()">🔍</button>
+                <input type="text" id="locationSearch" placeholder="Buscar ubicación..." />
+                <button onclick="buscarLugar()">🔍🌍</button>
               </div>
+              <div class="search-group">
+                <input type="text" id="inputBusquedaLibre" placeholder="Buscar elemento en concreto..." style="width: 100%; padding: 8px;" />
+                <button onclick="buscar('__libre__')">🔍📍</button>
+              </div>
+
               <label>v1.2.24</label>
               <label for="radiusSlider" class="slider-label">Radio búsqueda: <span id="radiusValue">1000</span>m</label>
               <input type="range" id="radiusSlider" min="0" max="10000" value="1000" step="100">

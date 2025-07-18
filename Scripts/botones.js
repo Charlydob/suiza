@@ -168,12 +168,33 @@ cafe: [
     const centro = window.getCentroBusqueda?.() || { lat: currentCoords[0], lng: currentCoords[1] };
     const radius = parseInt(document.getElementById("radiusSlider").value);
     const service = new google.maps.places.PlacesService(map);
-    const configTipo = tipoGooglePlaces[tipo];
 
-    if (!configTipo) {
-      document.getElementById("status").innerText = `Este tipo no está disponible con Google Maps`;
-      return;
-    }
+    //BUSQUEDA PERSONALIZADA
+
+let configTipo = tipoGooglePlaces[tipo];
+
+// Caso especial: búsqueda libre del usuario
+if (tipo === "__libre__") {
+  const queryLibre = document.getElementById("inputBusquedaLibre")?.value?.trim();
+  if (!queryLibre) {
+    document.getElementById("status").innerText = `Escribe algo para buscar`;
+    return;
+  }
+if (markersPorTipo["__libre__"]) {
+    markersPorTipo["__libre__"].forEach(m => m.setMap(null));
+    markersPorTipo["__libre__"] = [];
+  }
+  configTipo = {
+    type: "",
+    keyword: queryLibre
+  };
+}
+
+if (!configTipo) {
+  document.getElementById("status").innerText = `Este tipo no está disponible con Google Maps`;
+  return;
+}
+
 
 const mostrarResultados = (tipo, results) => {
 if (!markersPorTipo[tipo]) markersPorTipo[tipo] = [];
