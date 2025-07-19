@@ -33,23 +33,28 @@ function cargarFavoritosDesdeFirebase() {
         favoritos = Object.values(data);
         guardarListas(); // opcional: sincroniza con local
         renderizarFavoritos();
+                renderizarFavoritosEnSidebar();
         mostrarMarcadoresFavoritos();
       } else {
         console.log("📂 No hay favoritos en Firebase, usando localStorage...");
         cargarListas(); // por si tienes algún favorito local
         renderizarFavoritos();
+        renderizarFavoritosEnSidebar();
         mostrarMarcadoresFavoritos();
       }
     }, err => {
       console.error("Error cargando favoritos desde Firebase:", err);
       cargarListas(); // fallback
       renderizarFavoritos();
+        renderizarFavoritosEnSidebar();
       mostrarMarcadoresFavoritos();
     });
   } else {
     console.warn("📡 Sin conexión: cargando favoritos desde localStorage");
     cargarListas();
     renderizarFavoritos();
+          renderizarFavoritos();
+
     mostrarMarcadoresFavoritos();
   }
 }
@@ -122,8 +127,13 @@ function crearTarjetaFavorito(f) {
   });
 
   tarjeta.addEventListener("click", () => {
-    mostrarEditorFavorito(f.id);
+    if (document.getElementById("pagina-favoritos").style.display !== "none") {
+      mostrarEditorFavoritoDesdeLista(f.id); // nueva lógica
+    } else {
+      mostrarEditorFavorito(f.id); // la original del sidebar
+    }
   });
+
 
   return clon;
 }
@@ -262,6 +272,7 @@ editarFavoritoDesdeMapa(id);
 
   guardarListas();
   renderizarFavoritos();
+  renderizarFavoritosEnSidebar();
   mostrarMarcadoresFavoritos();
 }
 window.toggleFavorito = toggleFavorito;
@@ -380,6 +391,22 @@ function mostrarEditorFavorito(id) {
   document.getElementById("sidebarContenido").style.display = "none";
   document.getElementById("editorFavorito").style.display = "block";
 }
+function mostrarEditorFavoritoDesdeLista(id) {
+  const favorito = favoritos.find(f => f.id === id);
+  if (!favorito) return;
+
+  favoritoEditandoId = id;
+
+  // Aquí mostrarías el editor específico de la sección de favoritos
+  // por ejemplo, podrías mostrar un modal o un panel diferente
+  document.getElementById("editorFavoritoLista").style.display = "block";
+
+  // Rellenar campos
+  document.getElementById("editNombreLista").value = favorito.datosPersonalizados.nombre || "";
+  document.getElementById("editPrecioLista").value = favorito.datosPersonalizados.precio || "";
+  document.getElementById("editHorarioLista").value = favorito.datosPersonalizados.horario || "";
+  document.getElementById("editNotasLista").value = favorito.datosPersonalizados.notas || "";
+}
 
 function guardarEdicionFavorito() {
   const favorito = favoritos.find(f => f.id === favoritoEditandoId);
@@ -392,6 +419,7 @@ function guardarEdicionFavorito() {
 
   guardarListas();
   renderizarFavoritos();
+  renderizarFavoritosEnSidebar();
   mostrarMarcadoresFavoritos();
   cerrarEditorFavorito();
 
@@ -403,6 +431,40 @@ function guardarEdicionFavorito() {
       .catch(err => console.error("Error actualizando en Firebase:", err));
   }
 }
+function guardarEdicionFavoritoLista() {
+  if (!favoritoEditandoId) return;
+
+  const favorito = favoritos.find(f => f.id === favoritoEditandoId);
+  if (!favorito) return;
+
+  // Obtener valores del editor en la lista
+  const nombre = document.getElementById("editNombreLista").value.trim();
+  const precio = document.getElementById("editPrecioLista").value.trim();
+  const horario = document.getElementById("editHorarioLista").value.trim();
+  const notas = document.getElementById("editNotasLista").value.trim();
+
+  // Actualizar datos
+  favorito.datosPersonalizados = { nombre, precio, horario, notas };
+
+  // Guardar local
+  guardarListas();
+
+  // Guardar en Firebase si corresponde
+  if (navigator.onLine && typeof db !== "undefined") {
+    const ref = db.ref(`${rutaFavoritos}/${favorito.id}`);
+    ref.set(favorito)
+      .then(() => console.log("✅ Favorito actualizado en Firebase (desde lista)"))
+      .catch(err => console.error("Error actualizando en Firebase desde lista:", err));
+  }
+
+  // Actualizar vistas
+  renderizarFavoritos();
+  renderizarFavoritosEnSidebar();
+  mostrarMarcadoresFavoritos?.(); // por si quieres sincronizar también mapa
+
+  cerrarEditorFavoritoLista();
+}
+
 
 function borrarFavorito() {
   const index = favoritos.findIndex(f => f.id === favoritoEditandoId);
@@ -413,6 +475,7 @@ function borrarFavorito() {
     favoritos.splice(index, 1);
     guardarListas();
     renderizarFavoritos();
+    renderizarFavoritosEnSidebar();
     mostrarMarcadoresFavoritos();
     cerrarEditorFavorito();
 
@@ -426,12 +489,31 @@ function borrarFavorito() {
   }
 
 }
+function borrarFavoritoLista() {
+  if (!favoritoEditandoId) return;
+
+  const index = favoritos.findIndex(f => f.id === favoritoEditandoId);
+  if (index === -1) return;
+
+  favoritos.splice(index, 1);
+
+  guardarFavoritosEnFirebase(favoritos);
+  renderizarFavoritos();
+  renderizarFavoritosEnSidebar();
+
+  cerrarEditorFavoritoLista();
+}
 
 function cerrarEditorFavorito() {
   favoritoEditandoId = null;
   document.getElementById("editorFavorito").style.display = "none";
   document.getElementById("sidebarContenido").style.display = "block";
 }
+function cerrarEditorFavoritoLista() {
+  favoritoEditandoId = null;
+  document.getElementById("editorFavoritoLista").style.display = "none";
+}
+
 
 function editarFavoritoDesdeMapa(id) {
   const favorito = favoritos.find(f => f.id === id);
@@ -449,8 +531,12 @@ function editarFavoritoDesdeMapa(id) {
 window.mostrarMarcadoresFavoritos = mostrarMarcadoresFavoritos;
 window.mostrarEditorFavorito = mostrarEditorFavorito;
 window.guardarEdicionFavorito = guardarEdicionFavorito;
+window.guardarEdicionFavoritoLista = guardarEdicionFavoritoLista;
 window.borrarFavorito = borrarFavorito;
+window.borrarFavoritoLista = borrarFavoritoLista;
 window.cerrarEditorFavorito = cerrarEditorFavorito;
+window.cerrarEditorFavoritoLista = cerrarEditorFavoritoLista;
 window.renderizarFavoritos = renderizarFavoritos;
+window.renderizarFavoritosEnSidebar = renderizarFavoritosEnSidebar
 window.editarFavoritoDesdeMapa = editarFavoritoDesdeMapa;
 window.cargarFavoritosDesdeFirebase = cargarFavoritosDesdeFirebase;

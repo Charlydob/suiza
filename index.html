@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="Styles/styles.css" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="Styles/menuInferior.css" />
+  <link rel="stylesheet" href="Styles/favoritos.css" />
   <link rel="apple-touch-icon" href="Recursos/icono.png" />
 </head>
 
@@ -31,7 +32,7 @@
                 <button onclick="buscar('__libre__')">🔍📍</button>
               </div>
 
-              <label>v1.3.3</label>
+              <label>v1.3.7</label>
               <label for="radiusSlider" class="slider-label">Radio búsqueda: <span id="radiusValue">1000</span>m</label>
               <input type="range" id="radiusSlider" min="0" max="10000" value="1000" step="100">
             </div>
@@ -99,7 +100,7 @@
                   <div id="filtrosFavoritos">
                     <input type="text" id="buscadorFavoritos" placeholder="🔍 Buscar..."">
                       <template id="template-favorito-sidebar">
-                        <div class="favorito-sidebar-tarjeta">
+                        <div class="favorito-sidebar-tarjeta favorito-sidebar-item">
                           <!-- Contenedor de la info -->
                           <div class="favorito-sidebar-info">
                             <!-- Texto superpuesto -->
@@ -184,29 +185,54 @@
         <div class="favorito-tarjeta">
           <!-- Imagen del lugar -->
           <div class="favorito-imagen">
-            <img src="" alt="Imagen del lugar">
+            <img src="" 
+              alt="Imagen del lugar" 
+              onerror="this.onerror=null; this.src='Recursos/img/default.jpg';">
+
           </div>
 
           <!-- Contenedor de la info -->
           <div class="favorito-info">
-            <!-- Checkbox de visitado -->
-            <input type="checkbox" class="favorito-visitado" title="Marcar como visitado">
-
             <!-- Texto superpuesto -->
             <div class="favorito-detalles">
-              <h3 class="favorito-nombre">Nombre del lugar</h3>
-              <p class="favorito-ubicacion">Ciudad, País</p>
-              <p class="favorito-direccion">Dirección exacta</p>
-              <p class="favorito-notas">📝 Notas personales</p>
-              <p class="favorito-precio">💰 Precio estimado</p>
-              <p class="favorito-horario">🕒 Horario</p>
+              <div class="nombre-favorito">
+                <h3 class="favorito-nombre">Nombre del lugar</h3>
+                <input type="checkbox" class="favorito-visitado" title="Marcar como visitado">
+              </div>
+              <div class="detalles-ubicacion">
+                <p class="favorito-ubicacion">Ciudad, País</p>
+                <p class="favorito-direccion">Dirección exacta</p>
+              </div>
+              <div class="detalles-añadidos">
+                <p class="favorito-notas">📝 Notas personales</p>
+                <p class="favorito-precio">💰 Precio estimado</p>
+                <p class="favorito-horario">🕒 Horario</p>
+              </div>
+              </div>
             </div>
 
             <!-- Botones -->
             <div class="favorito-botones">
-              <button class="btn-ver">📍 Ver en el mapa</button>
+              <button class="btn-editar">✏️Editar</button>
+              <button class="btn-ver">📍 Mapa</button>
               <button class="btn-eliminar">🗑️ Eliminar</button>
             </div>
+                  </div>
+      <!-- 📝 Editor de Favorito -->
+      <div id="editorFavoritoLista" style="display: none; padding: 10px;">
+        <h3>Editar lugar</h3>
+        <label>Nombre personalizado:</label>
+        <input type="text" id="editNombreLista"><br><br>
+        <label>Precio:</label>
+        <input type="text" id="editPrecioLista"><br><br>
+        <label>Horario:</label>
+        <input type="text" id="editHorarioLista"><br><br>
+        <label>Observaciones:</label>
+        <textarea id="editNotasLista" rows="3"></textarea><br><br>
+        <button onclick="guardarEdicionFavorito()">💾 Guardar</button>
+        <button onclick="borrarFavorito()">🗑️ Eliminar</button>
+        <button onclick="cerrarEditorFavorito()">❌ Cancelar</button>
+      </div>
           </div>
         </div>
       </template>
