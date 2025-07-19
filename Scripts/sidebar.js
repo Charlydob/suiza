@@ -48,25 +48,28 @@ toggleBtn.addEventListener("click", () => {
   // 🔄 Listeners para filtros de favoritos
   document.getElementById("buscadorFavoritos").addEventListener("input", (e) => {
     localStorage.setItem("filtroTextoFavoritos", e.target.value);
-    renderizarFavoritos();
+    renderizarFavoritosEn("lista");
   });
 
   document.getElementById("filtroTipoFavoritos").addEventListener("change", (e) => {
     localStorage.setItem("filtroTipoFavoritos", e.target.value);
-    renderizarFavoritos();
+    renderizarFavoritosEn("lista");
+;
   });
 
   document.getElementById("ordenFavoritos").addEventListener("change", (e) => {
     localStorage.setItem("ordenFavoritos", e.target.value);
-    renderizarFavoritos();
+    renderizarFavoritosEn("lista");
+;
   });
 
   // 📍 Cargar mapa con ubicación inicial
   getLocation();
 // 🔄 Cargar favoritos desde Firebase
-cargarFavoritosDesdeFirebase();
+GestorFavoritos.cargarDesdeFirebase();
   // ⭐ Cargar favoritos al iniciar
-  renderizarFavoritos();
+  renderizarFavoritosEn("lista");
+;
 
   // 🔁 Recuperar filtros guardados
   document.getElementById("buscadorFavoritos").value = localStorage.getItem("filtroTextoFavoritos") || "";

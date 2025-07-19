@@ -1,84 +1,272 @@
-
-
-function guardarListas() {
-  try {
-    localStorage.setItem("listaFavoritos", JSON.stringify(favoritos));
-    console.log("💾 Favoritos guardados en localStorage");
-  } catch (e) {
-    console.error("❌ Error al guardar favoritos en localStorage:", e);
-  }
-}
-function cargarListas() {
-  try {
-    const data = localStorage.getItem("listaFavoritos");
-    if (data) {
-      favoritos = JSON.parse(data);
-      console.log("📥 Favoritos cargados desde localStorage");
-    } else {
-      favoritos = [];
-      console.log("📂 No hay favoritos en localStorage");
+const GestorFavoritos = {
+  guardarLocal: () => {
+    try {
+      localStorage.setItem("listaFavoritos", JSON.stringify(favoritos));
+      console.log("💾 Favoritos guardados en localStorage");
+    } catch (e) {
+      console.error("❌ Error al guardar favoritos en localStorage:", e);
     }
-  } catch (e) {
-    console.error("❌ Error al cargar favoritos desde localStorage:", e);
-    favoritos = [];
+  },
+
+  cargarLocal: () => {
+    try {
+      const data = localStorage.getItem("listaFavoritos");
+      favoritos = data ? JSON.parse(data) : [];
+      console.log(data ? "📥 Favoritos cargados desde localStorage" : "📂 Lista de favoritos vacía");
+    } catch (e) {
+      console.error("❌ Error al cargar favoritos desde localStorage:", e);
+      favoritos = [];
+    }
+  },
+
+  guardarFirebase: (favorito) => {
+    if (navigator.onLine && typeof db !== "undefined") {
+      const ref = db.ref(`${rutaFavoritos}/${favorito.id}`);
+      ref.set(favorito)
+        .then(() => console.log("✅ Favorito guardado en Firebase"))
+        .catch(err => console.error("❌ Error al guardar en Firebase:", err));
+    } else {
+      console.warn("📴 Sin conexión, no se guardó en Firebase");
+    }
+  },
+
+  borrarFirebase: (id) => {
+    if (navigator.onLine && typeof db !== "undefined") {
+      const ref = db.ref(`${rutaFavoritos}/${id}`);
+      ref.remove()
+        .then(() => console.log("🗑️ Favorito eliminado de Firebase"))
+        .catch(err => console.error("❌ Error al eliminar en Firebase:", err));
+    } else {
+      console.warn("📴 Sin conexión, no se eliminó en Firebase");
+    }
+  },
+
+  cargarDesdeFirebase: () => {
+    if (navigator.onLine && typeof db !== "undefined") {
+      db.ref(rutaFavoritos).once('value', snapshot => {
+        const data = snapshot.val();
+        if (data) {
+          favoritos = Object.values(data);
+          GestorFavoritos.guardarLocal(); // opcional
+          console.log("☁️ Favoritos sincronizados desde Firebase");
+        } else {
+          console.log("📂 Firebase vacío, usando localStorage");
+          GestorFavoritos.cargarLocal();
+        }
+
+        renderizarFavoritosEn("lista");
+        renderizarFavoritosEn("sidebar");
+        mostrarMarcadoresFavoritos?.();
+
+      }, err => {
+        console.error("❌ Error al cargar desde Firebase:", err);
+        GestorFavoritos.cargarLocal();
+        renderizarFavoritosEn("lista");
+        renderizarFavoritosEn("sidebar");
+        mostrarMarcadoresFavoritos?.();
+      });
+
+    } else {
+      console.warn("📡 Sin conexión: usando localStorage");
+      GestorFavoritos.cargarLocal();
+      renderizarFavoritosEn("lista");
+      renderizarFavoritosEn("sidebar");
+      mostrarMarcadoresFavoritos?.();
+    }
+  },
+
+  cargarIgnorados: () => {
+    if (navigator.onLine && typeof db !== "undefined") {
+      db.ref(rutaIgnorados).once('value', snapshot => {
+        const data = snapshot.val();
+        if (Array.isArray(data)) {
+          ignorados.splice(0);
+          ignorados.push(...data);
+          localStorage.setItem("lugaresIgnorados", JSON.stringify(ignorados));
+          console.log("✅ Ignorados cargados desde Firebase");
+        } else {
+          console.log("📂 No hay ignorados en Firebase");
+        }
+      }, err => {
+        console.error("❌ Error al cargar ignorados:", err);
+      });
+
+    } else {
+      console.warn("📴 Sin conexión: usando ignorados de localStorage");
+      const local = JSON.parse(localStorage.getItem("lugaresIgnorados") || "[]");
+      ignorados.splice(0);
+      ignorados.push(...local);
+    }
+  }
+};
+function guardarEdicionFavoritoDesde(origen) {
+  if (!favoritoEditandoId) return;
+
+  const favorito = favoritos.find(f => f.id === favoritoEditandoId);
+  if (!favorito) return;
+
+  // Detectar si los campos son del sidebar o de la lista
+  const sufijo = origen === "lista" ? "Lista" : "";
+
+  const nombre = document.getElementById(`editNombre${sufijo}`).value.trim();
+  const precio = document.getElementById(`editPrecio${sufijo}`).value.trim();
+  const horario = document.getElementById(`editHorario${sufijo}`).value.trim();
+  const notas = document.getElementById(`editNotas${sufijo}`).value.trim();
+
+  // Actualizar datos
+  favorito.datosPersonalizados = { nombre, precio, horario, notas };
+
+  // Guardar local y en Firebase
+  GestorFavoritos.guardarLocal();
+  GestorFavoritos.guardarFirebase(favorito);
+
+  // Refrescar vistas
+  renderizarFavoritosEn("lista");
+  renderizarFavoritosEn("sidebar");
+  mostrarMarcadoresFavoritos?.();
+
+  // Cerrar el editor correspondiente
+  if (origen === "lista") {
+    cerrarEditorFavoritoDesde("lista");
+  } else {
+    cerrarEditorFavoritoDesde("sidebar");
   }
 }
+function borrarFavoritoDesde(origen) {
+  if (!favoritoEditandoId) return;
 
+  const index = favoritos.findIndex(f => f.id === favoritoEditandoId);
+  if (index === -1) return;
 
-function cargarFavoritosDesdeFirebase() {
-  if (navigator.onLine && typeof db !== "undefined") {
-    db.ref(rutaFavoritos).once('value', snapshot => {
-      const data = snapshot.val();
-      if (data) {
-        favoritos = Object.values(data);
-        guardarListas(); // opcional: sincroniza con local
-        renderizarFavoritos();
-                renderizarFavoritosEnSidebar();
-        mostrarMarcadoresFavoritos();
-      } else {
-        console.log("📂 No hay favoritos en Firebase, usando localStorage...");
-        cargarListas(); // por si tienes algún favorito local
-        renderizarFavoritos();
-        renderizarFavoritosEnSidebar();
-        mostrarMarcadoresFavoritos();
-      }
-    }, err => {
-      console.error("Error cargando favoritos desde Firebase:", err);
-      cargarListas(); // fallback
-      renderizarFavoritos();
-        renderizarFavoritosEnSidebar();
-      mostrarMarcadoresFavoritos();
-    });
+  const id = favoritos[index].id;
+
+  // Eliminar de favoritos
+  favoritos.splice(index, 1);
+
+  // Guardar local y borrar de Firebase
+  GestorFavoritos.guardarLocal();
+  GestorFavoritos.borrarFirebase(id);
+
+  // Refrescar vistas
+  renderizarFavoritosEn("lista");
+  renderizarFavoritosEn("sidebar");
+  mostrarMarcadoresFavoritos?.();
+
+  // Cerrar el editor adecuado
+  if (origen === "lista") {
+    cerrarEditorFavoritoDesde("lista");
   } else {
-    console.warn("📡 Sin conexión: cargando favoritos desde localStorage");
-    cargarListas();
-    renderizarFavoritos();
-          renderizarFavoritos();
-
-    mostrarMarcadoresFavoritos();
+    cerrarEditorFavoritoDesde("sidebar");
   }
 }
-function cargarIgnoradosDesdeFirebase() {
-  if (navigator.onLine && typeof db !== "undefined") {
-    db.ref(rutaIgnorados).once('value', snapshot => {
-      const data = snapshot.val();
-      if (Array.isArray(data)) {
-        ignorados.splice(0); // borra todo sin perder referencia
-        ignorados.push(...data);
-        localStorage.setItem("lugaresIgnorados", JSON.stringify(ignorados));
-        console.log("✅ Ignorados cargados desde Firebase");
-      } else {
-        console.log("📂 No hay ignorados en Firebase");
-      }
-    }, err => {
-      console.error("Error cargando ignorados desde Firebase:", err);
-    });
+function cerrarEditorFavoritoDesde(origen) {
+  favoritoEditandoId = null;
+
+  if (origen === "lista") {
+    document.getElementById("editorFavoritoLista").style.display = "none";
   } else {
-    console.warn("📡 Sin conexión: usando ignorados desde localStorage");
-    const local = JSON.parse(localStorage.getItem("lugaresIgnorados") || "[]");
-    ignorados.splice(0);
-    ignorados.push(...local);
+    document.getElementById("editorFavorito").style.display = "none";
+    document.getElementById("sidebarContenido").style.display = "block";
   }
+}
+function mostrarEditorFavoritoDesde(origen, id) {
+  const favorito = favoritos.find(f => f.id === id);
+  if (!favorito) return;
+
+  favoritoEditandoId = id;
+
+  const sufijo = origen === "lista" ? "Lista" : "";
+
+  document.getElementById(`editNombre${sufijo}`).value = favorito.datosPersonalizados.nombre || "";
+  document.getElementById(`editPrecio${sufijo}`).value = favorito.datosPersonalizados.precio || "";
+  document.getElementById(`editHorario${sufijo}`).value = favorito.datosPersonalizados.horario || "";
+  document.getElementById(`editNotas${sufijo}`).value = favorito.datosPersonalizados.notas || "";
+
+  if (origen === "sidebar") {
+    document.getElementById("sidebarContenido").style.display = "none";
+  }
+
+  document.getElementById(`editorFavorito${sufijo}`).style.display = "block";
+}
+function renderizarFavoritosEn(origen) {
+  const esLista = origen === "lista";
+  const contenedor = document.getElementById(esLista ? "contenedorFavoritos" : "contenedorFavoritosSidebar");
+  contenedor.innerHTML = "";
+
+  let listaFinal = favoritos;
+
+  if (esLista) {
+    const listaDiv = document.getElementById("listaFavoritos");
+    const filtroTexto = document.getElementById("buscadorFavoritos")?.value.toLowerCase() || "";
+    const filtroTipo = document.getElementById("filtroTipoFavoritos")?.value || "";
+    const orden = document.getElementById("ordenFavoritos")?.value || "distanciaAsc";
+
+    if (favoritos.length === 0) {
+      listaDiv.style.display = "none";
+      return;
+    } else {
+      listaDiv.style.display = "block";
+    }
+
+    const userPos = ubicacionReal || currentCoords;
+    const lat1 = Array.isArray(userPos) ? userPos[0] : userPos.lat;
+    const lon1 = Array.isArray(userPos) ? userPos[1] : userPos.lng;
+
+    listaFinal = favoritos
+      .map(f => ({ ...f, distanciaKm: calcularDistancia(lat1, lon1, f.lat, f.lon) }))
+      .filter(f => {
+        const texto = `${f.datosPersonalizados?.nombre || ""} ${f.datosPersonalizados?.notas || ""}`.toLowerCase();
+        const coincideTexto = texto.includes(filtroTexto);
+        const coincideTipo = filtroTipo === "" || f.tipo === filtroTipo;
+        return coincideTexto && coincideTipo;
+      });
+
+    if (orden === "distanciaAsc") {
+      listaFinal.sort((a, b) => a.distanciaKm - b.distanciaKm);
+    } else if (orden === "distanciaDesc") {
+      listaFinal.sort((a, b) => b.distanciaKm - a.distanciaKm);
+    }
+  }
+
+  listaFinal.forEach(f => {
+    if (esLista) {
+      contenedor.appendChild(crearTarjetaFavorito(f));
+    } else {
+      const clon = document.getElementById("template-favorito-sidebar").content.cloneNode(true);
+      const item = clon.querySelector(".favorito-sidebar-item");
+      const nombreEl = clon.querySelector(".favorito-sidebar-nombre");
+      const ubicacionEl = clon.querySelector(".favorito-sidebar-ubicacion");
+      const notasEl = clon.querySelector(".favorito-sidebar-notas");
+      const btnVer = clon.querySelector(".btn-ver");
+      const btnEliminar = clon.querySelector(".btn-eliminar");
+
+      item.dataset.id = f.id;
+
+      const nombre = f.datosPersonalizados?.nombre || f.id;
+      const ciudadPais = f.ubicacion || "Ubicación desconocida";
+      const notas = f.datosPersonalizados?.notas || "";
+
+      nombreEl.textContent = nombre;
+      ubicacionEl.textContent = ciudadPais;
+      notasEl.textContent = notas ? `📝 ${notas}` : "";
+
+      btnVer.addEventListener("click", e => {
+        e.stopPropagation();
+        establecerCentroDesdeFavorito(f.lat, f.lon);
+      });
+
+      btnEliminar.addEventListener("click", e => {
+        e.stopPropagation();
+        toggleFavorito(f.id, f.tipo, [f.lat, f.lon], nombre, { innerText: "☆ Favorito" });
+      });
+
+      item.addEventListener("click", () => {
+        mostrarEditorFavoritoDesde("sidebar", f.id);
+      });
+
+      contenedor.appendChild(clon);
+    }
+  });
 }
 function crearTarjetaFavorito(f) {
   const clon = document.getElementById("template-favorito").content.cloneNode(true);
@@ -93,7 +281,10 @@ function crearTarjetaFavorito(f) {
   const horarioEl = clon.querySelector(".favorito-horario");
   const btnVer = clon.querySelector(".btn-ver");
   const btnEliminar = clon.querySelector(".btn-eliminar");
+  const btnEditar = clon.querySelector(".btn-editar");
   const checkbox = clon.querySelector(".favorito-visitado");
+
+  tarjeta.dataset.id = f.id;
 
   const nombre = f.datosPersonalizados?.nombre || f.id;
   const ciudadPais = f.ubicacion || "Ubicación desconocida";
@@ -122,102 +313,16 @@ function crearTarjetaFavorito(f) {
     toggleFavorito(f.id, f.tipo, [f.lat, f.lon], nombre, { innerText: "☆ Favorito" });
   });
 
+  btnEditar.addEventListener("click", e => {
+    e.stopPropagation();
+    mostrarEditorFavoritoDesde("lista", f.id);
+  });
+
   checkbox.addEventListener("change", () => {
     tarjeta.classList.toggle("visitado", checkbox.checked);
   });
 
-  tarjeta.addEventListener("click", () => {
-    if (document.getElementById("pagina-favoritos").style.display !== "none") {
-      mostrarEditorFavoritoDesdeLista(f.id); // nueva lógica
-    } else {
-      mostrarEditorFavorito(f.id); // la original del sidebar
-    }
-  });
-
-
   return clon;
-}
-
-
-function renderizarFavoritos() {
-  const listaDiv = document.getElementById("listaFavoritos");
-  const contenedor = document.getElementById("contenedorFavoritos");
-  const filtroTexto = document.getElementById("buscadorFavoritos")?.value.toLowerCase() || "";
-  const filtroTipo = document.getElementById("filtroTipoFavoritos")?.value || "";
-  const orden = document.getElementById("ordenFavoritos")?.value || "distanciaAsc";
-
-  contenedor.innerHTML = "";
-
-  if (favoritos.length === 0) {
-    listaDiv.style.display = "none";
-    return;
-  }
-
-  listaDiv.style.display = "block";
-
-  const userPos = ubicacionReal || currentCoords;
-  const lat1 = Array.isArray(userPos) ? userPos[0] : userPos.lat;
-  const lon1 = Array.isArray(userPos) ? userPos[1] : userPos.lng;
-
-  let favoritosFiltrados = favoritos
-    .map(f => ({ ...f, distanciaKm: calcularDistancia(lat1, lon1, f.lat, f.lon) }))
-    .filter(f => {
-      const texto = `${f.datosPersonalizados?.nombre || ""} ${f.datosPersonalizados?.notas || ""}`.toLowerCase();
-      const coincideTexto = texto.includes(filtroTexto);
-      const coincideTipo = filtroTipo === "" || f.tipo === filtroTipo;
-      return coincideTexto && coincideTipo;
-    });
-
-  if (orden === "distanciaAsc") {
-    favoritosFiltrados.sort((a, b) => a.distanciaKm - b.distanciaKm);
-  } else if (orden === "distanciaDesc") {
-    favoritosFiltrados.sort((a, b) => b.distanciaKm - a.distanciaKm);
-  }
-
-  favoritosFiltrados.forEach(f => {
-    contenedor.appendChild(crearTarjetaFavorito(f));
-  });
-}
-
-
-function renderizarFavoritosEnSidebar() {
-  const contenedor = document.getElementById("contenedorFavoritosSidebar");
-  contenedor.innerHTML = "";
-
-  favoritos.forEach(f => {
-    const clon = document.getElementById("template-favorito-sidebar").content.cloneNode(true);
-
-    const item = clon.querySelector(".favorito-sidebar-item");
-    const nombreEl = clon.querySelector(".favorito-sidebar-nombre");
-    const ubicacionEl = clon.querySelector(".favorito-sidebar-ubicacion");
-    const notasEl = clon.querySelector(".favorito-sidebar-notas");
-    const btnVer = clon.querySelector(".btn-ver");
-    const btnEliminar = clon.querySelector(".btn-eliminar");
-
-    const nombre = f.datosPersonalizados?.nombre || f.id;
-    const ciudadPais = f.ubicacion || "Ubicación desconocida";
-    const notas = f.datosPersonalizados?.notas || "";
-
-    nombreEl.textContent = nombre;
-    ubicacionEl.textContent = ciudadPais;
-    notasEl.textContent = notas ? `📝 ${notas}` : "";
-
-    btnVer.addEventListener("click", e => {
-      e.stopPropagation();
-      establecerCentroDesdeFavorito(f.lat, f.lon);
-    });
-
-    btnEliminar.addEventListener("click", e => {
-      e.stopPropagation();
-      toggleFavorito(f.id, f.tipo, [f.lat, f.lon], nombre, { innerText: "☆ Favorito" });
-    });
-
-    item.addEventListener("click", () => {
-      mostrarEditorFavorito(f.id);
-    });
-
-    contenedor.appendChild(clon);
-  });
 }
 
 
@@ -227,27 +332,30 @@ function renderizarFavoritosEnSidebar() {
 function toggleFavorito(id, tipo, coords, name, btn) {
   const index = favoritos.findIndex(f => f.id === id);
 
-  if (index === -1) {
-    // Añadir nuevo favorito
-    const nuevoFavorito = {
-      id,
-      tipo,
-      lat: coords[0],
-      lon: coords[1],
-      datosPersonalizados: {
-        nombre: name,
-        precio: '',
-        horario: '',
-        notas: ''
-      }
-    };
-    favoritos.push(nuevoFavorito);
-    // Mostrar el editor inmediatamente
-mostrarEditorFavorito(id); 
-// O si prefieres abrir el sidebar con todo:
-editarFavoritoDesdeMapa(id);
+if (index === -1) {
+  const nuevoFavorito = {
+    id,
+    tipo,
+    lat: coords[0],
+    lon: coords[1],
+    datosPersonalizados: {
+      nombre: name,
+      precio: '',
+      horario: '',
+      notas: ''
+    }
+  };
+  favoritos.push(nuevoFavorito);
 
-    btn.innerText = "⭐ Favorito";
+  // Mostrar editor según vista actual
+  if (document.getElementById("pagina-favoritos").style.display !== "none") {
+    mostrarEditorFavoritoDesde("lista", id);
+  } else {
+    mostrarEditorFavoritoDesde("sidebar", id);
+  }
+
+  btn.innerText = "⭐ Favorito";
+
 
     // 🟢 También guardar en Firebase
     if (navigator.onLine && typeof db !== "undefined") {
@@ -270,16 +378,12 @@ editarFavoritoDesdeMapa(id);
     }
   }
 
-  guardarListas();
-  renderizarFavoritos();
-  renderizarFavoritosEnSidebar();
+  GestorFavoritos.guardarLocal();
+  renderizarFavoritosEn("lista");
+  renderizarFavoritosEn("sidebar");
   mostrarMarcadoresFavoritos();
 }
 window.toggleFavorito = toggleFavorito;
-
-
-
-
 let favoritoEditandoId = null;
 function mostrarMarcadoresFavoritos() {
   // 🧹 Borra marcadores anteriores
@@ -377,144 +481,6 @@ function establecerCentroDesdeFavorito(lat, lon) {
     console.warn("Mapa no inicializado");
   }
 }
-function mostrarEditorFavorito(id) {
-  const favorito = favoritos.find(f => f.id === id);
-  if (!favorito) return;
-
-  favoritoEditandoId = id;
-
-  document.getElementById("editNombre").value = favorito.datosPersonalizados.nombre || "";
-  document.getElementById("editPrecio").value = favorito.datosPersonalizados.precio || "";
-  document.getElementById("editHorario").value = favorito.datosPersonalizados.horario || "";
-  document.getElementById("editNotas").value = favorito.datosPersonalizados.notas || "";
-
-  document.getElementById("sidebarContenido").style.display = "none";
-  document.getElementById("editorFavorito").style.display = "block";
-}
-function mostrarEditorFavoritoDesdeLista(id) {
-  const favorito = favoritos.find(f => f.id === id);
-  if (!favorito) return;
-
-  favoritoEditandoId = id;
-
-  // Aquí mostrarías el editor específico de la sección de favoritos
-  // por ejemplo, podrías mostrar un modal o un panel diferente
-  document.getElementById("editorFavoritoLista").style.display = "block";
-
-  // Rellenar campos
-  document.getElementById("editNombreLista").value = favorito.datosPersonalizados.nombre || "";
-  document.getElementById("editPrecioLista").value = favorito.datosPersonalizados.precio || "";
-  document.getElementById("editHorarioLista").value = favorito.datosPersonalizados.horario || "";
-  document.getElementById("editNotasLista").value = favorito.datosPersonalizados.notas || "";
-}
-
-function guardarEdicionFavorito() {
-  const favorito = favoritos.find(f => f.id === favoritoEditandoId);
-  if (!favorito) return;
-
-  favorito.datosPersonalizados.nombre = document.getElementById("editNombre").value;
-  favorito.datosPersonalizados.precio = document.getElementById("editPrecio").value;
-  favorito.datosPersonalizados.horario = document.getElementById("editHorario").value;
-  favorito.datosPersonalizados.notas = document.getElementById("editNotas").value;
-
-  guardarListas();
-  renderizarFavoritos();
-  renderizarFavoritosEnSidebar();
-  mostrarMarcadoresFavoritos();
-  cerrarEditorFavorito();
-
-  // 🔄 Guardar cambios también en Firebase si hay conexión
-  if (navigator.onLine && typeof db !== "undefined") {
-    const ref = db.ref(`${rutaFavoritos}/${favorito.id}`);
-    ref.set(favorito)
-      .then(() => console.log("✅ Favorito actualizado en Firebase"))
-      .catch(err => console.error("Error actualizando en Firebase:", err));
-  }
-}
-function guardarEdicionFavoritoLista() {
-  if (!favoritoEditandoId) return;
-
-  const favorito = favoritos.find(f => f.id === favoritoEditandoId);
-  if (!favorito) return;
-
-  // Obtener valores del editor en la lista
-  const nombre = document.getElementById("editNombreLista").value.trim();
-  const precio = document.getElementById("editPrecioLista").value.trim();
-  const horario = document.getElementById("editHorarioLista").value.trim();
-  const notas = document.getElementById("editNotasLista").value.trim();
-
-  // Actualizar datos
-  favorito.datosPersonalizados = { nombre, precio, horario, notas };
-
-  // Guardar local
-  guardarListas();
-
-  // Guardar en Firebase si corresponde
-  if (navigator.onLine && typeof db !== "undefined") {
-    const ref = db.ref(`${rutaFavoritos}/${favorito.id}`);
-    ref.set(favorito)
-      .then(() => console.log("✅ Favorito actualizado en Firebase (desde lista)"))
-      .catch(err => console.error("Error actualizando en Firebase desde lista:", err));
-  }
-
-  // Actualizar vistas
-  renderizarFavoritos();
-  renderizarFavoritosEnSidebar();
-  mostrarMarcadoresFavoritos?.(); // por si quieres sincronizar también mapa
-
-  cerrarEditorFavoritoLista();
-}
-
-
-function borrarFavorito() {
-  const index = favoritos.findIndex(f => f.id === favoritoEditandoId);
-  if (index !== -1) {
-    const id = favoritos[index].id;
-
-    // 1. Eliminar de local
-    favoritos.splice(index, 1);
-    guardarListas();
-    renderizarFavoritos();
-    renderizarFavoritosEnSidebar();
-    mostrarMarcadoresFavoritos();
-    cerrarEditorFavorito();
-
-    // 2. Eliminar de Firebase si hay conexión
-    if (navigator.onLine && typeof db !== "undefined") {
-      const ref = db.ref(`${rutaFavoritos}/${id}`);
-      ref.remove()
-        .then(() => console.log("🗑️ Favorito eliminado de Firebase"))
-        .catch(err => console.error("Error eliminando de Firebase:", err));
-    }
-  }
-
-}
-function borrarFavoritoLista() {
-  if (!favoritoEditandoId) return;
-
-  const index = favoritos.findIndex(f => f.id === favoritoEditandoId);
-  if (index === -1) return;
-
-  favoritos.splice(index, 1);
-
-  guardarFavoritosEnFirebase(favoritos);
-  renderizarFavoritos();
-  renderizarFavoritosEnSidebar();
-
-  cerrarEditorFavoritoLista();
-}
-
-function cerrarEditorFavorito() {
-  favoritoEditandoId = null;
-  document.getElementById("editorFavorito").style.display = "none";
-  document.getElementById("sidebarContenido").style.display = "block";
-}
-function cerrarEditorFavoritoLista() {
-  favoritoEditandoId = null;
-  document.getElementById("editorFavoritoLista").style.display = "none";
-}
-
-
 function editarFavoritoDesdeMapa(id) {
   const favorito = favoritos.find(f => f.id === id);
   if (!favorito) return;
@@ -525,18 +491,21 @@ function editarFavoritoDesdeMapa(id) {
   document.getElementById("toggleMenu").style.display = "none";
 
   // Abre el editor del favorito
-  mostrarEditorFavorito(id); // asegúrate de tener esta función
+  mostrarEditorFavoritoDesde("sidebar", id); // asegúrate de tener esta función
 }
 // Exponer al global:
+window.guardarLocal = GestorFavoritos.guardarLocal;
+window.cargarLocal = GestorFavoritos.cargarLocal;
+window.guardarFirebase = GestorFavoritos.guardarFirebase;
+window.borrarFirebase = GestorFavoritos.borrarFirebase;
+window.cargarDesdeFirebase = GestorFavoritos.cargarDesdeFirebase;
+window.cargarIgnorados = GestorFavoritos.cargarIgnorados;
+window.guardarEdicionFavoritoDesde = guardarEdicionFavoritoDesde;
+window.cerrarEditorFavoritoDesde = cerrarEditorFavoritoDesde;
+window.borrarFavoritoDesde = borrarFavoritoDesde;
+window.toggleFavorito = toggleFavorito;
 window.mostrarMarcadoresFavoritos = mostrarMarcadoresFavoritos;
-window.mostrarEditorFavorito = mostrarEditorFavorito;
-window.guardarEdicionFavorito = guardarEdicionFavorito;
-window.guardarEdicionFavoritoLista = guardarEdicionFavoritoLista;
-window.borrarFavorito = borrarFavorito;
-window.borrarFavoritoLista = borrarFavoritoLista;
-window.cerrarEditorFavorito = cerrarEditorFavorito;
-window.cerrarEditorFavoritoLista = cerrarEditorFavoritoLista;
-window.renderizarFavoritos = renderizarFavoritos;
-window.renderizarFavoritosEnSidebar = renderizarFavoritosEnSidebar
+window.renderizarFavoritosEn = renderizarFavoritosEn;
+window.mostrarEditorFavoritoDesde = mostrarEditorFavoritoDesde;
 window.editarFavoritoDesdeMapa = editarFavoritoDesdeMapa;
-window.cargarFavoritosDesdeFirebase = cargarFavoritosDesdeFirebase;
+window.guardarListas = guardarListas;

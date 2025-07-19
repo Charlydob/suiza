@@ -135,7 +135,7 @@ function actualizarUbicacionReal() {
 
       actualizarCirculo();
       actualizarBusquedaActiva();
-      renderizarFavoritos();
+      renderizarFavoritosEn("lista");
 
       document.getElementById("status").innerText = "";
     },

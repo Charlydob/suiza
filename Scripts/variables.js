@@ -70,10 +70,7 @@ let marcadoresFavoritos = [];
 
 
 // 💾 Guardar listas en Firebase y localStorage
-function guardarListas() {
-  db.ref(rutaFavoritos).set(favoritos);
-  localStorage.setItem("ignorados", JSON.stringify(ignorados));
-}
+
 
 //================= VARIABLES GLOBALES 👆 ===================//
 
