@@ -170,6 +170,7 @@ function cerrarEditorFavoritoDesde(origen) {
   }
 }
 function mostrarEditorFavoritoDesde(origen, id) {
+  console.log(`🛠️ Editor desde ${origen}, ID:`, id);
   const favorito = favoritos.find(f => f.id === id);
   if (!favorito) return;
 
