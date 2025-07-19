@@ -100,65 +100,115 @@ const GestorFavoritos = {
   }
 };
 function guardarEdicionFavoritoDesde(origen) {
-  if (!favoritoEditandoId) return;
+  console.log("📝 Guardando edición desde:", origen);
+  if (!favoritoEditandoId) {
+    console.warn("❌ No hay favorito editando (favoritoEditandoId es null)");
+    return;
+  }
 
   const favorito = favoritos.find(f => f.id === favoritoEditandoId);
-  if (!favorito) return;
+  if (!favorito) {
+    console.warn("❌ No se encontró el favorito en la lista con ID:", favoritoEditandoId);
+    return;
+  }
 
-  // Detectar si los campos son del sidebar o de la lista
   const sufijo = origen === "lista" ? "Lista" : "";
+  console.log("🔍 Usando sufijo:", sufijo);
 
-  const nombre = document.getElementById(`editNombre${sufijo}`).value.trim();
-  const precio = document.getElementById(`editPrecio${sufijo}`).value.trim();
-  const horario = document.getElementById(`editHorario${sufijo}`).value.trim();
-  const notas = document.getElementById(`editNotas${sufijo}`).value.trim();
+  const nombreInput = document.getElementById(`editNombre${sufijo}`);
+  const precioInput = document.getElementById(`editPrecio${sufijo}`);
+  const horarioInput = document.getElementById(`editHorario${sufijo}`);
+  const notasInput = document.getElementById(`editNotas${sufijo}`);
 
-  // Actualizar datos
+  if (!nombreInput || !precioInput || !horarioInput || !notasInput) {
+    console.error("❌ Uno o más inputs no se encontraron en el DOM");
+    console.log({ nombreInput, precioInput, horarioInput, notasInput });
+    return;
+  }
+
+  const nombre = nombreInput.value.trim();
+  const precio = precioInput.value.trim();
+  const horario = horarioInput.value.trim();
+  const notas = notasInput.value.trim();
+
+  console.log("✍️ Nuevos datos ingresados:", { nombre, precio, horario, notas });
+
   favorito.datosPersonalizados = { nombre, precio, horario, notas };
+  console.log("✅ Datos actualizados en objeto favorito:", favorito);
 
-  // Guardar local y en Firebase
-  GestorFavoritos.guardarLocal();
-  GestorFavoritos.guardarFirebase(favorito);
+  try {
+    GestorFavoritos.guardarLocal();
+    console.log("💾 Guardado en localStorage");
+  } catch (e) {
+    console.error("❌ Error al guardar en localStorage", e);
+  }
 
-  // Refrescar vistas
+  try {
+    GestorFavoritos.guardarFirebase(favorito);
+    console.log("☁️ Guardado en Firebase");
+  } catch (e) {
+    console.error("❌ Error al guardar en Firebase", e);
+  }
+
+  console.log("🔄 Refrescando vistas...");
   renderizarFavoritosEn("lista");
   renderizarFavoritosEn("sidebar");
   mostrarMarcadoresFavoritos?.();
 
-  // Cerrar el editor correspondiente
+  console.log("📦 Cerrando editor...");
   if (origen === "lista") {
     cerrarEditorFavoritoDesde("lista");
   } else {
     cerrarEditorFavoritoDesde("sidebar");
   }
 }
+
 function borrarFavoritoDesde(origen) {
-  if (!favoritoEditandoId) return;
+  console.log("🗑️ Borrando favorito desde:", origen);
+  if (!favoritoEditandoId) {
+    console.warn("❌ No hay favorito editando (favoritoEditandoId es null)");
+    return;
+  }
 
   const index = favoritos.findIndex(f => f.id === favoritoEditandoId);
-  if (index === -1) return;
+  if (index === -1) {
+    console.warn("❌ No se encontró el favorito en la lista con ID:", favoritoEditandoId);
+    return;
+  }
 
   const id = favoritos[index].id;
+  console.log("🗑️ Eliminando favorito con ID:", id);
 
-  // Eliminar de favoritos
   favoritos.splice(index, 1);
+  console.log("✅ Favorito eliminado del array local");
 
-  // Guardar local y borrar de Firebase
-  GestorFavoritos.guardarLocal();
-  GestorFavoritos.borrarFirebase(id);
+  try {
+    GestorFavoritos.guardarLocal();
+    console.log("💾 Guardado en localStorage");
+  } catch (e) {
+    console.error("❌ Error al guardar en localStorage", e);
+  }
 
-  // Refrescar vistas
+  try {
+    GestorFavoritos.borrarFirebase(id);
+    console.log("☁️ Eliminado de Firebase");
+  } catch (e) {
+    console.error("❌ Error al eliminar en Firebase", e);
+  }
+
+  console.log("🔄 Refrescando vistas tras eliminación...");
   renderizarFavoritosEn("lista");
   renderizarFavoritosEn("sidebar");
   mostrarMarcadoresFavoritos?.();
 
-  // Cerrar el editor adecuado
+  console.log("📦 Cerrando editor...");
   if (origen === "lista") {
     cerrarEditorFavoritoDesde("lista");
   } else {
     cerrarEditorFavoritoDesde("sidebar");
   }
 }
+
 function cerrarEditorFavoritoDesde(origen) {
   favoritoEditandoId = null;
 
