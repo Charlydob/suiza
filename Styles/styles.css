@@ -1,50 +1,25 @@
-
-
-
 html, body {
   margin: 0;
   padding: 0;
   height: 100%;
-  overflow: hidden; /* ← bloquea scroll de página */
-  touch-action: none; /* ← bloquea zoom accidental */
+  font-family: 'Inter', system-ui, sans-serif;
+  background-color: #f5f5f5;
+  color: #333;
 }
-
 #pagina-mapa {
-  position: fixed; /* ← CAMBIO CLAVE */
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+}
+#map {
+  height: 100%;
+  width: 100%;
+  position: absolute;
   top: 0;
   left: 0;
-  width: 100vw;
-  height: 100dvh;
-  overflow: hidden;
   z-index: 1;
 }
-
-#map {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  touch-action: auto; /* ← muy importante para permitir mover el mapa */
-  z-index: 0;
-}
-
-.pagina {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100dvh;
-  overflow: hidden;
-}
-
-/* Solo permitir scroll donde lo necesites (como el itinerario): */
-#pagina-itinerario {
-  overflow-y: auto;
-  padding: 2rem; /* OK aquí porque ya controlas el scroll */
-}
-
-
 
 
 #controls {
