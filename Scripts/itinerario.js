@@ -1,285 +1,313 @@
-document.addEventListener("DOMContentLoaded", () => {
-  const btnNuevoEvento = document.getElementById("btn-nuevo-evento");
-  const modal = document.getElementById("modal-edicion-evento");
-  const tipoEntrada = document.getElementById("tipoEntrada");
-  const formManual = document.getElementById("formManual");
-  const formFavorito = document.getElementById("formFavorito");
-  const selectorFavoritos = document.getElementById("selectorFavoritos");
+// JS DE ITINERARIO
 
-  // Abrir el modal
-  btnNuevoEvento.addEventListener("click", () => {
-    abrirModalEdicion();
-  });
+(function() {
+  const contenedorUbicaciones = document.getElementById("contenedor-ubicaciones-itinerario");
+  const botonNuevaUbicacion = document.getElementById("btn-nueva-ubicacion");
+  const modalFondo = document.getElementById("modal-fondo");
+  const modalContenido = document.getElementById("modal-contenido");
 
-  // Cambiar entre modos
-  tipoEntrada.addEventListener("change", () => {
-    const tipo = tipoEntrada.value;
-    formManual.style.display = tipo === "manual" ? "block" : "none";
-    formFavorito.style.display = tipo === "favorito" ? "block" : "none";
-  });
-
-  // Cargar favoritos en el desplegable
-  cargarFavoritosEnSelector();
-
-  // 👇 Eventualmente podríamos renderizar el itinerario completo aquí
-  // renderizarItinerario();
-});
-
-function abrirModalEdicion() {
-  document.getElementById("modal-edicion-evento").style.display = "block";
-}
-
-function cerrarModalEdicion() {
-  document.getElementById("modal-edicion-evento").style.display = "none";
-}
-
-function cargarFavoritosEnSelector() {
-  const selector = document.getElementById("selectorFavoritos");
-  selector.innerHTML = "";
-
-  if (!Array.isArray(favoritos) || favoritos.length === 0) {
-    const opt = document.createElement("option");
-    opt.textContent = "No hay favoritos";
-    selector.appendChild(opt);
-    return;
+  function mostrarModal(html) {
+    modalContenido.innerHTML = html;
+    modalFondo.style.display = "flex";
   }
+  window.mostrarModal = mostrarModal;
 
-  // Ordenar por nombre alfabéticamente
-  const favoritosOrdenados = [...favoritos].sort((a, b) => {
-    const nA = a.datosPersonalizados?.nombre?.toLowerCase() || "";
-    const nB = b.datosPersonalizados?.nombre?.toLowerCase() || "";
-    return nA.localeCompare(nB);
+  function cerrarModal() {
+    modalFondo.style.display = "none";
+    modalContenido.innerHTML = "";
+  }
+  window.cerrarModal = cerrarModal;
+
+  function crearUbicacion(nombreUbicacion) {
+    const template = document.getElementById("template-ubicacion").content.cloneNode(true);
+    template.querySelector(".titulo-ubicacion").textContent = nombreUbicacion;
+
+    const seccion = template.querySelector(".seccion-ubicacion");
+    const contenedorDias = template.querySelector(".contenedor-dias");
+    const btnAgregarDia = template.querySelector(".btn-agregar-dia");
+
+    btnAgregarDia.addEventListener("click", () => mostrarFormularioDia(contenedorDias));
+
+    contenedorUbicaciones.appendChild(template);
+
+    console.log("✅ Se creó una ubicación:", nombreUbicacion);
+    guardarItinerarioLocal();
+guardarItinerarioFirebase();
+
+    return seccion;
+  }
+  window.crearUbicacion = crearUbicacion;
+
+  botonNuevaUbicacion.addEventListener("click", () => {
+    mostrarModal(`
+      <div class="modal-formulario">
+    <h3>¿Dónde empezamos?</h3>
+    <input type="text" id="input-nueva-ubicacion" placeholder="Introduce una ubicación">
+    <div>
+      <button onclick="guardarNuevaUbicacion()">Crear</button>
+      <button onclick="cerrarModal()">Cancelar</button>
+    </div>
+  </div>
+    `);
   });
 
-  favoritosOrdenados.forEach(f => {
-    const nombre = f.datosPersonalizados?.nombre || f.id;
-    const option = document.createElement("option");
-    option.value = f.id;
-    option.textContent = nombre;
-    selector.appendChild(option);
-  });
-}
-function guardarEventoDesdeModal() {
-  const tipoEntrada = document.getElementById("tipoEntrada").value;
-  console.log("📝 Tipo de entrada seleccionada:", tipoEntrada);
-
-  let evento = null;
-
-  if (tipoEntrada === "manual") {
-    const nombre = document.getElementById("eventoNombre").value.trim();
-    const ubicacion = document.getElementById("eventoUbicacion").value.trim();
-    const categoria = document.getElementById("eventoCategoria").value;
-    const hora = document.getElementById("eventoHora").value;
-    const notas = document.getElementById("eventoNotas").value.trim();
-    const dia = document.getElementById("eventoDia").value;
-
-    console.log("🧾 Datos manuales:", { nombre, ubicacion, categoria, hora, notas, dia });
-
-    if (!nombre || !ubicacion || !categoria || !dia) {
-      alert("Faltan datos obligatorios.");
-      return;
+  function guardarNuevaUbicacion() {
+    const input = document.getElementById("input-nueva-ubicacion");
+    const nombre = input.value.trim();
+    if (nombre) {
+      crearUbicacion(nombre);
+      cerrarModal();
+    } else {
+      alert("Introduce un nombre válido.");
     }
+  }
+  window.guardarNuevaUbicacion = guardarNuevaUbicacion;
 
-    evento = {
-      id: `evento_${Date.now()}`,
-      categoria,
-      nombre,
-      ubicacion,
-      hora,
-      notas,
-      dia
-    };
+  function mostrarFormularioDia(contenedorDias) {
+    mostrarModal(`
+      <div class="modal-formulario">
+    <h3>¿Qué día?</h3>
+    <input type="date" id="input-nuevo-dia">
+    <div>
+      <button onclick="guardarNuevoDia()">Guardar</button>
+      <button onclick="cerrarModal()">Cancelar</button>
+    </div>
+  </div>
+    `);
+    window._contenedorDiasActual = contenedorDias;
   }
 
-  if (tipoEntrada === "favorito") {
-    const favoritoId = document.getElementById("selectorFavoritos").value;
-    const dia = document.getElementById("favoritoDia").value;
-    const favorito = favoritos.find(f => f.id === favoritoId);
+  function guardarNuevoDia() {
+    const fecha = document.getElementById("input-nuevo-dia").value;
+    if (fecha) {
+      const contenedor = window._contenedorDiasActual;
+      const template = document.getElementById("template-dia").content.cloneNode(true);
+      template.querySelector(".titulo-dia").textContent = fecha;
 
-    console.log("📦 Importando favorito:", favoritoId, favorito);
+      const btnAgregarEvento = template.querySelector(".btn-agregar-evento");
+      const carousel = template.querySelector(".carousel-dia");
 
-    if (!favorito || !dia) {
-      alert("Seleccioná un favorito válido y un día.");
-      return;
+      btnAgregarEvento.addEventListener("click", () => mostrarFormularioEvento(carousel));
+
+      contenedor.appendChild(template);
+      guardarItinerarioLocal();
+guardarItinerarioFirebase();
+
+      cerrarModal();
+
+      console.log("📅 Día creado:", fecha);
+    } else {
+      alert("Selecciona una fecha válida.");
     }
+  }
+  window.guardarNuevoDia = guardarNuevoDia;
 
-    evento = {
-      id: `evento_${Date.now()}`,
-      categoria: favorito.tipo || "otros",
-      nombre: favorito.datosPersonalizados?.nombre || favorito.id,
-      ubicacion: favorito.ubicacion || "Ubicación desconocida",
-      hora: "", // No se extrae hora del favorito
-      notas: favorito.datosPersonalizados?.notas || "",
-      dia
-    };
+  function mostrarFormularioEvento(carousel) {
+    mostrarModal(`
+      <div class="modal-formulario">
+    <h3>¿Qué deseas añadir?</h3>
+    <select id="selector-tipo">
+      <option value="evento">Evento</option>
+      <option value="favorito">Favorito</option>
+    </select>
+    <div>
+      <button onclick="seleccionarTipoEvento()">Continuar</button>
+      <button onclick="cerrarModal()">Cancelar</button>
+    </div>
+  </div>
+    `);
+    window._carouselActual = carousel;
   }
 
-  if (!evento) {
-    console.warn("❌ No se pudo crear el evento.");
-    return;
-  }
+  window.seleccionarTipoEvento = function() {
+    const tipo = document.getElementById("selector-tipo").value;
+    cerrarModal();
+    if (tipo === "favorito") mostrarSelectorFavoritos();
+    else mostrarEditorEvento();
+  };
 
-  console.log("✅ Evento listo para guardar:", evento);
-
-  // Guardar en Firebase
-  const ref = db.ref(`itinerario/${evento.dia}/${evento.id}`);
-  ref.set(evento)
-    .then(() => {
-      console.log("☁️ Evento guardado en Firebase");
-      cerrarModalEdicion();
-      renderizarItinerario(); // volver a cargar todo el itinerario
-    })
-    .catch(err => {
-      console.error("❌ Error al guardar el evento en Firebase:", err);
-    });
+  function mostrarSelectorFavoritos() {
+  mostrarModal(`
+    <div class="modal-formulario">
+      <h3>Selecciona un favorito</h3>
+      <select id="selector-favorito">
+        <option>Hotel Interlaken</option>
+        <option>Restaurante Adler</option>
+      </select>
+      <input type="time" id="hora-favorito" placeholder="Hora (opcional)">
+      <div>
+        <button onclick="guardarFavoritoSeleccionado()">Añadir</button>
+        <button onclick="cerrarModal()">Cancelar</button>
+      </div>
+    </div>
+  `);
 }
-diasOrdenados.forEach(dia => {
-  const eventos = Object.values(data[dia]);
 
-  const diaDiv = document.createElement("div");
-  diaDiv.className = "dia-itinerario";
-  diaDiv.dataset.dia = dia;
 
-  const tituloDia = document.createElement("h3");
-  tituloDia.textContent = formatearFecha(dia);
-  diaDiv.appendChild(tituloDia);
+window.guardarFavoritoSeleccionado = function() {
+  const titulo = document.getElementById("selector-favorito").value;
+  const hora = document.getElementById("hora-favorito").value;
+  crearTarjeta(titulo, "favorito", hora, "");
+  guardarItinerarioLocal();
+guardarItinerarioFirebase();
 
-  // 🔵 Permitir soltar tarjetas aquí 👇
-  diaDiv.addEventListener("dragover", e => {
-    e.preventDefault(); // Necesario para permitir drop
-    diaDiv.style.backgroundColor = "#eef"; // opcional: feedback
-  });
+  cerrarModal();
+};
 
-  diaDiv.addEventListener("dragleave", () => {
-    diaDiv.style.backgroundColor = "";
-  });
+  function mostrarEditorEvento() {
+    mostrarModal(`
+      <div class="modal-formulario">
+    <h3>Nuevo evento</h3>
+    <input id="titulo-evento" placeholder="Título">
+    <input id="hora-evento" type="time">
+    <select id="etiqueta-evento">
+      <option value="alojamiento">Alojamiento</option>
+      <option value="transporte">Transporte</option>
+      <option value="comida">Comida</option>
+      <option value="atraccion">Atracción</option>
+      <option value="otros">Otros</option>
+    </select>
+    <textarea id="notas-evento" placeholder="Notas"></textarea>
+    <div>
+      <button onclick="guardarNuevoEvento()">Guardar</button>
+      <button onclick="cerrarModal()">Cancelar</button>
+    </div>
+  </div>
+    `);
+  }
 
-  diaDiv.addEventListener("drop", e => {
-    e.preventDefault();
-    diaDiv.style.backgroundColor = "";
+window.guardarNuevoEvento = function() {
+  const titulo = document.getElementById("titulo-evento").value;
+  const hora = document.getElementById("hora-evento").value;
+  const notas = document.getElementById("notas-evento").value;
+  crearTarjeta(titulo, "evento", hora, notas);
+  guardarItinerarioLocal();
+guardarItinerarioFirebase();
 
-    const data = e.dataTransfer.getData("text/plain");
-    if (!data) return;
+  cerrarModal();
+};
 
-    const evento = JSON.parse(data);
-    const nuevoDia = diaDiv.dataset.dia;
+  function parseHora(hora) {
+  if (!hora) return null;
+  const [h, m] = hora.split(":").map(Number);
+  return h * 60 + m;
+}
 
-    console.log(`📥 Evento ${evento.id} soltado en ${nuevoDia}`);
+function crearTarjeta(titulo, tipo, hora = null, notas = "") {
+  const template = document.getElementById("template-tarjeta-itinerario").content.cloneNode(true);
+  const tarjeta = template.querySelector(".tarjeta-itinerario");
+  const etiqueta = tarjeta.querySelector(".etiqueta-evento");
+  const strong = tarjeta.querySelector(".titulo-evento");
 
-    if (evento.dia === nuevoDia) {
-      console.log("↪️ Mismo día. No se mueve.");
-      return;
+  strong.textContent = titulo;
+
+  let textoEtiqueta = tipo === "evento" ? "Evento" : "Favorito";
+  if (hora) {
+    tarjeta.setAttribute("data-hora", hora);
+    textoEtiqueta += ` · ${hora}`;
+  }
+
+  etiqueta.textContent = textoEtiqueta;
+
+  // Extra: guardar notas en atributo para futuro modal de edición
+  if (notas) {
+    tarjeta.setAttribute("data-notas", notas);
+    tarjeta.title = notas; // tooltip básico
+  }
+
+  const contenedor = window._carouselActual;
+  const nuevaHora = parseHora(hora);
+
+  let insertado = false;
+  const tarjetas = contenedor.querySelectorAll(".tarjeta-itinerario");
+
+  for (let t of tarjetas) {
+    const horaExistente = t.getAttribute("data-hora");
+    if (horaExistente) {
+      const horaNum = parseHora(horaExistente);
+      if (nuevaHora !== null && nuevaHora < horaNum) {
+        contenedor.insertBefore(tarjeta, t);
+        insertado = true;
+        break;
+      }
     }
+  }
 
-    const refAntiguo = db.ref(`itinerario/${evento.dia}/${evento.id}`);
-    const refNuevo = db.ref(`itinerario/${nuevoDia}/${evento.id}`);
+  if (!insertado) contenedor.appendChild(tarjeta);
 
-    refAntiguo.remove()
-      .then(() => {
-        evento.dia = nuevoDia;
-        return refNuevo.set(evento);
-      })
-      .then(() => {
-        console.log("✅ Evento movido con éxito");
-        renderizarItinerario();
-      })
-      .catch(err => {
-        console.error("❌ Error al mover evento:", err);
-      });
-  });
-  // 🔵 Hasta aquí el bloque DnD
-
-  eventos.sort((a, b) => (a.hora || "").localeCompare(b.hora || ""));
-
-  eventos.forEach(ev => {
-    const tarjeta = crearTarjetaEvento(ev);
-    diaDiv.appendChild(tarjeta);
-  });
-
-  contenedor.appendChild(diaDiv);
-});
-
-function crearTarjetaEvento(ev) {
-  const tarjeta = document.createElement("div");
-  tarjeta.className = `evento-tarjeta categoria-${ev.categoria}`;
-  tarjeta.dataset.id = ev.id;
-  tarjeta.dataset.dia = ev.dia;
-  tarjeta.draggable = true; // ✅ Esto es clave
-
-  tarjeta.addEventListener("click", () => {
-    mostrarDetalleEvento(ev);
-  });
-
-  // 🟢 Drag start
-  tarjeta.addEventListener("dragstart", e => {
-    e.dataTransfer.setData("text/plain", JSON.stringify(ev));
-    console.log("🚚 Drag iniciado:", ev.id);
-  });
-
-  // Contenido visible
-  const nombre = document.createElement("strong");
-  nombre.textContent = ev.nombre;
-
-  const ubicacion = document.createElement("span");
-  ubicacion.textContent = ev.ubicacion;
-
-  const categoria = document.createElement("span");
-  categoria.className = "evento-categoria";
-  categoria.textContent = ev.categoria;
-
-  tarjeta.appendChild(nombre);
-  tarjeta.appendChild(ubicacion);
-  tarjeta.appendChild(categoria);
-
+  console.log(`🧩 ${tipo} añadido:`, titulo, hora || "(sin hora)");
   return tarjeta;
 }
 
-function formatearFecha(fechaISO) {
-  const fecha = new Date(fechaISO);
-  return fecha.toLocaleDateString("es-ES", {
-    weekday: "long", day: "numeric", month: "long"
-  });
+
+
+
+  window.crearTarjeta = crearTarjeta;
+})();
+
+let itinerarioData = [];
+
+function guardarItinerarioLocal() {
+  try {
+    localStorage.setItem("itinerarioData", JSON.stringify(itinerarioData));
+    console.log("💾 Itinerario guardado en localStorage.");
+  } catch (err) {
+    console.error("❌ Error al guardar en localStorage:", err);
+  }
 }
-function mostrarDetalleEvento(ev) {
-  console.log("👁️ Mostrando detalle del evento:", ev);
+window.guardarItinerarioLocal = guardarItinerarioLocal;
 
-  const detalle = document.getElementById("detalleEvento");
-  const contenido = document.getElementById("detalleContenidoEvento");
-
-  // Ocultar itinerario
-  document.getElementById("pagina-itinerario").style.display = "none";
-  detalle.style.display = "block";
-  contenido.innerHTML = ""; // Limpiar vista anterior
-
-  // Crear elementos
-  const titulo = document.createElement("h2");
-  titulo.textContent = ev.nombre;
-
-  const categoria = document.createElement("p");
-  categoria.innerHTML = `<strong>Categoría:</strong> ${ev.categoria}`;
-
-  const ubicacion = document.createElement("p");
-  ubicacion.innerHTML = `<strong>Ubicación:</strong> ${ev.ubicacion}`;
-
-  const hora = document.createElement("p");
-  hora.innerHTML = `<strong>Hora:</strong> ${ev.hora || "Sin hora definida"}`;
-
-  const notas = document.createElement("p");
-  notas.innerHTML = `<strong>Notas:</strong> ${ev.notas || "Sin observaciones"}`;
-
-  const dia = document.createElement("p");
-  dia.innerHTML = `<strong>Día:</strong> ${formatearFecha(ev.dia)}`;
-
-  // Append
-  contenido.appendChild(titulo);
-  contenido.appendChild(dia);
-  contenido.appendChild(categoria);
-  contenido.appendChild(ubicacion);
-  contenido.appendChild(hora);
-  contenido.appendChild(notas);
+function cargarItinerarioLocal() {
+  try {
+    const data = localStorage.getItem("itinerarioData");
+    if (data) {
+      itinerarioData = JSON.parse(data);
+      renderizarItinerario();
+      console.log("📥 Itinerario cargado desde localStorage.");
+    }
+  } catch (err) {
+    console.error("❌ Error al cargar de localStorage:", err);
+  }
 }
-function cerrarDetalleEvento() {
-  document.getElementById("detalleEvento").style.display = "none";
-  document.getElementById("pagina-itinerario").style.display = "block";
-  console.log("↩️ Volviendo al itinerario");
+window.cargarItinerarioLocal = cargarItinerarioLocal;
+
+function guardarItinerarioFirebase() {
+  if (!navigator.onLine || typeof db === "undefined") {
+    console.warn("📴 Sin conexión, no se guarda en Firebase.");
+    return;
+  }
+
+  db.ref(window.rutaItinerario).set(itinerarioData)
+    .then(() => console.log("☁️ Itinerario guardado en Firebase"))
+    .catch(err => console.error("❌ Error al guardar en Firebase:", err));
 }
+window.guardarItinerarioFirebase = guardarItinerarioFirebase;
+
+function cargarItinerarioFirebase() {
+  if (!navigator.onLine || typeof db === "undefined") {
+    console.warn("📴 Sin conexión, no se carga de Firebase.");
+    return;
+  }
+
+  db.ref(window.rutaItinerario).once("value")
+    .then(snapshot => {
+      const data = snapshot.val();
+      if (data) {
+        itinerarioData = data;
+        renderizarItinerario();
+        guardarItinerarioLocal(); // backup
+        console.log("📥 Itinerario cargado desde Firebase.");
+      }
+    })
+    .catch(err => console.error("❌ Error al cargar de Firebase:", err));
+}
+window.cargarItinerarioFirebase = cargarItinerarioFirebase;
+
+document.addEventListener("DOMContentLoaded", () => {
+  if (navigator.onLine) {
+    cargarItinerarioFirebase();
+  } else {
+    cargarItinerarioLocal();
+  }
+});
+

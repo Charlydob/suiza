@@ -168,63 +168,51 @@
     </section>
 <!--🟨🟨🟨🟨 ITINERARIO 🟨🟨🟨🟨-->
 <section id="pagina-itinerario" class="pagina" style="display: none;">
-  <h2>🗓️ Itinerario</h2>
-  <p>Planificá día por día lo que haréis en Suiza.</p>
+  <h2 class="titulo-itinerario">🗓️ ITINERARIO</h2>
+  <p class="subtitulo-itinerario">Crea tu itinerario.</p>
 
-  <div id="contenedor-dias-itinerario">
-    <!-- Aquí se renderizarán los días y tarjetas -->
-  </div>
+  <!-- Contenedor principal de secciones de ubicaciones -->
+  <div id="contenedor-ubicaciones-itinerario"></div>
 
-  <!-- Botón flotante para añadir -->
-  <button id="btn-nuevo-evento" class="boton-flotante">＋</button>
+  <!-- Botón flotante para añadir nueva ubicación -->
+  <button id="btn-nueva-ubicacion" class="boton-flotante">＋</button>
 </section>
 
-<!-- 📝 Modal de edición/creación -->
-<div id="modal-edicion-evento" class="modal-oculto">
-  <div class="modal-contenido">
-    <h3>Nuevo elemento del itinerario</h3>
-    
-    <label for="tipoEntrada">¿Qué quieres añadir</label>
-    <select id="tipoEntrada">
-      <option value="manual">Crear manualmente</option>
-      <option value="favorito">Importar desde favoritos</option>
-    </select>
-
-    <div id="formManual" class="formulario-tipo">
-      <input type="text" id="eventoNombre" placeholder="Nombre del evento">
-      <input type="text" id="eventoUbicacion" placeholder="Ubicación">
-      <select id="eventoCategoria">
-        <option value="transporte">Transporte</option>
-        <option value="alojamiento">Alojamiento</option>
-        <option value="visita">Visita</option>
-        <option value="comida">Comida</option>
-        <option value="otros">Otros</option>
-      </select>
-      <input type="time" id="eventoHora">
-      <textarea id="eventoNotas" placeholder="Notas..."></textarea>
-      <input type="date" id="eventoDia">
+<!-- TEMPLATE: Sección de Ubicación -->
+<template id="template-ubicacion">
+  <div class="seccion-ubicacion">
+    <div class="header-ubicacion">
+      <h2 class="titulo-ubicacion"></h2>
     </div>
+    <div class="contenedor-dias"></div>
+    <button class="btn-agregar-dia">＋</button>
+  </div>
+</template>
 
-    <div id="formFavorito" class="formulario-tipo" style="display: none;">
-      <label for="selectorFavoritos">Elegí un favorito:</label>
-      <select id="selectorFavoritos">
-        <!-- Se rellenará con opciones dinámicamente -->
-      </select>
-      <input type="date" id="favoritoDia">
-    </div>
+<!-- TEMPLATE: Día dentro de una ubicación -->
+<template id="template-dia">
+  <div class="dia-itinerario">
+    <h3 class="titulo-dia"></h3>
+    <div class="carousel-dia"></div>
+    <button class="btn-agregar-evento">＋</button>
+  </div>
+</template>
 
-    <div class="botones-modal">
-      <button onclick="guardarEventoDesdeModal()">💾 Guardar</button>
-      <button onclick="cerrarModalEdicion()">❌ Cancelar</button>
+<!-- TEMPLATE: Tarjeta de evento o favorito -->
+<template id="template-tarjeta-itinerario">
+  <div class="tarjeta-itinerario">
+    <span class="etiqueta-evento"></span>
+    <button class="checkbox-itinerario"></button>
+    <div class="info-tarjeta">
+      <strong class="titulo-evento"></strong>
     </div>
   </div>
-</div>
+</template>
 
-<!-- 🔍 Vista detalle a pantalla completa -->
-<div id="detalleEvento" class="modal-oculto">
-  <!-- Aquí se rellena dinámicamente el detalle completo -->
+<!-- MODALES DINÁMICOS -->
+<div id="modal-fondo" style="display:none">
+  <div id="modal-contenido"></div>
 </div>
-
 <!--🟨🟨🟨🟨 FAVORITOS 🟨🟨🟨🟨-->
     <section id="pagina-favoritos" class="pagina" style="display: none;">
       <h2>⭐ Favoritos</h2>
