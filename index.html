@@ -145,20 +145,26 @@
 
       </div>
       <!-- 📝 Editor de Favorito -->
-      <div id="editorFavorito" style="display: none; padding: 10px;">
-        <h3>Editar lugar</h3>
-        <label>Nombre personalizado:</label>
-        <input type="text" id="editNombre"><br><br>
-        <label>Precio:</label>
-        <input type="text" id="editPrecio"><br><br>
-        <label>Horario:</label>
-        <input type="text" id="editHorario"><br><br>
-        <label>Observaciones:</label>
-        <textarea id="editNotas" rows="3"></textarea><br><br>
-        <button onclick="guardarEdicionFavoritoDesde('sidebar')">💾 Guardar</button>
-        <button onclick="borrarFavoritoDesde('sidebar')">🗑️ Eliminar</button>
-        <button onclick="cerrarEditorFavoritoDesde('sidebar')">❌ Cancelar</button>
-      </div>
+      <!-- MODAL DEL EDITOR DE FAVORITOS -->
+<!-- MODAL EDITOR DE FAVORITO DESDE SIDEBAR -->
+<div id="modal-fondo-favoritos" style="display: none;">
+  <div id="modal-contenido-favoritos" class="editor-favorito">
+    <h3>Editar lugar</h3>
+    <label>Nombre personalizado:</label>
+    <input type="text" id="editNombre">
+    <label>Precio:</label>
+    <input type="text" id="editPrecio">
+    <label>Horario:</label>
+    <input type="text" id="editHorario">
+    <label>Observaciones:</label>
+    <textarea id="editNotas" rows="3"></textarea>
+    <button onclick="guardarEdicionFavoritoDesde('sidebar')">💾 Guardar</button>
+    <button onclick="borrarFavoritoDesde('sidebar')">🗑️ Eliminar</button>
+    <button onclick="cerrarEditorFavoritoDesde('sidebar')">❌ Cancelar</button>
+  </div>
+</div>
+
+
     </div>
 
       <button id="closeSidebar">‹</button>
@@ -263,7 +269,7 @@
             </div>
                   </div>
       <!-- 📝 Editor de Favorito -->
-      <div id="editorFavoritoLista" style="display: none; padding: 10px;">
+      <div id="editorFavoritoLista" class="editor-favorito" style="display: none;">
         <h3>Editar lugar</h3>
         <label>Nombre personalizado:</label>
         <input type="text" id="editNombreLista"><br><br>

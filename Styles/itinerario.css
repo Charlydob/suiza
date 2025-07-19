@@ -1,6 +1,7 @@
 #pagina-itinerario {
   padding: 1rem;
   font-family: 'Arial', sans-serif;
+  
 }
 
 #pagina-itinerario .titulo-itinerario,
@@ -11,35 +12,37 @@
 
 #pagina-itinerario .boton-flotante {
   position: fixed;
-  bottom: 1rem;
-  right: 1rem;
+  bottom: 80px;
+  right: 16px;
   background-color: #007aff;
   color: white;
   border: none;
   border-radius: 50%;
-  width: 50px;
-  height: 50px;
-  font-size: 16px;
+  width: 56px;
+  height: 56px;
+  font-size: 28px;
+  line-height: 56px;
+  text-align: center;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
   cursor: pointer;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
   z-index: 10;
 }
 
 #pagina-itinerario .seccion-ubicacion {
-  margin-bottom: 1rem;
-  background-color: #f9f9f9;
-  border-radius: 10px;
-  padding: 1rem;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+  margin-bottom: 20px;
+  padding: 16px;
 }
 
 #pagina-itinerario .header-ubicacion {
-  border-bottom: 1px solid #ddd;
-  margin-bottom: 1rem;
+  border-bottom: 1px solid #eee;
+  margin-bottom: 12px;
 }
 
 #pagina-itinerario .titulo-ubicacion {
-  font-size: 16px;
+  font-size: 18px;
   font-weight: bold;
   margin: 0;
 }
@@ -47,16 +50,15 @@
 #pagina-itinerario .btn-agregar-dia,
 #pagina-itinerario .btn-agregar-evento {
   display: block;
-  margin: 1rem auto;
+  margin: 12px auto 0;
+  width: 55%;
+  height: 40px;
   font-size: 16px;
-  background: transparent;
-  border: 2px dashed #ccc;
-  border-radius: 8px;
-  width: 100%;
-  height: 60px;
-  cursor: pointer;
-  color: #888;
-  transition: border 0.2s;
+  color: #007aff;
+  background-color: #f4f6f8;
+  border: 1px dashed #ccc;
+  border-radius: 10px;
+  transition: all 0.2s ease;
 }
 
 #pagina-itinerario .btn-agregar-dia:hover,
@@ -66,7 +68,7 @@
 }
 
 #pagina-itinerario .dia-itinerario {
-  margin-top: 1rem;
+  margin-top: 0.2rem;
 }
 
 #pagina-itinerario .titulo-dia {
@@ -77,8 +79,9 @@
 #pagina-itinerario .carousel-dia {
   display: flex;
   overflow-x: auto;
-  gap: 1rem;
-  padding: 0.5rem 0;
+  gap: 12px;
+  padding-bottom: 12px;
+  scrollbar-width: none; 
 }
 
 #pagina-itinerario .tarjeta-itinerario {
@@ -87,7 +90,7 @@
   height: 80px;
   background: white;
   border-radius: 12px;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+  box-shadow: 2px 2px 2px 2px rgba(0.1,0.1,0.1,0.1);
   position: relative;
   padding: 0.5rem;
   display: flex;
@@ -114,31 +117,60 @@
   cursor: pointer;
 }
 
-#pagina-itinerario .modal-formulario {
+ .modal-formulario {
   background: white;
-  padding: 1rem;
-  border-radius: 10px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-  width: 95%;
-  max-width: 400px;
+  border-radius: 12px;
+  padding: 20px;
+  width: 90%;
+  max-width: 360px;
   margin: auto;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.25);
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 16px;
   text-align: center;
 }
 
-#pagina-itinerario #modal-fondo {
+#modal-fondo {
   position: fixed;
   top: 0;
   left: 0;
-  width: 95%;
-  max-width: 400px;
-  padding: 1rem;
-  height: 100vh;
-  background-color: rgba(0, 0, 0, 0.4);
+  width: 100%;
+  height: 100%;
+  padding: 0px;
+  background-color: rgba(0, 0, 0, 0.233);
+  backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 100;
+}
+body, html {
+  overflow-y: auto !important;
+  height: auto !important;
+}
+
+.pagina {
+  min-height: 100vh;
+  overflow-y: auto;
+}
+.color-alojamiento {
+  background-color: #68ff547c !important; /* verde */
+}
+
+.color-transporte {
+  background-color: #4dd1e95b !important; /* azul */
+}
+
+.color-comida {
+   background-color: #ffbb547c !important; /* naranja */
+}
+
+.color-atraccion {
+  background-color:  #bc80c746 !important; /* morado */
+  backdrop-filter: blur(2px) !important;
+}
+
+.color-otros {
+  background-color: #ff54547c !important; /* gris */
 }

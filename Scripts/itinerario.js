@@ -126,7 +126,7 @@ guardarItinerarioFirebase();
     else mostrarEditorEvento();
   };
 
-  function mostrarSelectorFavoritos() {
+function mostrarSelectorFavoritos() {
   mostrarModal(`
     <div class="modal-formulario">
       <h3>Selecciona un favorito</h3>
@@ -135,6 +135,13 @@ guardarItinerarioFirebase();
         <option>Restaurante Adler</option>
       </select>
       <input type="time" id="hora-favorito" placeholder="Hora (opcional)">
+      <select id="etiqueta-favorito">
+        <option value="alojamiento">Alojamiento</option>
+        <option value="transporte">Transporte</option>
+        <option value="comida">Comida</option>
+        <option value="atraccion">Atracción</option>
+        <option value="otros">Otros</option>
+      </select>
       <div>
         <button onclick="guardarFavoritoSeleccionado()">Añadir</button>
         <button onclick="cerrarModal()">Cancelar</button>
@@ -147,12 +154,15 @@ guardarItinerarioFirebase();
 window.guardarFavoritoSeleccionado = function() {
   const titulo = document.getElementById("selector-favorito").value;
   const hora = document.getElementById("hora-favorito").value;
-  crearTarjeta(titulo, "favorito", hora, "");
+  const etiqueta = document.getElementById("etiqueta-favorito").value;
+
+  crearTarjeta(titulo, "favorito", hora, "", etiqueta);
   guardarItinerarioLocal();
-guardarItinerarioFirebase();
+  guardarItinerarioFirebase();
 
   cerrarModal();
 };
+
 
   function mostrarEditorEvento() {
     mostrarModal(`
@@ -180,8 +190,8 @@ window.guardarNuevoEvento = function() {
   const titulo = document.getElementById("titulo-evento").value;
   const hora = document.getElementById("hora-evento").value;
   const notas = document.getElementById("notas-evento").value;
-  crearTarjeta(titulo, "evento", hora, notas);
-  guardarItinerarioLocal();
+  const etiqueta = document.getElementById("etiqueta-evento").value;
+crearTarjeta(titulo, "evento", hora, notas, etiqueta);  guardarItinerarioLocal();
 guardarItinerarioFirebase();
 
   cerrarModal();
@@ -193,7 +203,7 @@ guardarItinerarioFirebase();
   return h * 60 + m;
 }
 
-function crearTarjeta(titulo, tipo, hora = null, notas = "") {
+function crearTarjeta(titulo, tipo, hora = null, notas = "", etiquetaEvento = "") {
   const template = document.getElementById("template-tarjeta-itinerario").content.cloneNode(true);
   const tarjeta = template.querySelector(".tarjeta-itinerario");
   const etiqueta = tarjeta.querySelector(".etiqueta-evento");
@@ -201,23 +211,43 @@ function crearTarjeta(titulo, tipo, hora = null, notas = "") {
 
   strong.textContent = titulo;
 
+  // Establecer etiqueta visual
   let textoEtiqueta = tipo === "evento" ? "Evento" : "Favorito";
   if (hora) {
     tarjeta.setAttribute("data-hora", hora);
     textoEtiqueta += ` · ${hora}`;
   }
-
   etiqueta.textContent = textoEtiqueta;
 
-  // Extra: guardar notas en atributo para futuro modal de edición
+  // Guardar notas si hay
   if (notas) {
     tarjeta.setAttribute("data-notas", notas);
-    tarjeta.title = notas; // tooltip básico
+    tarjeta.title = notas;
   }
 
+  // Aplicar color según etiqueta
+  let claseColor = "";
+  switch (etiquetaEvento) {
+    case "alojamiento":
+      claseColor = "color-alojamiento";
+      break;
+    case "transporte":
+      claseColor = "color-transporte";
+      break;
+    case "comida":
+      claseColor = "color-comida";
+      break;
+    case "atraccion":
+      claseColor = "color-atraccion";
+      break;
+    default:
+      claseColor = "color-otros";
+  }
+  tarjeta.classList.add(claseColor);
+
+  // Insertar ordenado por hora
   const contenedor = window._carouselActual;
   const nuevaHora = parseHora(hora);
-
   let insertado = false;
   const tarjetas = contenedor.querySelectorAll(".tarjeta-itinerario");
 
@@ -236,8 +266,40 @@ function crearTarjeta(titulo, tipo, hora = null, notas = "") {
   if (!insertado) contenedor.appendChild(tarjeta);
 
   console.log(`🧩 ${tipo} añadido:`, titulo, hora || "(sin hora)");
+
+  // Evento para abrir el modal de edición
+  tarjeta.addEventListener("click", () => {
+    const titulo = strong.textContent;
+    const hora = tarjeta.getAttribute("data-hora") || "";
+    const notas = tarjeta.getAttribute("data-notas") || "";
+    const tipo = etiqueta.textContent.includes("Favorito") ? "favorito" : "evento";
+
+    mostrarModal(`
+      <div class="modal-formulario">
+        <h3>Editar ${tipo}</h3>
+        <input id="titulo-evento" placeholder="Título" value="${titulo}">
+        <input id="hora-evento" type="time" value="${hora}">
+        <select id="etiqueta-evento">
+          <option value="alojamiento">Alojamiento</option>
+          <option value="transporte">Transporte</option>
+          <option value="comida">Comida</option>
+          <option value="atraccion">Atracción</option>
+          <option value="otros">Otros</option>
+        </select>
+        <textarea id="notas-evento" placeholder="Notas">${notas}</textarea>
+        <div>
+          <button onclick="actualizarTarjeta(this)">Guardar cambios</button>
+          <button onclick="cerrarModal()">Cancelar</button>
+        </div>
+      </div>
+    `);
+
+    window._tarjetaEditando = tarjeta;
+  });
+
   return tarjeta;
 }
+
 
 
 
@@ -256,6 +318,31 @@ function guardarItinerarioLocal() {
   }
 }
 window.guardarItinerarioLocal = guardarItinerarioLocal;
+function actualizarTarjeta(boton) {
+  const tarjeta = window._tarjetaEditando;
+  if (!tarjeta) return;
+
+  const nuevoTitulo = document.getElementById("titulo-evento").value.trim();
+  const nuevaHora = document.getElementById("hora-evento").value;
+  const nuevasNotas = document.getElementById("notas-evento").value.trim();
+
+  tarjeta.querySelector(".titulo-evento").textContent = nuevoTitulo;
+  tarjeta.setAttribute("data-hora", nuevaHora);
+  tarjeta.setAttribute("data-notas", nuevasNotas);
+  tarjeta.title = nuevasNotas;
+
+  const etiqueta = tarjeta.querySelector(".etiqueta-evento");
+  const tipo = etiqueta.textContent.includes("Favorito") ? "Favorito" : "Evento";
+  etiqueta.textContent = tipo + (nuevaHora ? ` · ${nuevaHora}` : "");
+
+  // Limpieza y guardado
+  cerrarModal();
+  guardarItinerarioLocal();
+  guardarItinerarioFirebase();
+
+  console.log("📝 Tarjeta actualizada:", nuevoTitulo);
+}
+window.actualizarTarjeta = actualizarTarjeta;
 
 function cargarItinerarioLocal() {
   try {
