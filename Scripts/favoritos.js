@@ -19,20 +19,23 @@ const GestorFavoritos = {
     }
   },
 
-  guardarFirebase: (favorito) => {
+    guardarFirebase: (favorito) => {
     if (navigator.onLine && typeof db !== "undefined") {
-      const ref = db.ref(`${rutaFavoritos}/${favorito.id}`);
+      const idSeguro = codificarID(favorito.id);
+      const ref = db.ref(`${rutaFavoritos}/${idSeguro}`);
       ref.set(favorito)
         .then(() => console.log("✅ Favorito guardado en Firebase"))
         .catch(err => console.error("❌ Error al guardar en Firebase:", err));
     } else {
       console.warn("📴 Sin conexión, no se guardó en Firebase");
     }
-  },
+    },
+
 
   borrarFirebase: (id) => {
     if (navigator.onLine && typeof db !== "undefined") {
-      const ref = db.ref(`${rutaFavoritos}/${id}`);
+      const idSeguro = codificarID(id);
+      const ref = db.ref(`${rutaFavoritos}/${idSeguro}`);
       ref.remove()
         .then(() => console.log("🗑️ Favorito eliminado de Firebase"))
         .catch(err => console.error("❌ Error al eliminar en Firebase:", err));
@@ -41,39 +44,44 @@ const GestorFavoritos = {
     }
   },
 
-  cargarDesdeFirebase: () => {
-    if (navigator.onLine && typeof db !== "undefined") {
-      db.ref(rutaFavoritos).once('value', snapshot => {
-        const data = snapshot.val();
-        if (data) {
-          favoritos = Object.values(data);
-          GestorFavoritos.guardarLocal(); // opcional
-          console.log("☁️ Favoritos sincronizados desde Firebase");
-        } else {
-          console.log("📂 Firebase vacío, usando localStorage");
-          GestorFavoritos.cargarLocal();
-        }
 
-        renderizarFavoritosEn("lista");
-        renderizarFavoritosEn("sidebar");
-        mostrarMarcadoresFavoritos?.();
-
-      }, err => {
-        console.error("❌ Error al cargar desde Firebase:", err);
+cargarDesdeFirebase: () => {
+  if (navigator.onLine && typeof db !== "undefined") {
+    db.ref(rutaFavoritos).once('value', snapshot => {
+      const data = snapshot.val();
+      if (data) {
+        favoritos = Object.entries(data).map(([key, val]) => {
+          val.id = decodificarID(key); // restaurar puntos
+          return val;
+        });
+        GestorFavoritos.guardarLocal(); // opcional
+        console.log("☁️ Favoritos sincronizados desde Firebase");
+      } else {
+        console.log("📂 Firebase vacío, usando localStorage");
         GestorFavoritos.cargarLocal();
-        renderizarFavoritosEn("lista");
-        renderizarFavoritosEn("sidebar");
-        mostrarMarcadoresFavoritos?.();
-      });
+      }
 
-    } else {
-      console.warn("📡 Sin conexión: usando localStorage");
+      renderizarFavoritosEn("lista");
+      renderizarFavoritosEn("sidebar");
+      mostrarMarcadoresFavoritos?.();
+
+    }, err => {
+      console.error("❌ Error al cargar desde Firebase:", err);
       GestorFavoritos.cargarLocal();
       renderizarFavoritosEn("lista");
       renderizarFavoritosEn("sidebar");
       mostrarMarcadoresFavoritos?.();
-    }
-  },
+    });
+
+  } else {
+    console.warn("📡 Sin conexión: usando localStorage");
+    GestorFavoritos.cargarLocal();
+    renderizarFavoritosEn("lista");
+    renderizarFavoritosEn("sidebar");
+    mostrarMarcadoresFavoritos?.();
+  }
+},
+
 
   cargarIgnorados: () => {
     if (navigator.onLine && typeof db !== "undefined") {
@@ -436,6 +444,10 @@ if (index === -1) {
 }
 window.toggleFavorito = toggleFavorito;
 let favoritoEditandoId = null;
+// 🛡️ Sanitizar ID para rutas Firebase
+const codificarID = id => id.replace(/\./g, "_");
+const decodificarID = id => id.replace(/_/g, ".");
+
 function mostrarMarcadoresFavoritos() {
   // 🧹 Borra marcadores anteriores
   marcadoresFavoritos.forEach(m => m.setMap(null));
