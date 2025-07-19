@@ -1,0 +1,65 @@
+/* 🟨 Sección de itinerario */
+#pagina-itinerario {
+  padding: 1.5rem 1rem;
+  font-family: 'Inter', sans-serif;
+}
+
+#pagina-itinerario h2 {
+  font-size: 1.6rem;
+  text-align: center;
+  color: #111;
+  margin-bottom: 0.5rem;
+}
+
+#pagina-itinerario p {
+  text-align: center;
+  color: #666;
+  font-size: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+/* 📅 Contenedor de días */
+#contenedor-dias-itinerario {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* 📦 Cada día */
+.dia-itinerario {
+  background: #fafafa;
+  border-radius: 14px;
+  padding: 1rem;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+}
+
+/* Título del día */
+.dia-itinerario h3 {
+  font-size: 1.2rem;
+  color: #222;
+  margin-bottom: 1rem;
+}
+
+/* ➕ Botón flotante */
+#btn-nuevo-evento.boton-flotante {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: #111;
+  color: white;
+  font-size: 1.8rem;
+  width: 54px;
+  height: 54px;
+  border: none;
+  border-radius: 50%;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  transition: background 0.2s ease;
+}
+
+#btn-nuevo-evento.boton-flotante:hover {
+  background: #333;
+}

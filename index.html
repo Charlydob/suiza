@@ -7,6 +7,8 @@
   <link rel="stylesheet" href="Styles/styles.css" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="Styles/menuInferior.css" />
+  <link rel="stylesheet" href="Styles/itinerario.css" />
+
   <link rel="stylesheet" href="Styles/favoritos.css" />
   <link rel="apple-touch-icon" href="Recursos/icono.png" />
 </head>
@@ -32,7 +34,7 @@
                 <button onclick="buscar('__libre__')">🔍📍</button>
               </div>
 
-              <label>v1.3.7</label>
+              <label>v1.3.12</label>
               <label for="radiusSlider" class="slider-label">Radio búsqueda: <span id="radiusValue">1000</span>m</label>
               <input type="range" id="radiusSlider" min="0" max="10000" value="1000" step="100">
             </div>
@@ -165,10 +167,64 @@
         <div id="map"></div>
     </section>
 <!--🟨🟨🟨🟨 ITINERARIO 🟨🟨🟨🟨-->
-    <section id="pagina-itinerario" class="pagina" style="display: none;">
-      <h2>🗓️ Itinerario</h2>
-      <p>Aquí puedes planificar día por día lo que haréis en Suiza.</p>
-    </section>
+<section id="pagina-itinerario" class="pagina" style="display: none;">
+  <h2>🗓️ Itinerario</h2>
+  <p>Planificá día por día lo que haréis en Suiza.</p>
+
+  <div id="contenedor-dias-itinerario">
+    <!-- Aquí se renderizarán los días y tarjetas -->
+  </div>
+
+  <!-- Botón flotante para añadir -->
+  <button id="btn-nuevo-evento" class="boton-flotante">＋</button>
+</section>
+
+<!-- 📝 Modal de edición/creación -->
+<div id="modal-edicion-evento" class="modal-oculto">
+  <div class="modal-contenido">
+    <h3>Nuevo elemento del itinerario</h3>
+    
+    <label for="tipoEntrada">¿Qué quieres añadir</label>
+    <select id="tipoEntrada">
+      <option value="manual">Crear manualmente</option>
+      <option value="favorito">Importar desde favoritos</option>
+    </select>
+
+    <div id="formManual" class="formulario-tipo">
+      <input type="text" id="eventoNombre" placeholder="Nombre del evento">
+      <input type="text" id="eventoUbicacion" placeholder="Ubicación">
+      <select id="eventoCategoria">
+        <option value="transporte">Transporte</option>
+        <option value="alojamiento">Alojamiento</option>
+        <option value="visita">Visita</option>
+        <option value="comida">Comida</option>
+        <option value="otros">Otros</option>
+      </select>
+      <input type="time" id="eventoHora">
+      <textarea id="eventoNotas" placeholder="Notas..."></textarea>
+      <input type="date" id="eventoDia">
+    </div>
+
+    <div id="formFavorito" class="formulario-tipo" style="display: none;">
+      <label for="selectorFavoritos">Elegí un favorito:</label>
+      <select id="selectorFavoritos">
+        <!-- Se rellenará con opciones dinámicamente -->
+      </select>
+      <input type="date" id="favoritoDia">
+    </div>
+
+    <div class="botones-modal">
+      <button onclick="guardarEventoDesdeModal()">💾 Guardar</button>
+      <button onclick="cerrarModalEdicion()">❌ Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- 🔍 Vista detalle a pantalla completa -->
+<div id="detalleEvento" class="modal-oculto">
+  <!-- Aquí se rellena dinámicamente el detalle completo -->
+</div>
+
 <!--🟨🟨🟨🟨 FAVORITOS 🟨🟨🟨🟨-->
     <section id="pagina-favoritos" class="pagina" style="display: none;">
       <h2>⭐ Favoritos</h2>
@@ -311,5 +367,7 @@
 <script src="Scripts/testVariables.js"></script>
 <!-- Lógica del menú inferior de navegación -->
 <script src="Scripts/menuInferior.js"></script>
+<!-- Lógica de la ventana itinerario -->
+<script src="Scripts/itinerario.js"></script>
 </body>
 </html>
