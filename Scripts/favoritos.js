@@ -352,7 +352,7 @@ function crearTarjetaFavorito(f) {
   const precio = f.datosPersonalizados?.precio || "";
   const horario = f.datosPersonalizados?.horario || "";
 
-  const imagenURL = f.imagen || `https://maps.googleapis.com/maps/api/staticmap?center=${f.lat},${f.lon}&zoom=15&size=300x200&maptype=roadmap&markers=color:red%7C${f.lat},${f.lon}&key=TU_API_KEY`;
+  const imagenURL = f.imagen || `https://maps.googleapis.com/maps/api/staticmap?center=${f.lat},${f.lon}&zoom=15&size=300x200&maptype=roadmap&markers=color:red%7C${f.lat},${f.lon}&key=AIzaSyA8KhfGc61uBT3DHS1hiCEl7HgnFYaWySI`;
   imagen.src = imagenURL;
 
   nombreEl.textContent = nombre;
