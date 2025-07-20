@@ -162,6 +162,39 @@ window.guardarFavoritoSeleccionado = function() {
 
   cerrarModal();
 };
+function renderizarItinerario() {
+  const contenedorUbicaciones = document.getElementById("contenedor-ubicaciones-itinerario");
+  contenedorUbicaciones.innerHTML = "";
+
+  itinerarioData.forEach(ubicacion => {
+    const seccion = crearUbicacion(ubicacion.nombre);
+    const contenedorDias = seccion.querySelector(".contenedor-dias");
+
+    ubicacion.dias.forEach(dia => {
+      const templateDia = document.getElementById("template-dia").content.cloneNode(true);
+      const tituloDia = templateDia.querySelector(".titulo-dia");
+      const carousel = templateDia.querySelector(".carousel-dia");
+      const btnAgregarEvento = templateDia.querySelector(".btn-agregar-evento");
+
+      tituloDia.textContent = dia.fecha;
+      btnAgregarEvento.addEventListener("click", () => mostrarFormularioEvento(carousel));
+
+      dia.eventos.forEach(evento => {
+        const tarjeta = crearTarjeta(
+          evento.titulo,
+          evento.tipo,
+          evento.hora,
+          evento.notas,
+          evento.etiquetaEvento
+        );
+        carousel.appendChild(tarjeta);
+      });
+
+      contenedorDias.appendChild(templateDia);
+    });
+  });
+}
+window.renderizarItinerario = renderizarItinerario;
 
 
   function mostrarEditorEvento() {
@@ -381,6 +414,8 @@ function cargarItinerarioFirebase() {
       const data = snapshot.val();
       if (data) {
         itinerarioData = data;
+        console.log("🧩 ItinerarioData cargado desde Firebase:", itinerarioData);
+
         renderizarItinerario();
         guardarItinerarioLocal(); // backup
         console.log("📥 Itinerario cargado desde Firebase.");
