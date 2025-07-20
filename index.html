@@ -341,6 +341,11 @@
   };
   firebase.initializeApp(firebaseConfig);
   const db = firebase.database();
+    db.ref().once("value")
+    .then(snapshot => {
+      console.log("🔥 Firebase raíz:", snapshot.val());
+    });
+
   const rutaFavoritos = "favoritos/charlyylaura";
   const rutaIgnorados = "ignorados/charlyylaura";
 </script>
