@@ -223,10 +223,15 @@ function cerrarEditorFavoritoDesde(origen) {
   if (origen === "lista") {
     document.getElementById("editorFavoritoLista").style.display = "none";
   } else {
-    document.getElementById("editorFavorito").style.display = "none";
-    document.getElementById("sidebarContenido").style.display = "block";
+    // Usar el modal real del sidebar
+    const modalSidebar = document.getElementById("modal-fondo-favoritos");
+    if (modalSidebar) modalSidebar.style.display = "none";
+
+    const contenidoSidebar = document.getElementById("sidebarContenido");
+    if (contenidoSidebar) contenidoSidebar.style.display = "block";
   }
 }
+
 function mostrarEditorFavoritoDesde(origen, id) {
   console.log(`🛠️ Editor desde ${origen}, ID:`, id);
   const favorito = favoritos.find(f => f.id === id);
@@ -245,7 +250,11 @@ function mostrarEditorFavoritoDesde(origen, id) {
     document.getElementById("sidebarContenido").style.display = "none";
   }
 
-  document.getElementById(`editorFavorito${sufijo}`).style.display = "block";
+  if (sufijo === "Lista") {
+  document.getElementById("editorFavoritoLista").style.display = "block";
+} else {
+  document.getElementById("modal-fondo-favoritos").style.display = "block";
+}
 }
 function renderizarFavoritosEn(origen) {
   const esLista = origen === "lista";
