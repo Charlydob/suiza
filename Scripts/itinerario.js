@@ -1,4 +1,6 @@
 // JS DE ITINERARIO
+const usuarioId = "charlyylaura"; // en el futuro esto podría ser un usuario real
+window.rutaItinerario = `itinerario/${usuarioId}`;
 
 (function() {
   const contenedorUbicaciones = document.getElementById("contenedor-ubicaciones-itinerario");
