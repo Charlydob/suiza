@@ -397,7 +397,7 @@ function guardarItinerarioFirebase() {
     console.warn("📴 Sin conexión, no se guarda en Firebase.");
     return;
   }
-
+console.log("💾 Guardando itinerario en ruta:", window.rutaItinerario);
   db.ref(window.rutaItinerario).set(itinerarioData)
     .then(() => console.log("☁️ Itinerario guardado en Firebase"))
     .catch(err => console.error("❌ Error al guardar en Firebase:", err));
