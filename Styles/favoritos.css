@@ -157,9 +157,9 @@
   position: fixed;
   top: 0;
   left: 0;
-  width: 100vw;
+  width: 320px;
   height: 100vh;
-  background-color: rgba(0, 0, 0, 0.25);
+  background-color: rgba(172, 172, 172, 0.25);
   backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
@@ -168,22 +168,23 @@
 }
 
 .editor-favorito {
+    margin-top: 80px;
   background-color: white;
   border-radius: 12px;
-  padding: 20px;
+  padding: 10px;
   max-width: 360px;
-  width: 90%;
+  width: 80%;
   box-shadow: 0 4px 20px rgba(0,0,0,0.15);
   font-family: 'Inter', sans-serif;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 7px;
   text-align: left;
 }
 
 .editor-favorito h3 {
-  margin-top: 0;
-  font-size: 1.3rem;
+  margin: 0;
+  font-size: 14px;
   color: #333;
   text-align: center;
 }
@@ -198,7 +199,7 @@
 .editor-favorito textarea {
   border: 1px solid #ddd;
   border-radius: 8px;
-  padding: 10px;
+  padding: 3px;
   font-size: 0.95rem;
   width: 100%;
   box-sizing: border-box;
@@ -212,10 +213,13 @@
 }
 
 .editor-favorito button {
+    display: flex;
+    flex-direction: row;
+    margin: 0;
   background-color: #f4f6f8;
   border: 1px solid #ccc;
   border-radius: 8px;
-  padding: 0.6rem;
+  padding: 8px;
   font-size: 0.95rem;
   color: #007aff;
   cursor: pointer;
