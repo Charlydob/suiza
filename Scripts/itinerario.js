@@ -238,6 +238,36 @@ guardarItinerarioFirebase();
   const [h, m] = hora.split(":").map(Number);
   return h * 60 + m;
 }
+function reconstruirItinerarioDesdeDOM() {
+  itinerarioData = {};
+
+  const dias = document.querySelectorAll(".dia-itinerario");
+  dias.forEach(dia => {
+    const fecha = dia.getAttribute("data-fecha");
+    const tarjetas = dia.querySelectorAll(".tarjeta-itinerario");
+
+    const eventos = Array.from(tarjetas).map(tarjeta => {
+      return {
+        titulo: tarjeta.querySelector(".titulo-evento")?.textContent || "",
+        tipo: tarjeta.querySelector(".etiqueta-evento")?.textContent.includes("Favorito") ? "favorito" : "evento",
+        hora: tarjeta.getAttribute("data-hora") || "",
+        notas: tarjeta.getAttribute("data-notas") || "",
+        etiquetaEvento: obtenerEtiquetaDesdeClase(tarjeta.classList)
+      };
+    });
+
+    itinerarioData[fecha] = { eventos };
+  });
+}
+
+function obtenerEtiquetaDesdeClase(classList) {
+  if (classList.contains("color-alojamiento")) return "alojamiento";
+  if (classList.contains("color-transporte")) return "transporte";
+  if (classList.contains("color-comida")) return "comida";
+  if (classList.contains("color-atraccion")) return "atraccion";
+  return "otros";
+}
+
 
 function crearTarjeta(titulo, tipo, hora = null, notas = "", etiquetaEvento = "") {
   const template = document.getElementById("template-tarjeta-itinerario").content.cloneNode(true);
@@ -343,7 +373,7 @@ function crearTarjeta(titulo, tipo, hora = null, notas = "", etiquetaEvento = ""
   window.crearTarjeta = crearTarjeta;
 })();
 
-let itinerarioData = [];
+let itinerarioData = {};
 
 function guardarItinerarioLocal() {
   try {
@@ -399,12 +429,14 @@ function guardarItinerarioFirebase() {
     console.warn("📴 Sin conexión, no se guarda en Firebase.");
     return;
   }
-console.log("💾 Guardando itinerario en ruta:", window.rutaItinerario);
+
+  reconstruirItinerarioDesdeDOM(); // 🔁 reconstruimos antes de guardar
+
+  console.log("💾 Guardando itinerario en ruta:", window.rutaItinerario);
   db.ref(window.rutaItinerario).set(itinerarioData)
     .then(() => console.log("☁️ Itinerario guardado en Firebase"))
     .catch(err => console.error("❌ Error al guardar en Firebase:", err));
 }
-window.guardarItinerarioFirebase = guardarItinerarioFirebase;
 
 function cargarItinerarioFirebase() {
   if (!navigator.onLine || typeof db === "undefined") {
