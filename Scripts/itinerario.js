@@ -166,35 +166,36 @@ function renderizarItinerario() {
   const contenedorUbicaciones = document.getElementById("contenedor-ubicaciones-itinerario");
   contenedorUbicaciones.innerHTML = "";
 
-  itinerarioData.forEach(ubicacion => {
-    const seccion = crearUbicacion(ubicacion.nombre);
+  for (const [fecha, entrada] of Object.entries(itinerarioData)) {
+    const seccion = crearUbicacion(`Día ${fecha}`);
     const contenedorDias = seccion.querySelector(".contenedor-dias");
 
-    ubicacion.dias.forEach(dia => {
-      const templateDia = document.getElementById("template-dia").content.cloneNode(true);
-      const tituloDia = templateDia.querySelector(".titulo-dia");
-      const carousel = templateDia.querySelector(".carousel-dia");
-      const btnAgregarEvento = templateDia.querySelector(".btn-agregar-evento");
+    const templateDia = document.getElementById("template-dia").content.cloneNode(true);
+    templateDia.querySelector(".titulo-dia").textContent = fecha;
 
-      tituloDia.textContent = dia.fecha;
-      btnAgregarEvento.addEventListener("click", () => mostrarFormularioEvento(carousel));
+    const carousel = templateDia.querySelector(".carousel-dia");
+    const btnAgregarEvento = templateDia.querySelector(".btn-agregar-evento");
 
-      dia.eventos.forEach(evento => {
-        const tarjeta = crearTarjeta(
-          evento.titulo,
-          evento.tipo,
-          evento.hora,
-          evento.notas,
-          evento.etiquetaEvento
-        );
-        carousel.appendChild(tarjeta);
-      });
+    btnAgregarEvento.addEventListener("click", () => mostrarFormularioEvento(carousel));
 
-      contenedorDias.appendChild(templateDia);
-    });
-  });
+    for (const evento of entrada.eventos || []) {
+      const tarjeta = crearTarjeta(
+        evento.titulo,
+        evento.tipo,
+        evento.hora,
+        evento.notas,
+        evento.etiquetaEvento
+      );
+      carousel.appendChild(tarjeta);
+    }
+
+    contenedorDias.appendChild(templateDia);
+  }
+
+  console.log("✅ Itinerario renderizado desde objeto.");
 }
 window.renderizarItinerario = renderizarItinerario;
+
 
 
   function mostrarEditorEvento() {
@@ -413,7 +414,7 @@ function cargarItinerarioFirebase() {
     .then(snapshot => {
       const data = snapshot.val();
       if (data) {
-        itinerarioData = data;
+itinerarioData = data.itinerario || {};
         console.log("🧩 ItinerarioData cargado desde Firebase:", itinerarioData);
 
         renderizarItinerario();
