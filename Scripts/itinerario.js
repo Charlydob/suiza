@@ -143,12 +143,21 @@ window.guardarNuevoDia = guardarNuevoDia;
   };
 //👇👇👇👇👇👇
 function mostrarSelectorFavoritos() {
+  if (!Array.isArray(favoritos) || favoritos.length === 0) {
+    alert("No hay favoritos guardados.");
+    return;
+  }
+
+  const opciones = favoritos.map(f => {
+    const nombre = f.datosPersonalizados?.nombre || f.id;
+    return `<option value="${f.id}">${nombre}</option>`;
+  }).join("");
+
   mostrarModal(`
     <div class="modal-formulario">
       <h3>Selecciona un favorito</h3>
       <select id="selector-favorito">
-        <option>Hotel Interlaken</option>
-        <option>Restaurante Adler</option>
+        ${opciones}
       </select>
       <input type="time" id="hora-favorito" placeholder="Hora (opcional)">
       <select id="etiqueta-favorito">
@@ -165,6 +174,7 @@ function mostrarSelectorFavoritos() {
     </div>
   `);
 }
+
 
 
 window.guardarFavoritoSeleccionado = function () {
