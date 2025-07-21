@@ -222,15 +222,16 @@ function mostrarSelectorFavoritos() {
 
 
 window.guardarFavoritoSeleccionado = function () {
-  const titulo = document.getElementById("selector-favorito").value;
+  const idFavorito = document.getElementById("selector-favorito").value;
   const hora = document.getElementById("hora-favorito").value;
   const etiqueta = document.getElementById("etiqueta-favorito").value;
 
-  // Obtener el precio del favorito desde la lista
-  const favorito = favoritos.find(f => f.datosPersonalizados.nombre === titulo);
+  // Buscar el favorito por ID
+  const favorito = favoritos.find(f => f.id === idFavorito);
+  const nombre = favorito?.datosPersonalizados?.nombre || "Favorito sin nombre";
   const precio = favorito?.datosPersonalizados?.precio || "";
 
-  crearTarjeta(titulo, "favorito", hora, "", etiqueta, precio);
+  crearTarjeta(nombre, "favorito", hora, "", etiqueta, precio);
 
   const seccion = document.querySelector(".seccion-ubicacion:last-child");
   const tituloUbicacion = seccion?.querySelector(".titulo-ubicacion")?.textContent;
@@ -238,7 +239,7 @@ window.guardarFavoritoSeleccionado = function () {
 
   if (fecha && itinerarioData[fecha]) {
     itinerarioData[fecha].eventos.push({
-      titulo,
+      titulo: nombre,
       tipo: "favorito",
       hora,
       notas: "",
@@ -251,6 +252,7 @@ window.guardarFavoritoSeleccionado = function () {
   guardarItinerarioFirebase();
   cerrarModal();
 };
+
 
 ;
 function renderizarItinerario() {

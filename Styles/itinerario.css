@@ -50,14 +50,15 @@
 #pagina-itinerario .btn-agregar-dia,
 #pagina-itinerario .btn-agregar-evento {
   display: block;
-  margin: 12px auto 0;
-  width: 55%;
+  margin: 8px auto 0;
+  width: 40%;
   height: 40px;
+  padding: 0px;;
   font-size: 16px;
   color: #007aff;
   background-color: #f4f6f8;
-  border: 1px dashed #ccc;
-  border-radius: 10px;
+  border: 1px dashed #0059be71;
+  border-radius: 12px;
   transition: all 0.2s ease;
 }
 
@@ -79,14 +80,17 @@
 #pagina-itinerario .carousel-dia {
   display: flex;
   overflow-x: auto;
+  padding-inline: 8px;
+  scroll-snap-type: x mandatory;
   gap: 12px;
   padding-bottom: 12px;
   scrollbar-width: none; 
 }
 
 #pagina-itinerario .tarjeta-itinerario {
-  min-width: 80px;
-  max-width: 80px;
+  min-width: 100px;
+  scroll-snap-align: start;
+  max-width: 100px;
   height: 80px;
   background: white;
   border-radius: 12px;
@@ -101,7 +105,8 @@
 }
 
 #pagina-itinerario .etiqueta-evento {
-  font-size: 16px;
+  font-size: 12px;
+  line-height: 1.2;
   color: #999;
 }
 
@@ -155,22 +160,25 @@ body, html {
   overflow-y: auto;
 }
 .color-alojamiento {
-  background-color: #68ff547c !important; /* verde */
+  border: 2px solid #25c410 !important;
 }
 
 .color-transporte {
-  background-color: #4dd1e95b !important; /* azul */
+  border: 2px solid #1d8b9eb9 !important;
+
 }
 
 .color-comida {
-   background-color: #ffbb547c !important; /* naranja */
+  border: 2px solid #f59a12d2 !important;
+
 }
 
 .color-atraccion {
-  background-color:  #bc80c746 !important; /* morado */
-  backdrop-filter: blur(2px) !important;
+  border: 2px solid #8a11a0ad !important;
+
 }
 
-.color-otros {
-  background-color: #ff54547c !important; /* gris */
+.color-otros {      
+  border: 2px solid #dd07077c !important;
+
 }
