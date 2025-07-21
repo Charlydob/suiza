@@ -343,7 +343,7 @@ function crearTarjeta(titulo, tipo, hora = null, notas = "", etiquetaEvento = ""
   window.crearTarjeta = crearTarjeta;
 })();
 
-let itinerarioData = [];
+let itinerarioData = {};
 
 function guardarItinerarioLocal() {
   try {
@@ -393,6 +393,64 @@ function cargarItinerarioLocal() {
   }
 }
 window.cargarItinerarioLocal = cargarItinerarioLocal;
+    
+/*
+guardarItinerarioFirebase: (itinerario) => {
+    if (navigator.onLine && typeof db !== "undefined") {
+      const idSeguro = codificarID(itinerario.id);
+      const ref = db.ref(`${rutaItinerario}/${idSeguro}`);
+      ref.set(itinerario)
+        .then(() => console.log("✅ Itinerario guardado en Firebase"))
+        .catch(err => console.error("❌ Error al guardar itinerario en Firebase:", err));
+    } else {
+      console.warn("📴 Sin conexión, no se guardó en Firebase");
+    }
+    },
+
+
+  borrarItinerarioFirebase: (id) => {
+    if (navigator.onLine && typeof db !== "undefined") {
+      const idSeguro = codificarID(id);
+      const ref = db.ref(`${rutaItinerario}/${idSeguro}`);
+      ref.remove()
+        .then(() => console.log("🗑️ Itinerario eliminado de Firebase"))
+        .catch(err => console.error("❌ Error al eliminar Itinerario en Firebase:", err));
+    } else {
+      console.warn("📴 Sin conexión, no se eliminó Itinerario en Firebase");
+    }
+  },
+
+
+cargarItinerarioDesdeFirebase: () => {
+  if (navigator.onLine && typeof db !== "undefined") {
+    db.ref(rutaItinerario).once('value', snapshot => {
+      const data = snapshot.val();
+      if (data) {
+        Itinerario = Object.entries(data).map(([key, val]) => {
+          val.id = decodificarID(key); // restaurar puntos
+          return val;
+        });
+        GestorFavoritos.guardarLocal(); // opcional
+        console.log("☁️ Itinerario sincronizados desde Firebase");
+      } else {
+        console.log("📂 Firebase vacío, usando localStorage");
+        GestorFavoritos.cargarLocal();
+      }
+
+      renderizarItinerario();
+
+    }, err => {
+      console.error("❌ Error al cargar Itinerario desde Firebase:", err);
+      renderizarItinerario();
+
+    });
+
+  } else {
+    console.warn("📡 Sin conexión: usando localStorage");
+      renderizarItinerario();
+
+  }
+},*/
 
 function guardarItinerarioFirebase() {
   if (!navigator.onLine || typeof db === "undefined") {
