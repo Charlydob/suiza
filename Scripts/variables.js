@@ -74,3 +74,27 @@ let marcadoresFavoritos = [];
 
 //================= VARIABLES GLOBALES 👆 ===================//
 
+// Inicialización del auth
+const auth = firebase.auth();
+
+document.getElementById("btn-login").addEventListener("click", () => {
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value;
+
+  auth.signInWithEmailAndPassword(email, password)
+    .then(userCredential => {
+      console.log("✅ Usuario autenticado:", userCredential.user.uid);
+      document.getElementById("login-container").style.display = "none";
+      // Aquí puedes mostrar el contenido real de la app
+      document.getElementById("pagina-itinerario").style.display = "block"; // o lo que uses
+    })
+    .catch(error => {
+      console.error("❌ Error de login:", error.message);
+      document.getElementById("login-error").textContent = "Error: " + error.message;
+    });
+});
+
+function mostrarContenido() {
+  document.getElementById("auth-container").style.display = "none";
+  document.getElementById("pagina-itinerario").style.display = "block";
+}

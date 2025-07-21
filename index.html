@@ -16,10 +16,12 @@
 
 
 <body>
+
+
   <main id="contenedor-paginas">
     <!-- 🌍 PÁGINAS -->
 <!--🟨🟨🟨🟨 MAPA 🟨🟨🟨🟨-->
-    <section id="pagina-mapa" class="pagina">
+    <section id="pagina-mapa" class="pagina" >
       <div id="sidebar">
         <div id="sidebarContenido">
         <h2>Viajecito con Laura</h2>
@@ -155,6 +157,11 @@
     <input type="text" id="editNombre">
     <label>Precio:</label>
     <input type="text" id="editPrecio">
+    <select id="editMoneda">
+      <option value="EUR">EUR</option>
+      <option value="CHF">CHF</option>
+      <option value="USD">USD</option>
+    </select>
     <label>Horario:</label>
     <input type="text" id="editHorario">
     <label>Observaciones:</label>
@@ -276,6 +283,10 @@
         <input type="text" id="editNombreLista"><br><br>
         <label>Precio:</label>
         <input type="text" id="editPrecioLista"><br><br>
+        <select id="editMonedaLista">
+          <option value="EUR">EUR</option>
+          <option value="CHF">CHF</option>
+          <option value="USD">USD</option>
         <label>Horario:</label>
         <input type="text" id="editHorarioLista"><br><br>
         <label>Observaciones:</label>
@@ -338,6 +349,8 @@
 <!-- Firebase SDKs -->
 <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"></script>
+
 <!-- Configuración Firebase -->
 <script>
   const firebaseConfig = {

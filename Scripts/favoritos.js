@@ -127,6 +127,8 @@ function guardarEdicionFavoritoDesde(origen) {
   const precioInput = document.getElementById(`editPrecio${sufijo}`);
   const horarioInput = document.getElementById(`editHorario${sufijo}`);
   const notasInput = document.getElementById(`editNotas${sufijo}`);
+  const monedaInput = document.getElementById(`editMoneda${sufijo}`);
+  const moneda = monedaInput.value.trim();
 
   if (!nombreInput || !precioInput || !horarioInput || !notasInput) {
     console.error("❌ Uno o más inputs no se encontraron en el DOM");

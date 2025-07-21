@@ -55,3 +55,33 @@ function añadirGastoManual(dia, btn) {
 
   renderizarResumenGastos(); // volver a pintar
 }
+function obtenerGastosDeEventos(diaBuscado) {
+  const lista = [];
+
+  document.querySelectorAll(".dia-itinerario").forEach(diaEl => {
+    const titulo = diaEl.querySelector(".titulo-dia")?.textContent?.trim();
+    if (titulo !== diaBuscado) return;
+
+    diaEl.querySelectorAll(".tarjeta-itinerario").forEach(tarjeta => {
+      const rawPrecio = tarjeta.getAttribute("data-precio");
+      const cantidad = parseFloat(rawPrecio?.replace(",", "."));
+      if (!isNaN(cantidad)) {
+        lista.push({
+          concepto: tarjeta.querySelector(".titulo-evento")?.textContent || "Evento",
+          cantidad
+        });
+      }
+    });
+  });
+
+  return lista;
+}
+function obtenerDiasDesdeItinerario() {
+  if (typeof itinerarioData !== "object") return [];
+
+  return Object.keys(itinerarioData)
+    .filter(fecha => /^\d{4}-\d{2}-\d{2}$/.test(fecha)) // asegurar formato de fecha válido
+    .sort(); // orden cronológico ascendente
+    
+}
+console.log("📅 Días detectados en el itinerario:", obtenerDiasDesdeItinerario());
