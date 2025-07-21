@@ -53,17 +53,24 @@ guardarItinerarioFirebase();
     `);
   });
 
-  function guardarNuevaUbicacion() {
-    const input = document.getElementById("input-nueva-ubicacion");
-    const nombre = input.value.trim();
-    if (nombre) {
-      crearUbicacion(nombre);
-      cerrarModal();
-    } else {
-      alert("Introduce un nombre válido.");
+function guardarNuevaUbicacion() {
+  const input = document.getElementById("input-nueva-ubicacion");
+  const nombre = input.value.trim();
+  if (nombre) {
+    crearUbicacion(nombre);
+    // Inicializamos en itinerarioData con clave segura
+    if (!itinerarioData[nombre]) {
+      itinerarioData[nombre] = { eventos: [] };
     }
+    guardarItinerarioLocal();
+    guardarItinerarioFirebase();
+    cerrarModal();
+  } else {
+    alert("Introduce un nombre válido.");
   }
-  window.guardarNuevaUbicacion = guardarNuevaUbicacion;
+}
+window.guardarNuevaUbicacion = guardarNuevaUbicacion;
+
 
   function mostrarFormularioDia(contenedorDias) {
     mostrarModal(`
@@ -79,30 +86,37 @@ guardarItinerarioFirebase();
     window._contenedorDiasActual = contenedorDias;
   }
 
-  function guardarNuevoDia() {
-    const fecha = document.getElementById("input-nuevo-dia").value;
-    if (fecha) {
-      const contenedor = window._contenedorDiasActual;
-      const template = document.getElementById("template-dia").content.cloneNode(true);
-      template.querySelector(".titulo-dia").textContent = fecha;
+function guardarNuevoDia() {
+  const fecha = document.getElementById("input-nuevo-dia").value;
+  if (fecha) {
+    const contenedor = window._contenedorDiasActual;
+    const template = document.getElementById("template-dia").content.cloneNode(true);
+    template.querySelector(".titulo-dia").textContent = fecha;
 
-      const btnAgregarEvento = template.querySelector(".btn-agregar-evento");
-      const carousel = template.querySelector(".carousel-dia");
+    const btnAgregarEvento = template.querySelector(".btn-agregar-evento");
+    const carousel = template.querySelector(".carousel-dia");
 
-      btnAgregarEvento.addEventListener("click", () => mostrarFormularioEvento(carousel));
+    btnAgregarEvento.addEventListener("click", () => mostrarFormularioEvento(carousel));
 
-      contenedor.appendChild(template);
-      guardarItinerarioLocal();
-guardarItinerarioFirebase();
+    contenedor.appendChild(template);
 
-      cerrarModal();
-
-      console.log("📅 Día creado:", fecha);
-    } else {
-      alert("Selecciona una fecha válida.");
+    // Actualizar estructura de datos
+    if (!itinerarioData[fecha]) {
+      itinerarioData[fecha] = { eventos: [] };
     }
+
+    guardarItinerarioLocal();
+    guardarItinerarioFirebase();
+
+    cerrarModal();
+
+    console.log("📅 Día creado:", fecha);
+  } else {
+    alert("Selecciona una fecha válida.");
   }
-  window.guardarNuevoDia = guardarNuevoDia;
+}
+window.guardarNuevoDia = guardarNuevoDia;
+
 
   function mostrarFormularioEvento(carousel) {
     mostrarModal(`
@@ -153,17 +167,32 @@ function mostrarSelectorFavoritos() {
 }
 
 
-window.guardarFavoritoSeleccionado = function() {
+window.guardarFavoritoSeleccionado = function () {
   const titulo = document.getElementById("selector-favorito").value;
   const hora = document.getElementById("hora-favorito").value;
   const etiqueta = document.getElementById("etiqueta-favorito").value;
 
   crearTarjeta(titulo, "favorito", hora, "", etiqueta);
+
+  const seccion = document.querySelector(".seccion-ubicacion:last-child");
+  const tituloUbicacion = seccion?.querySelector(".titulo-ubicacion")?.textContent;
+  const fecha = tituloUbicacion?.replace("Día ", "").trim();
+
+  if (fecha && itinerarioData[fecha]) {
+    itinerarioData[fecha].eventos.push({
+      titulo,
+      tipo: "favorito",
+      hora,
+      notas: "",
+      etiquetaEvento: etiqueta
+    });
+  }
+
   guardarItinerarioLocal();
   guardarItinerarioFirebase();
-
   cerrarModal();
 };
+;
 function renderizarItinerario() {
   const contenedorUbicaciones = document.getElementById("contenedor-ubicaciones-itinerario");
   contenedorUbicaciones.innerHTML = "";
@@ -222,16 +251,34 @@ window.renderizarItinerario = renderizarItinerario;
     `);
   }
 
-window.guardarNuevoEvento = function() {
+window.guardarNuevoEvento = function () {
   const titulo = document.getElementById("titulo-evento").value;
   const hora = document.getElementById("hora-evento").value;
   const notas = document.getElementById("notas-evento").value;
   const etiqueta = document.getElementById("etiqueta-evento").value;
-crearTarjeta(titulo, "evento", hora, notas, etiqueta);  guardarItinerarioLocal();
-guardarItinerarioFirebase();
 
+  crearTarjeta(titulo, "evento", hora, notas, etiqueta);
+
+  // Obtener fecha del día actual
+  const seccion = document.querySelector(".seccion-ubicacion:last-child");
+  const tituloUbicacion = seccion?.querySelector(".titulo-ubicacion")?.textContent;
+  const fecha = tituloUbicacion?.replace("Día ", "").trim();
+
+  if (fecha && itinerarioData[fecha]) {
+    itinerarioData[fecha].eventos.push({
+      titulo,
+      tipo: "evento",
+      hora,
+      notas,
+      etiquetaEvento: etiqueta
+    });
+  }
+
+  guardarItinerarioLocal();
+  guardarItinerarioFirebase();
   cerrarModal();
 };
+
 
   function parseHora(hora) {
   if (!hora) return null;
