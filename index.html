@@ -282,24 +282,37 @@
             </div>
                   </div>
       <!-- 📝 Editor de Favorito -->
-      <div id="editorFavoritoLista" class="editor-favorito" style="display: none;">
-        <h3>Editar lugar</h3>
-        <label>Nombre personalizado:</label>
-        <input type="text" id="editNombreLista"><br><br>
-        <label>Precio:</label>
-        <input type="text" id="editPrecioLista"><br><br>
-        <select id="editMonedaLista">
-          <option value="EUR">EUR</option>
-          <option value="CHF">CHF</option>
-          <option value="USD">USD</option>
-        <label>Horario:</label>
-        <input type="text" id="editHorarioLista"><br><br>
-        <label>Observaciones:</label>
-        <textarea id="editNotasLista" rows="3"></textarea><br><br>
-        <button onclick="guardarEdicionFavoritoDesde('lista')">💾 Guardar</button>
-        <button onclick="borrarFavoritoDesde('lista')">🗑️ Eliminar</button>
-        <button onclick="cerrarEditorFavoritoDesde('lista')">❌ Cancelar</button>
-      </div>
+     <div id="modal-fondo-editor" style="display: none;">
+  <div id="editorFavoritoLista" class="modal-formulario-favorito-lista">
+    <h3>Editar lugar</h3>
+
+    <label for="editNombreLista">Nombre personalizado:</label>
+    <input type="text" id="editNombreLista">
+
+    <label for="editPrecioLista">Precio:</label>
+    <input type="text" id="editPrecioLista">
+
+    <label for="editMonedaLista">Moneda:</label>
+    <select id="editMonedaLista">
+      <option value="EUR">EUR</option>
+      <option value="CHF">CHF</option>
+      <option value="USD">USD</option>
+    </select>
+
+    <label for="editHorarioLista">Horario:</label>
+    <input type="text" id="editHorarioLista">
+
+    <label for="editNotasLista">Observaciones:</label>
+    <textarea id="editNotasLista" rows="3"></textarea>
+
+    <div class="fila-botones-editor">
+      <button onclick="guardarEdicionFavoritoDesde('lista')">💾 Guardar</button>
+      <button onclick="borrarFavoritoDesde('lista')">🗑️ Eliminar</button>
+      <button onclick="cerrarEditorFavoritoDesde('lista')">❌ Cancelar</button>
+    </div>
+  </div>
+</div>
+
           </div>
         </div>
       </template>

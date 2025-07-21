@@ -16,11 +16,11 @@ window.rutaItinerario = `itinerario/${usuarioId}`;
 
 window.confirmarAccion = function (mensaje, callbackAceptar) {
   mostrarModal(`
-    <div class="modal-formulario">
+    <div class="modal-formulario-eliminar">
       <h3>${mensaje}</h3>
       <div>
         <button id="btn-confirmar-aceptar">Sí</button>
-        <button onclick="cerrarModal()">Cancelar</button>
+        <button id="btn-generico" onclick="cerrarModal()">Cancelar</button>
       </div>
     </div>
   `);
@@ -73,12 +73,12 @@ window.crearUbicacion = crearUbicacion;
 
   botonNuevaUbicacion.addEventListener("click", () => {
     mostrarModal(`
-      <div class="modal-formulario">
+      <div class="modal-formulario-donde">
     <h3>¿Dónde empezamos?</h3>
     <input type="text" id="input-nueva-ubicacion" placeholder="Introduce una ubicación">
     <div>
-      <button onclick="guardarNuevaUbicacion()">Crear</button>
-      <button onclick="cerrarModal()">Cancelar</button>
+      <button id="btn-generico" onclick="guardarNuevaUbicacion()">Crear</button>
+      <button id="btn-generico" onclick="cerrarModal()">Cancelar</button>
     </div>
   </div>
     `);
@@ -105,12 +105,12 @@ window.guardarNuevaUbicacion = guardarNuevaUbicacion;
 
   function mostrarFormularioDia(contenedorDias) {
     mostrarModal(`
-      <div class="modal-formulario">
+      <div class="modal-formulario-cuando">
     <h3>¿Qué día?</h3>
     <input type="date" id="input-nuevo-dia">
     <div>
-      <button onclick="guardarNuevoDia()">Guardar</button>
-      <button onclick="cerrarModal()">Cancelar</button>
+      <button id="btn-generico" onclick="guardarNuevoDia()">Guardar</button>
+      <button id="btn-generico" onclick="cerrarModal()">Cancelar</button>
     </div>
   </div>
     `);
@@ -183,15 +183,15 @@ window.guardarNuevoDia = guardarNuevoDia;
 
   function mostrarFormularioEvento(carousel) {
     mostrarModal(`
-      <div class="modal-formulario">
+      <div class="modal-formulario-evento">
     <h3>¿Qué deseas añadir?</h3>
     <select id="selector-tipo">
       <option value="evento">Evento</option>
       <option value="favorito">Favorito</option>
     </select>
     <div>
-      <button onclick="seleccionarTipoEvento()">Continuar</button>
-      <button onclick="cerrarModal()">Cancelar</button>
+      <button id="btn-generico" onclick="seleccionarTipoEvento()">Continuar</button>
+      <button id="btn-generico" onclick="cerrarModal()">Cancelar</button>
     </div>
   </div>
     `);
@@ -217,12 +217,11 @@ function mostrarSelectorFavoritos() {
   }).join("");
 
   mostrarModal(`
-    <div class="modal-formulario">
+    <div class="modal-formulario-favoritos">
       <h3>Selecciona un favorito</h3>
       <select id="selector-favorito">
         ${opciones}
       </select>
-      <input type="time" id="hora-favorito" placeholder="Hora (opcional)">
       <select id="etiqueta-favorito">
         <option value="alojamiento">Alojamiento</option>
         <option value="transporte">Transporte</option>
@@ -230,9 +229,10 @@ function mostrarSelectorFavoritos() {
         <option value="atraccion">Atracción</option>
         <option value="otros">Otros</option>
       </select>
+      <input type="time" id="hora-favorito" value="00:00">
       <div>
-        <button onclick="guardarFavoritoSeleccionado()">Añadir</button>
-        <button onclick="cerrarModal()">Cancelar</button>
+        <button id="btn-generico" onclick="guardarFavoritoSeleccionado()">Añadir</button>
+        <button id="btn-generico" onclick="cerrarModal()">Cancelar</button>
       </div>
     </div>
   `);
@@ -346,27 +346,43 @@ window.renderizarItinerario = renderizarItinerario;
 
 //👇👇👇👇👇👇
 
-  function mostrarEditorEvento() {
-    mostrarModal(`
-      <div class="modal-formulario">
-    <h3>Nuevo evento</h3>
-    <input id="titulo-evento" placeholder="Título">
-    <input id="hora-evento" type="time">
-    <select id="etiqueta-evento">
-      <option value="alojamiento">Alojamiento</option>
-      <option value="transporte">Transporte</option>
-      <option value="comida">Comida</option>
-      <option value="atraccion">Atracción</option>
-      <option value="otros">Otros</option>
-    </select>
-    <textarea id="notas-evento" placeholder="Notas"></textarea>
-    <div>
-      <button onclick="guardarNuevoEvento()">Guardar</button>
-      <button onclick="cerrarModal()">Cancelar</button>
+function mostrarEditorEvento() {
+  mostrarModal(`
+    <div class="modal-formulario-evento-edit">
+      <h3>Nuevo evento</h3>
+      <input id="titulo-evento" placeholder="Título">
+      <div class="inputs-evento">
+        <input id="hora-evento" type="time" value="00:00">
+        <select id="etiqueta-evento">
+          <option value="alojamiento">Alojamiento</option>
+          <option value="transporte">Transporte</option>
+          <option value="comida">Comida</option>
+          <option value="atraccion">Atracción</option>
+          <option value="otros">Otros</option>
+        </select>
+      </div>
+      <textarea id="notas-evento" placeholder="Notas"></textarea>
+      <div>
+        <button onclick="guardarNuevoEvento()">Guardar</button>
+        <button onclick="cerrarModal()">Cancelar</button>
+      </div>
     </div>
-  </div>
-    `);
+  `);
+
+  // ⬇️ Aquí sí se ejecuta porque está fuera del innerHTML
+  const textarea = document.getElementById('notas-evento');
+  if (textarea) {
+    textarea.addEventListener('input', autoResize);
+
+    function autoResize() {
+      this.style.height = 'auto';
+      this.style.height = this.scrollHeight + 'px';
+    }
+
+    autoResize.call(textarea);
   }
+}
+
 
 window.guardarNuevoEvento = function () {
   const titulo = document.getElementById("titulo-evento").value;
@@ -505,31 +521,51 @@ if (!tarjeta) {
   }
 
   mostrarModal(`
-    <div class="modal-formulario">
+    <div class="modal-formulario-tarjeta">
       <h3>Editar ${tipo}</h3>
       <input id="titulo-evento" placeholder="Título" value="${eventoActual.titulo || ""}">
-      <input id="hora-evento" type="time" value="${eventoActual.hora || ""}">
-      <select id="etiqueta-evento">
-        <option value="alojamiento" ${eventoActual.etiquetaEvento === "alojamiento" ? "selected" : ""}>Alojamiento</option>
-        <option value="transporte" ${eventoActual.etiquetaEvento === "transporte" ? "selected" : ""}>Transporte</option>
-        <option value="comida" ${eventoActual.etiquetaEvento === "comida" ? "selected" : ""}>Comida</option>
-        <option value="atraccion" ${eventoActual.etiquetaEvento === "atraccion" ? "selected" : ""}>Atracción</option>
-        <option value="otros" ${eventoActual.etiquetaEvento === "otros" ? "selected" : ""}>Otros</option>
-      </select>
+      
+      <div id="inputs-evento">
+        <input id="hora-evento" type="time" value="${eventoActual.hora || ""}">
+        
+        <select id="etiqueta-evento">
+          <option value="alojamiento" ${eventoActual.etiquetaEvento === "alojamiento" ? "selected" : ""}>Alojamiento</option>
+          <option value="transporte" ${eventoActual.etiquetaEvento === "transporte" ? "selected" : ""}>Transporte</option>
+          <option value="comida" ${eventoActual.etiquetaEvento === "comida" ? "selected" : ""}>Comida</option>
+          <option value="atraccion" ${eventoActual.etiquetaEvento === "atraccion" ? "selected" : ""}>Atracción</option>
+          <option value="otros" ${eventoActual.etiquetaEvento === "otros" ? "selected" : ""}>Otros</option>
+        </select>
+      </div>
+
       <textarea id="notas-evento" placeholder="Notas">${eventoActual.notas || ""}</textarea>
-      <input id="precio-evento" placeholder="Precio" value="${eventoActual.precio || ""}">
-      <select id="moneda-evento">
-        <option value="EUR" ${eventoActual.moneda === "EUR" ? "selected" : ""}>EUR</option>
-        <option value="CHF" ${eventoActual.moneda === "CHF" ? "selected" : ""}>CHF</option>
-        <option value="USD" ${eventoActual.moneda === "USD" ? "selected" : ""}>USD</option>
-      </select>
+      
+      <div id="inputs-evento">
+        <input id="precio-evento" placeholder="Precio" value="${eventoActual.precio || ""}">
+        <select id="moneda-evento">
+          <option value="EUR" ${eventoActual.moneda === "EUR" ? "selected" : ""}>EUR</option>
+          <option value="CHF" ${eventoActual.moneda === "CHF" ? "selected" : ""}>CHF</option>
+          <option value="USD" ${eventoActual.moneda === "USD" ? "selected" : ""}>USD</option>
+        </select>
+      </div>
+
       <div>
-        <button onclick="actualizarTarjeta(this)">Guardar cambios</button>
-        <button onclick="borrarTarjeta(window._tarjetaEditando)">Eliminar</button>
-        <button onclick="cerrarModal()">Cancelar</button>
+        <button id="btn-generico" onclick="actualizarTarjeta(this)">Guardar</button>
+        <button id="btn-generico" onclick="borrarTarjeta(window._tarjetaEditando)">Eliminar</button>
+        <button id="btn-generico" onclick="cerrarModal()">Cancelar</button>
       </div>
     </div>
   `);
+   const textarea = document.getElementById('notas-evento');
+  if (textarea) {
+    textarea.addEventListener('input', autoResize);
+
+    function autoResize() {
+      this.style.height = 'auto';
+      this.style.height = this.scrollHeight + 'px';
+    }
+
+    autoResize.call(textarea);
+  }
 });
 
 

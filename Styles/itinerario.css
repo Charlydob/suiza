@@ -122,18 +122,339 @@
   cursor: pointer;
 }
 
- .modal-formulario {
+ .modal-formulario-eliminar {
   background: white;
   border-radius: 12px;
-  padding: 20px;
-  width: 90%;
+  padding: 15px;
+  width: 60%;
   max-width: 360px;
   margin: auto;
   box-shadow: 0 4px 20px rgba(0,0,0,0.25);
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 0px;
   text-align: center;
+}
+ .modal-formulario-tarjeta {
+  background: white;
+  border-radius: 12px;
+  padding: 15px;
+  width: 60%;
+  max-width: 360px;
+  margin: auto;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+  display: flex;
+  flex-direction: column;
+  gap: 0px;
+}
+
+/* MODAL PARA CUANDO */
+
+.modal-formulario-cuando {
+  background: #ffffffa6;
+  backdrop-filter: blur(3px);
+  border-radius: 16px;
+  padding: 20px 16px;
+  width: 90%;
+  max-width: 380px;
+  margin: auto;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-family: 'Arial', sans-serif;
+  text-align: center;
+}
+
+.modal-formulario-cuando h3 {
+  font-size: 18px;
+  margin: 0;
+  color: #333;
+}
+
+.modal-formulario-cuando input {
+  -webkit-appearance: none;
+  position: relative;
+  appearance: none;
+  margin-left: 12px;
+  margin-top: 0px;
+  background: rgba(96, 205, 255, 0.075);
+  backdrop-filter: blur(6px);
+  border: 1.5px solid #ccc;
+  border-radius: 12px;
+  padding: 3px;
+  font-size: 15px;
+  color: #333;
+  height: 18px;
+  width: 80%;
+    text-align: center;
+
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  transition: border 0.2s ease;
+}
+
+/* MODAL DEL DONDE */
+
+.modal-formulario-donde {
+  background: #ffffffa6;
+  backdrop-filter: blur(3px);
+  border-radius: 16px;
+  padding: 20px 16px;
+  width: 90%;
+  max-width: 380px;
+  margin: auto;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-family: 'Arial', sans-serif;
+  text-align: center;
+}
+
+.modal-formulario-donde h3 {
+  font-size: 18px;
+  margin: 0;
+  color: #333;
+}
+
+.modal-formulario-donde input {
+  -webkit-appearance: none;
+  position: relative;
+  appearance: none;
+  margin-left: 15px;
+  background: rgba(96, 205, 255, 0.075);
+  backdrop-filter: blur(6px);
+  border: 1.5px solid #ccc;
+  border-radius: 12px;
+  padding: 3px;
+  font-size: 15px;
+  color: #333;
+  height: 28px;
+  width: 80%;
+    text-align: center;
+
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  transition: border 0.2s ease;
+}
+
+
+/* MODAL DEL evento */
+
+.modal-formulario-evento {
+  background: #ffffffa6;
+  backdrop-filter: blur(3px);
+  border-radius: 16px;
+  padding: 20px 16px;
+  width: 90%;
+  max-width: 380px;
+  margin: auto;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-family: 'Arial', sans-serif;
+  text-align: center;
+}
+
+.modal-formulario-evento h3 {
+  font-size: 18px;
+  margin: 0;
+  color: #333;
+}
+
+.modal-formulario-evento input {
+  -webkit-appearance: none;
+  position: relative;
+  appearance: none;
+  margin-left: 15px;
+  background: rgba(96, 205, 255, 0.075);
+  backdrop-filter: blur(6px);
+  border: 1.5px solid #ccc;
+  border-radius: 12px;
+  padding: 3px;
+  font-size: 15px;
+  color: #333;
+  height: 28px;
+    text-align: center;
+
+  width: 80%;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  transition: border 0.2s ease;
+}
+
+/* MODAL DEL favoritos */
+
+.modal-formulario-favoritos {
+  background: #ffffffa6;
+  backdrop-filter: blur(3px);
+  border-radius: 16px;
+  padding: 20px 16px;
+  width: 90%;
+  max-width: 380px;
+  margin: auto;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-family: 'Arial', sans-serif;
+  text-align: center;
+}
+
+.modal-formulario-favoritos h3 {
+  font-size: 18px;
+  margin: 0;
+  color: #333;
+}
+
+.modal-formulario-favoritos input {
+  -webkit-appearance: none;
+  position: relative;
+  appearance: none;
+  margin-left: 72px;
+  background: rgba(96, 205, 255, 0.075);
+  backdrop-filter: blur(6px);
+  border: 1.5px solid #ccc;
+  border-radius: 12px;
+  padding: 3px;
+  font-size: 15px;
+  color: #333;
+  height: 18px;
+  width: 25%;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  transition: border 0.2s ease;
+}
+
+/* MODAL DEL EVENTO EDIT */
+
+.modal-formulario-evento-edit {
+  background: #ffffffa6;
+  backdrop-filter: blur(3px);
+  border-radius: 16px;
+  padding: 20px 16px;
+  width: 90%;
+  max-width: 380px;
+  margin: auto;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-family: 'Arial', sans-serif;
+  text-align: center;
+}
+
+.modal-formulario-evento-edit h3 {
+  font-size: 18px;
+  margin: 0;
+  color: #333;
+}
+
+.modal-formulario-evento-edit input#titulo-evento {
+  -webkit-appearance: none;
+  position: relative;
+  appearance: none;
+  margin-left: 5px;
+  background: rgba(255, 255, 255, 0.075);
+  backdrop-filter: blur(6px);
+  border: 1.5px solid #ccc;
+  border-radius: 8px;
+  padding: 3px;
+  font-size: 15px;
+  color: #333;
+  height: 18px;
+    text-align: center;
+
+  width: 90%;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  transition: border 0.2s ease;
+}
+.modal-formulario-evento-edit div.inputs-evento {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.modal-formulario-evento-edit textarea#notas-evento {
+  resize: none; /* Desactiva el "arrastrar" manual */
+  overflow: hidden; /* Elimina la barra de scroll vertical */
+  min-height: 60px; /* Altura mínima para que no sea enano */
+  max-height: 300px; /* Por si querés limitarlo */
+}
+
+
+/* MODAL DEL editar tarjeta */
+
+.modal-formulario-tarjeta {
+  background: #ffffffa6;
+  backdrop-filter: blur(3px);
+  border-radius: 16px;
+  padding: 20px 16px;
+  width: 90%;
+  max-width: 380px;
+  margin: auto;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-family: 'Arial', sans-serif;
+  text-align: center;
+}
+
+.modal-formulario-tarjeta h3 {
+  font-size: 18px;
+  margin: 0;
+  color: #333;
+}
+
+.modal-formulario-tarjeta input#titulo-evento {
+  -webkit-appearance: none;
+  position: relative;
+  appearance: none;
+  margin-left: 5px;
+  background: rgba(255, 255, 255, 0.075);
+  backdrop-filter: blur(6px);
+  border: 1.5px solid #ccc;
+  border-radius: 8px;
+  padding: 3px;
+  font-size: 15px;
+  color: #333;
+  height: 18px;
+  width: 90%;
+    text-align: center;
+
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  transition: border 0.2s ease;
+}
+.modal-formulario-tarjeta div.inputs-evento {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.modal-formulario-tarjeta textarea#notas-evento {
+  resize: none; /* Desactiva el "arrastrar" manual */
+  overflow: hidden; /* Elimina la barra de scroll vertical */
+  min-height: 60px; /* Altura mínima para que no sea enano */
+  max-height: 300px; /* Por si querés limitarlo */
+}
+.modal-formulario-tarjeta input#precio-evento {
+  -webkit-appearance: none;
+  position: relative;
+  appearance: none;
+  margin-left: 5px;
+  background: rgba(255, 255, 255, 0.075);
+  backdrop-filter: blur(6px);
+  border: 1.5px solid #ccc;
+  border-radius: 8px;
+  padding: 3px;
+  font-size: 15px;
+  color: #333;
+  height: 18px;
+  width: 20%;
+  text-align: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  transition: border 0.2s ease;
 }
 
 #modal-fondo {
@@ -196,6 +517,7 @@ button.btn-cerrar-ubicacion {
   cursor: pointer;
 }
 
+
 button.btn-cerrar-dia{
   position: absolute;
   top: 0px;
@@ -217,14 +539,26 @@ h3.titulo-dia{
 
 
 .modal-formulario button#btn-confirmar-aceptar {
-  background-color: #e74c3c;
-  width: 40px;
-  padding: 4px;
-  font-size: 20px;
-  border-radius: 8px;
+  background-color: #ff1b1b;
   color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  box-shadow: #333 0px 2px 4px;
+}
+button#btn-generico {
+  background-color: #007aff;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 14px;
+  padding: 5px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+    box-shadow: #333 0px 2px 4px;
 }
 
-.modal-formulario button:hover {
-  opacity: 0.9;
-}

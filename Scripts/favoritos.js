@@ -223,7 +223,7 @@ function cerrarEditorFavoritoDesde(origen) {
   favoritoEditandoId = null;
 
   if (origen === "lista") {
-    document.getElementById("editorFavoritoLista").style.display = "none";
+    document.getElementById("modal-fondo-editor").style.display = "none";
   } else {
     // Usar el modal real del sidebar
     const modalSidebar = document.getElementById("modal-fondo-favoritos");
@@ -253,7 +253,7 @@ function mostrarEditorFavoritoDesde(origen, id) {
   }
 
   if (sufijo === "Lista") {
-  document.getElementById("editorFavoritoLista").style.display = "block";
+  document.getElementById("modal-fondo-editor").style.display = "block";
 } else {
   document.getElementById("modal-fondo-favoritos").style.display = "block";
 }
