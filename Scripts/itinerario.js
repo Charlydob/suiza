@@ -419,54 +419,101 @@ function guardarItinerarioLocal() {
 window.guardarItinerarioLocal = guardarItinerarioLocal;
 
 function actualizarTarjeta(boton) {
+  console.log("🚀 Ejecutando actualizarTarjeta");
+
   const tarjeta = window._tarjetaEditando;
   const evento = window._eventoEditando;
 
-  if (!tarjeta || !evento) {
-    console.warn("❌ Faltan referencias para actualizar");
+  console.log("🧾 tarjeta:", tarjeta);
+  console.log("🧾 evento:", evento);
+
+  if (!tarjeta) {
+    console.warn("❌ No hay tarjeta editando (window._tarjetaEditando)");
+    return;
+  }
+
+  if (!evento) {
+    console.warn("❌ No hay evento editando (window._eventoEditando)");
     return;
   }
 
   const modal = boton.closest(".modal-formulario");
+  console.log("🧱 Modal activo:", modal);
 
-  const nuevoTitulo = modal.querySelector("#titulo-evento")?.value.trim();
-  const nuevaHora = modal.querySelector("#hora-evento")?.value;
-  const nuevasNotas = modal.querySelector("#notas-evento")?.value.trim();
-  const nuevaEtiqueta = modal.querySelector("#etiqueta-evento")?.value;
-  const nuevoPrecio = modal.querySelector("#precio-evento")?.value;
-  const nuevaMoneda = modal.querySelector("#moneda-evento")?.value;
+  const inputTitulo = modal.querySelector("#titulo-evento");
+  const inputHora = modal.querySelector("#hora-evento");
+  const inputNotas = modal.querySelector("#notas-evento");
+  const inputEtiqueta = modal.querySelector("#etiqueta-evento");
+  const inputPrecio = modal.querySelector("#precio-evento");
+  const inputMoneda = modal.querySelector("#moneda-evento");
 
-  // Validación básica
+  console.log("📦 Inputs obtenidos:", {
+    inputTitulo,
+    inputHora,
+    inputNotas,
+    inputEtiqueta,
+    inputPrecio,
+    inputMoneda
+  });
+
+  const nuevoTitulo = inputTitulo?.value.trim();
+  const nuevaHora = inputHora?.value;
+  const nuevasNotas = inputNotas?.value.trim();
+  const nuevaEtiqueta = inputEtiqueta?.value;
+  const nuevoPrecio = inputPrecio?.value;
+  const nuevaMoneda = inputMoneda?.value;
+
+  console.log("📥 Nuevos valores capturados:", {
+    nuevoTitulo,
+    nuevaHora,
+    nuevasNotas,
+    nuevaEtiqueta,
+    nuevoPrecio,
+    nuevaMoneda
+  });
+
   if (!nuevoTitulo) {
-    alert("El título no puede estar vacío.");
+    console.warn("⚠️ El título está vacío. Cancelando.");
     return;
   }
 
   // Actualizar DOM
-  tarjeta.querySelector(".titulo-evento").textContent = nuevoTitulo;
+  const tituloDOM = tarjeta.querySelector(".titulo-evento");
+  const etiquetaDOM = tarjeta.querySelector(".etiqueta-evento");
+
+  if (!tituloDOM || !etiquetaDOM) {
+    console.error("❌ No se encontraron elementos .titulo-evento o .etiqueta-evento en la tarjeta");
+    return;
+  }
+
+  console.log("🖋️ Actualizando DOM...");
+
+  tituloDOM.textContent = nuevoTitulo;
   tarjeta.setAttribute("data-hora", nuevaHora);
   tarjeta.setAttribute("data-notas", nuevasNotas);
   tarjeta.setAttribute("data-precio", nuevoPrecio);
   tarjeta.setAttribute("data-moneda", nuevaMoneda);
   tarjeta.title = nuevasNotas;
 
-  const tipo = tarjeta.classList.contains("color-favorito") ? "favorito" : "evento";
-  const etiquetaTexto = tipo.charAt(0).toUpperCase() + tipo.slice(1) + (nuevaHora ? ` · ${nuevaHora}` : "");
-  tarjeta.querySelector(".etiqueta-evento").textContent = etiquetaTexto;
+  const tipo = etiquetaDOM.textContent.includes("Favorito") ? "favorito" : "evento";
+  const textoEtiqueta = tipo.charAt(0).toUpperCase() + tipo.slice(1) + (nuevaHora ? ` · ${nuevaHora}` : "");
+  etiquetaDOM.textContent = textoEtiqueta;
 
-  // Actualizar clase color
+  // Clase color
   tarjeta.classList.remove("color-alojamiento", "color-transporte", "color-comida", "color-atraccion", "color-otros");
-  let nuevaClase = "";
+  let claseColor = "";
   switch (nuevaEtiqueta) {
-    case "alojamiento": nuevaClase = "color-alojamiento"; break;
-    case "transporte": nuevaClase = "color-transporte"; break;
-    case "comida": nuevaClase = "color-comida"; break;
-    case "atraccion": nuevaClase = "color-atraccion"; break;
-    default: nuevaClase = "color-otros";
+    case "alojamiento": claseColor = "color-alojamiento"; break;
+    case "transporte": claseColor = "color-transporte"; break;
+    case "comida": claseColor = "color-comida"; break;
+    case "atraccion": claseColor = "color-atraccion"; break;
+    default: claseColor = "color-otros";
   }
-  tarjeta.classList.add(nuevaClase);
+  tarjeta.classList.add(claseColor);
+  console.log("🎨 Clase color aplicada:", claseColor);
 
-  // Actualizar objeto original
+  // Actualizar en objeto original
+  console.log("📦 Actualizando objeto evento original...");
   evento.titulo = nuevoTitulo;
   evento.hora = nuevaHora;
   evento.notas = nuevasNotas;
@@ -475,13 +522,17 @@ function actualizarTarjeta(boton) {
   evento.moneda = nuevaMoneda;
   evento.tipo = tipo;
 
+  console.log("✅ Objeto evento actualizado:", evento);
+
   guardarItinerarioLocal();
+  console.log("💾 Guardado en localStorage");
+
   guardarItinerarioFirebase();
+  console.log("☁️ Intento de guardado en Firebase");
+
   cerrarModal();
-
-  console.log("📝 Tarjeta actualizada:", nuevoTitulo);
+  console.log("❎ Modal cerrado");
 }
-
 
 window.actualizarTarjeta = actualizarTarjeta;
 
