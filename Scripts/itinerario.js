@@ -738,3 +738,4 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 
+window.itinerarioData = itinerarioData;
