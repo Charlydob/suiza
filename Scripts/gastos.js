@@ -12,12 +12,15 @@ function convertirMoneda(cantidad, desde, hacia) {
   if (!desde || !cantidad) return 0;
   if (desde === hacia) return parseFloat(cantidad);
   const cantidadEUR = parseFloat(cantidad) / tasasCambio[desde];
-  return cantidadEUR * tasasCambio[hacia];
+  const resultado = cantidadEUR * tasasCambio[hacia];
+  console.log(`💱 Convertido ${cantidad} ${desde} → ${resultado.toFixed(2)} ${hacia}`);
+  return resultado;
 }
 
 function cambiarMonedaDestino() {
   const select = document.getElementById("monedaDestino");
   monedaDestino = select.value;
+  console.log("🪙 Moneda destino cambiada a:", monedaDestino);
   guardarGastosFirebase();
   renderizarResumenGastos();
 }
@@ -29,10 +32,14 @@ function añadirGastoManual(fecha, btn) {
   const cantidad = parseFloat(inputs[1].value);
   const moneda = select.value;
 
-  if (!concepto || isNaN(cantidad)) return;
+  if (!concepto || isNaN(cantidad)) {
+    console.warn("⚠️ Gasto manual inválido:", concepto, cantidad);
+    return;
+  }
 
   if (!gastosExtra[fecha]) gastosExtra[fecha] = [];
   gastosExtra[fecha].push({ concepto, cantidad, moneda });
+  console.log("📝 Gasto manual añadido:", concepto, cantidad, moneda, "→", fecha);
 
   guardarGastosFirebase();
   renderizarResumenGastos();
@@ -41,28 +48,41 @@ function añadirGastoManual(fecha, btn) {
 function renderizarResumenGastos() {
   const contenedor = document.getElementById("contenedor-gastos-dias");
   contenedor.innerHTML = "";
-  if (typeof itinerarioData !== "object") return;
+  if (typeof itinerarioData !== "object") {
+    console.warn("❌ itinerarioData no es un objeto válido:", itinerarioData);
+    return;
+  }
 
   const select = document.getElementById("monedaDestino");
   if (select) select.value = monedaDestino;
 
+  console.log("🧩 Renderizando gastos con moneda:", monedaDestino);
   let totalGeneral = 0;
   const agrupado = {};
 
   for (const [fecha, datosDia] of Object.entries(itinerarioData)) {
-    if (!datosDia.eventos || !Array.isArray(datosDia.eventos)) continue;
+    if (!datosDia.eventos || !Array.isArray(datosDia.eventos)) {
+      console.log(`📭 Día sin eventos válidos: ${fecha}`, datosDia);
+      continue;
+    }
 
     const ubicacion = datosDia.ubicacion || "Sin ubicación";
     if (!agrupado[ubicacion]) agrupado[ubicacion] = {};
 
+    console.log(`📅 Procesando fecha ${fecha} en ${ubicacion}...`);
+
     agrupado[ubicacion][fecha] = datosDia.eventos
-      .filter(e => parseFloat(e.precio))
+      .filter(e => {
+        const valido = parseFloat(e.precio);
+        if (!valido) console.log("❌ Evento sin precio válido:", e);
+        return valido;
+      })
       .map(e => {
         const precio = parseFloat(e.precio.toString().replace(",", "."));
         const moneda = e.moneda || "EUR";
         const convertido = convertirMoneda(precio, moneda, monedaDestino);
 
-        return {
+        const eventoFormateado = {
           tipo: e.tipo,
           titulo: e.titulo,
           etiqueta: e.etiquetaEvento,
@@ -70,6 +90,9 @@ function renderizarResumenGastos() {
           precioConvertido: `${convertido.toFixed(2)} ${monedaDestino}`,
           valorNumerico: convertido
         };
+
+        console.log("✅ Evento con precio válido:", eventoFormateado);
+        return eventoFormateado;
       });
   }
 
@@ -90,6 +113,8 @@ function renderizarResumenGastos() {
       const todos = [...eventos, ...manuales];
       const totalDia = todos.reduce((s, e) => s + e.valorNumerico, 0);
       totalGeneral += totalDia;
+
+      console.log(`📦 Día ${fecha} en ${ubicacion}:`, todos, `→ Total: ${totalDia.toFixed(2)} ${monedaDestino}`);
 
       const div = document.createElement("div");
       div.className = "gasto-dia";
@@ -117,6 +142,7 @@ function renderizarResumenGastos() {
     }
   }
 
+  console.log("💰 Total general:", totalGeneral.toFixed(2), monedaDestino);
   document.getElementById("gastos-total").textContent = `${totalGeneral.toFixed(2)} ${monedaDestino}`;
 }
 
@@ -132,7 +158,7 @@ function guardarGastosFirebase() {
   };
 
   db.ref(rutaGastos).set(datos)
-    .then(() => console.log("☁️ Gastos guardados en Firebase"))
+    .then(() => console.log("☁️ Gastos guardados en Firebase:", datos))
     .catch(err => console.error("❌ Error al guardar gastos:", err));
 }
 
@@ -149,9 +175,9 @@ function cargarGastosFirebase() {
       if (data) {
         monedaDestino = data.monedaDestino || "CHF";
         gastosExtra = data.gastosExtra || {};
-        console.log("🧾 Gastos cargados desde Firebase:", data);
+        console.log("☁️ Gastos cargados desde Firebase:", data);
       } else {
-        console.log("📂 Firebase vacío, iniciando con valores por defecto.");
+        console.log("📂 Firebase vacío, usando valores por defecto.");
       }
       renderizarResumenGastos();
     })
