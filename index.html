@@ -7,9 +7,10 @@
   <link rel="stylesheet" href="Styles/styles.css" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="Styles/menuInferior.css" />
-<link rel="stylesheet" href="Styles/itinerario.css" />
-
+  <link rel="stylesheet" href="Styles/itinerario.css" />
   <link rel="stylesheet" href="Styles/favoritos.css" />
+  <link rel="stylesheet" href="Styles/gastos.css" />
+
   <link rel="apple-touch-icon" href="Recursos/icono.png" />
 </head>
 
@@ -288,10 +289,19 @@
       </template>
     </section>
 <!--🟨🟨🟨🟨 GASTOS 🟨🟨🟨🟨-->
-    <section id="pagina-gastos" class="pagina" style="display: none;">
-      <h2>💰 Gastos</h2>
-      <p>Lleva un registro de cada gasto del viaje.</p>
-    </section>
+<section id="pagina-gastos" class="pagina-gastos" style="display: none;">
+  <h2>💰 Resumen de gastos</h2>
+  <p>Calculamos automáticamente lo que costará cada día y lo que se va sumando durante el viaje.</p>
+
+  <div id="contenedor-gastos-dias">
+    <!-- Aquí se insertan los días y sus gastos -->
+  </div>
+
+  <div id="gastos-total-final">
+    <h3>Total estimado del viaje: <span id="gastos-total">0 CHF</span></h3>
+  </div>
+</section>
+
 <!--🟨🟨🟨🟨 NOTAS 🟨🟨🟨🟨-->
     <section id="pagina-notas" class="pagina-app" style="display: none;">
       <h2>📝 Notas</h2>
@@ -369,5 +379,7 @@
 <script src="Scripts/menuInferior.js"></script>
 <!-- Lógica de la ventana itinerario -->
 <script src="Scripts/itinerario.js"></script>
+<!-- Lógica de la ventana gastos -->
+<script src="Scripts/gastos.js"></script>
 </body>
 </html>

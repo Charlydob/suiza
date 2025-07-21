@@ -1,0 +1,44 @@
+.gasto-dia {
+  background: #fff;
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.gasto-dia h4 {
+  margin-bottom: 0.5rem;
+}
+
+.gasto-dia ul {
+  list-style: none;
+  padding-left: 0;
+  margin-bottom: 0.5rem;
+}
+
+.gasto-dia li {
+  margin-bottom: 0.3rem;
+}
+
+.gasto-extra {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.gasto-extra input {
+  flex: 1;
+  padding: 5px;
+}
+
+.gasto-extra button {
+  padding: 5px 10px;
+  font-weight: bold;
+}
+
+#gastos-total-final {
+  padding: 1rem;
+  text-align: center;
+  font-size: 1.2rem;
+  font-weight: bold;
+}
