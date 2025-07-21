@@ -54,52 +54,63 @@ function renderizarResumenGastos() {
       });
   }
 
-  for (const [ubicacion, fechas] of Object.entries(agrupado)) {
-    for (const [fecha, eventos] of Object.entries(fechas)) {
-      const manuales = (gastosExtra[fecha] || []).map(g => {
-        const convertido = convertirMoneda(g.cantidad, g.moneda, monedaDestino);
-        return {
-          tipo: "manual",
-          titulo: g.concepto,
-          etiqueta: "Manual",
-          precioOriginal: `${g.cantidad.toFixed(2)} ${g.moneda}`,
-          precioConvertido: `${convertido.toFixed(2)} ${monedaDestino}`,
-          valorNumerico: convertido
-        };
-      });
+for (const [ubicacion, fechas] of Object.entries(agrupado)) {
+  for (const [fecha, eventos] of Object.entries(fechas)) {
+    const manuales = (gastosExtra[fecha] || []).map((g, i) => {
+      const convertido = convertirMoneda(g.cantidad, g.moneda, monedaDestino);
+      return {
+        tipo: "manual",
+        titulo: g.concepto,
+        etiqueta: "Manual",
+        precioOriginal: `${g.cantidad.toFixed(2)} ${g.moneda}`,
+        precioConvertido: `${convertido.toFixed(2)} ${monedaDestino}`,
+        valorNumerico: convertido,
+        indice: i // necesario para eliminar luego
+      };
+    });
 
-      const todos = [...eventos, ...manuales];
-      const totalDia = todos.reduce((s, e) => s + e.valorNumerico, 0);
-      totalGeneral += totalDia;
+    const todos = [...eventos, ...manuales];
+    const totalDia = todos.reduce((s, e) => s + e.valorNumerico, 0);
+    totalGeneral += totalDia;
 
-      const div = document.createElement("div");
-      div.className = "gasto-dia";
-      div.innerHTML = `
-        <h3>${ubicacion}</h3>
-        <h4>${fecha}</h4>
-        <ul>
-          ${todos.map(e => `
-            <li><strong>${e.titulo}</strong> – ${e.etiqueta} – ${e.precioOriginal} → <strong>${e.precioConvertido}</strong></li>
-          `).join("")}
-        </ul>
-        <div class="gasto-extra">
-          <input type="text" placeholder="Nuevo gasto">
-          <input type="number" placeholder="Cantidad">
-          <select>
-            <option value="EUR">EUR</option>
-            <option value="CHF">CHF</option>
-            <option value="USD">USD</option>
-          </select>
-          <button onclick="añadirGastoManual('${fecha}', this)">＋ Añadir</button>
-        </div>
-        <p class="total-dia">Total: ${totalDia.toFixed(2)} ${monedaDestino}</p>
-      `;
-      contenedor.appendChild(div);
-    }
+    const div = document.createElement("div");
+    div.className = "gasto-dia";
+    div.innerHTML = `
+      <h3>${ubicacion}</h3>
+      <h4>${fecha}</h4>
+      <ul>
+        ${todos.map((e, i) => `
+          <li>
+            <strong>${e.titulo}</strong> – ${e.etiqueta} – ${e.precioOriginal} → <strong>${e.precioConvertido}</strong>
+            ${e.tipo === "manual" ? `<button onclick="eliminarGastoManual('${fecha}', ${e.indice})">❌</button>` : ""}
+          </li>
+        `).join("")}
+      </ul>
+      <div class="gasto-extra">
+        <input type="text" placeholder="Nuevo gasto">
+        <input type="number" placeholder="Cantidad">
+        <select>
+          <option value="EUR">EUR</option>
+          <option value="CHF">CHF</option>
+          <option value="USD">USD</option>
+        </select>
+        <button onclick="añadirGastoManual('${fecha}', this)">＋ Añadir</button>
+      </div>
+      <p class="total-dia">Total: ${totalDia.toFixed(2)} ${monedaDestino}</p>
+    `;
+    contenedor.appendChild(div);
   }
+}
 
   document.getElementById("gastos-total").textContent = `${totalGeneral.toFixed(2)} ${monedaDestino}`;
 }
+function eliminarGastoManual(fecha, indice) {
+  if (!gastosExtra[fecha] || !gastosExtra[fecha][indice]) return;
+  const eliminado = gastosExtra[fecha].splice(indice, 1)[0];
+  console.log("🗑️ Gasto manual eliminado:", eliminado, "→", fecha);
+  renderizarResumenGastos();
+}
+window.eliminarGastoManual = eliminarGastoManual;
 
 function cambiarMonedaDestino() {
   const select = document.getElementById("monedaDestino");
