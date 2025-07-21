@@ -1,5 +1,45 @@
 let monedaDestino = "CHF";
 let gastosExtra = {};
+function guardarGastosFirebase() {
+  if (!navigator.onLine || typeof db === "undefined") {
+    console.warn("📴 Sin conexión, no se guarda en Firebase.");
+    return;
+  }
+
+  const datos = {
+    monedaDestino,
+    gastosExtra
+  };
+
+  db.ref(rutaGastos).set(datos)
+    .then(() => console.log("☁️ Gastos guardados en Firebase:", datos))
+    .catch(err => console.error("❌ Error al guardar gastos:", err));
+}
+
+function cargarGastosFirebase() {
+  if (!navigator.onLine || typeof db === "undefined") {
+    console.warn("📴 Sin conexión, no se carga de Firebase.");
+    renderizarResumenGastos();
+    return;
+  }
+
+  db.ref(rutaGastos).once("value")
+    .then(snapshot => {
+      const data = snapshot.val();
+      if (data) {
+        monedaDestino = data.monedaDestino || "CHF";
+        gastosExtra = data.gastosExtra || {};
+        console.log("☁️ Gastos cargados desde Firebase:", data);
+      } else {
+        console.log("📂 Firebase vacío, usando valores por defecto.");
+      }
+      renderizarResumenGastos();
+    })
+    .catch(err => {
+      console.error("❌ Error al cargar gastos desde Firebase:", err);
+      renderizarResumenGastos();
+    });
+}
 
 const tasasCambio = {
   EUR: 1.0,
