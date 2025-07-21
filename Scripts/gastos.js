@@ -187,4 +187,15 @@ function cargarGastosFirebase() {
     });
 }
 
-window.addEventListener("DOMContentLoaded", cargarGastosFirebase);
+window.addEventListener("DOMContentLoaded", () => {
+  // Esperar hasta que itinerarioData esté inicializado y renderizado
+  const check = setInterval(() => {
+    if (typeof itinerarioData === "object" && Object.keys(itinerarioData).length > 0) {
+      console.log("✅ itinerarioData listo. Cargando gastos...");
+      cargarGastosFirebase();
+      clearInterval(check);
+    } else {
+      console.log("⏳ Esperando a que itinerarioData esté disponible...");
+    }
+  }, 500);
+});
