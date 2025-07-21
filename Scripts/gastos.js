@@ -7,7 +7,15 @@ const tasasCambio = {
   CHF: 0.9318,
   USD: 1.09
 };
+function mostrarPagina(id) {
+  document.querySelectorAll(".pagina").forEach(p => p.style.display = "none");
+  document.getElementById(id).style.display = "block";
 
+  if (id === "pagina-gastos") {
+    console.log("👀 Mostrando sección de gastos...");
+    renderizarResumenGastos();
+  }
+}
 function convertirMoneda(cantidad, desde, hacia) {
   if (!desde || !cantidad) return 0;
   if (desde === hacia) return parseFloat(cantidad);
