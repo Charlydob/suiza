@@ -554,26 +554,37 @@ function actualizarTarjeta(boton) {
   tarjeta.classList.add(claseColor);
   console.log("🎨 Clase color aplicada:", claseColor);
 
-  // Actualizar en objeto original
-  console.log("📦 Actualizando objeto evento original...");
-  evento.titulo = nuevoTitulo;
-  evento.hora = nuevaHora;
-  evento.notas = nuevasNotas;
-  evento.etiquetaEvento = nuevaEtiqueta;
-  evento.precio = nuevoPrecio;
-  evento.moneda = nuevaMoneda;
-  evento.tipo = tipo;
+// 🧠 Actualizar en objeto original
+console.log("📦 Actualizando objeto evento original...");
+evento.titulo = nuevoTitulo;
+evento.hora = nuevaHora;
+evento.notas = nuevasNotas;
+evento.etiquetaEvento = nuevaEtiqueta;
+evento.precio = nuevoPrecio;
+evento.moneda = nuevaMoneda;
+evento.tipo = tipo;
 
-  console.log("✅ Objeto evento actualizado:", evento);
+console.log("✅ Objeto evento actualizado:", evento);
 
-  guardarItinerarioLocal();
-  console.log("💾 Guardado en localStorage");
+// 🧠 Actualizar también el dataset de la tarjeta para futuras ediciones
+tarjeta.dataset.originalTitulo = nuevoTitulo;
+tarjeta.dataset.originalHora = nuevaHora;
+tarjeta.setAttribute("data-notas", nuevasNotas);
+tarjeta.setAttribute("data-precio", nuevoPrecio);
+tarjeta.setAttribute("data-moneda", nuevaMoneda);
 
-  guardarItinerarioFirebase();
-  console.log("☁️ Intento de guardado en Firebase");
+// 🧠 Si querés mayor robustez aún, también podés guardar la etiqueta si la usás para búsquedas futuras:
+tarjeta.dataset.etiquetaEvento = nuevaEtiqueta;
 
-  cerrarModal();
-  console.log("❎ Modal cerrado");
+guardarItinerarioLocal();
+console.log("💾 Guardado en localStorage");
+
+guardarItinerarioFirebase();
+console.log("☁️ Intento de guardado en Firebase");
+
+cerrarModal();
+console.log("❎ Modal cerrado");
+
 }
 
 window.actualizarTarjeta = actualizarTarjeta;
