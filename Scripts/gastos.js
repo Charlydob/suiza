@@ -188,18 +188,18 @@ function cargarGastosFirebase() {
 }
 
 window.addEventListener("DOMContentLoaded", () => {
-  console.log("🧠 DOMContentLoaded: gastos.js activo");
-
   const check = setInterval(() => {
     if (typeof itinerarioData === "object" && Object.keys(itinerarioData).length > 0) {
       console.log("✅ itinerarioData listo. Cargando gastos...");
       cargarGastosFirebase();
+      renderizarResumenGastos(); // 👈 ESTA LÍNEA FALTABA
       clearInterval(check);
     } else {
       console.log("⏳ Esperando a que itinerarioData esté disponible...");
     }
   }, 500);
 });
+
 
 
 window.renderizarResumenGastos = renderizarResumenGastos;
