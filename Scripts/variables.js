@@ -94,7 +94,3 @@ document.getElementById("btn-login").addEventListener("click", () => {
     });
 });
 
-function mostrarContenido() {
-  document.getElementById("auth-container").style.display = "none";
-  document.getElementById("pagina-itinerario").style.display = "block";
-}
