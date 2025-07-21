@@ -215,11 +215,5 @@ window.renderizarResumenGastos = renderizarResumenGastos;
 window.cargarGastosFirebase = cargarGastosFirebase;
 window.cambiarMonedaDestino = cambiarMonedaDestino;
 window.añadirGastoManual = añadirGastoManual;
-db.ref(window.rutaItinerario).once("value")
-  .then(snapshot => {
-    const data = snapshot.val() || {};
-    window.itinerarioData = data;
-    renderizarItinerario(); // o lo que toque
-  });
 
 window.itinerarioData = {};
