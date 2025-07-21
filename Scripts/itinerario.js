@@ -328,7 +328,7 @@ function crearTarjeta(titulo, tipo, hora = null, notas = "", etiquetaEvento = ""
   }
   tarjeta.classList.add(claseColor);
 
-  // Insertar ordenado por hora
+  // Orden por hora
   const contenedor = window._carouselActual;
   const nuevaHora = parseHora(hora);
   let insertado = false;
@@ -346,7 +346,7 @@ function crearTarjeta(titulo, tipo, hora = null, notas = "", etiquetaEvento = ""
   }
   if (!insertado) contenedor.appendChild(tarjeta);
 
-  // 🧠 Evento de click con lógica completa
+  // Evento de clic para editar
   tarjeta.addEventListener("click", () => {
     mostrarModal(`
       <div class="modal-formulario">
@@ -369,21 +369,32 @@ function crearTarjeta(titulo, tipo, hora = null, notas = "", etiquetaEvento = ""
         </select>
         <div>
           <button onclick="actualizarTarjeta(this)">Guardar cambios</button>
-          <button onclick="borrarTarjeta(document._tarjetaEditando)">Eliminar</button>
+          <button onclick="borrarTarjeta(window._tarjetaEditando)">Eliminar</button>
           <button onclick="cerrarModal()">Cancelar</button>
         </div>
       </div>
     `);
 
-    document._tarjetaEditando = tarjeta;
+    window._tarjetaEditando = tarjeta;
 
-    // Asociar directamente el evento a editar
     const seccion = tarjeta.closest(".seccion-ubicacion");
     const tituloUbicacion = seccion?.querySelector(".titulo-ubicacion")?.textContent;
     const fecha = tituloUbicacion?.replace("Día ", "").trim();
+
     if (fecha && itinerarioData[fecha]) {
-      const evento = itinerarioData[fecha].eventos.find(e => e.titulo === titulo && e.hora === hora);
-      if (evento) window._eventoEditando = evento;
+      const evento = itinerarioData[fecha].eventos.find(
+        e => e.titulo === titulo && e.hora === hora
+      );
+
+      if (evento) {
+        window._eventoEditando = evento;
+      } else {
+        console.warn("⚠️ No se encontró el evento al hacer clic en la tarjeta.");
+        window._eventoEditando = null;
+      }
+    } else {
+      console.warn("⚠️ No se pudo determinar la fecha de la tarjeta.");
+      window._eventoEditando = null;
     }
   });
 
@@ -391,6 +402,7 @@ function crearTarjeta(titulo, tipo, hora = null, notas = "", etiquetaEvento = ""
 }
 
 window.crearTarjeta = crearTarjeta;
+
 
 })();
 
