@@ -408,7 +408,15 @@ window.guardarItinerarioLocal = guardarItinerarioLocal;
 function actualizarTarjeta(boton) {
   const tarjeta = window._tarjetaEditando;
   const evento = window._eventoEditando;
-  if (!tarjeta || !evento) return;
+
+  if (!tarjeta) {
+    console.warn("❌ No hay tarjeta editando (window._tarjetaEditando)");
+    return;
+  }
+  if (!evento) {
+    console.warn("❌ No hay evento editando (window._eventoEditando)");
+    return;
+  }
 
   const modal = boton.closest(".modal-formulario");
   const nuevoTitulo = modal.querySelector("#titulo-evento")?.value.trim();
