@@ -148,6 +148,7 @@ function eliminarGastoManual(fecha, indice) {
   if (!gastosExtra[fecha] || !gastosExtra[fecha][indice]) return;
   const eliminado = gastosExtra[fecha].splice(indice, 1)[0];
   console.log("🗑️ Gasto manual eliminado:", eliminado, "→", fecha);
+  guardarGastosFirebase();
   renderizarResumenGastos();
 }
 window.eliminarGastoManual = eliminarGastoManual;
@@ -175,14 +176,16 @@ function añadirGastoManual(fecha, btn) {
   gastosExtra[fecha].push({ concepto, cantidad, moneda });
   console.log("📝 Gasto manual añadido:", concepto, cantidad, moneda, "→", fecha);
 
-  renderizarResumenGastos();
+  guardarGastosFirebase();
+renderizarResumenGastos();
+
 }
 
 window.addEventListener("DOMContentLoaded", () => {
   const check = setInterval(() => {
     if (typeof itinerarioData === "object" && Object.keys(itinerarioData).length > 0) {
       console.log("✅ itinerarioData listo. Renderizando gastos...");
-      renderizarResumenGastos();
+      cargarGastosFirebase();
       clearInterval(check);
     } else {
       console.log("⏳ Esperando a que itinerarioData esté disponible...");
