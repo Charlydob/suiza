@@ -371,11 +371,12 @@
   };
   firebase.initializeApp(firebaseConfig);
   const db = firebase.database();
+    window.itinerarioData = {}; 
+
     db.ref().once("value")
     .then(snapshot => {
       console.log("🔥 Firebase raíz:", snapshot.val());
     });
-  window.itinerarioData = {}; 
   const rutaFavoritos = "favoritos/charlyylaura";
   const rutaIgnorados = "ignorados/charlyylaura";
   const rutaItinerario = "itinerario/charlyylaura"; 
