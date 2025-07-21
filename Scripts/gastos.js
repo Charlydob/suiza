@@ -199,3 +199,8 @@ window.addEventListener("DOMContentLoaded", () => {
     }
   }, 500);
 });
+
+window.renderizarResumenGastos = renderizarResumenGastos;
+window.cargarGastosFirebase = cargarGastosFirebase;
+window.cambiarMonedaDestino = cambiarMonedaDestino;
+window.añadirGastoManual = añadirGastoManual;
