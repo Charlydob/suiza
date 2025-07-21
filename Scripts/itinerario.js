@@ -98,13 +98,26 @@ window.guardarNuevaUbicacion = guardarNuevaUbicacion;
     `);
     window._contenedorDiasActual = contenedorDias;
   }
+function formatearFechaBonita(fechaISO) {
+  const fecha = new Date(fechaISO + "T00:00:00");
+  const dias = ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"];
+  const meses = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sept", "Oct", "Nov", "Dic"];
+
+  const diaSemana = dias[fecha.getDay()];
+  const dia = fecha.getDate();
+  const mes = meses[fecha.getMonth()];
+
+  return `${diaSemana} ${dia} ${mes}`;
+}
+
 
 function guardarNuevoDia() {
   const fecha = document.getElementById("input-nuevo-dia").value;
   if (fecha) {
     const contenedor = window._contenedorDiasActual;
     const template = document.getElementById("template-dia").content.cloneNode(true);
-    template.querySelector(".titulo-dia").textContent = fecha;
+const tituloFormateado = formatearFechaBonita(fecha);
+template.querySelector(".titulo-dia").textContent = tituloFormateado;
 
     const btnAgregarEvento = template.querySelector(".btn-agregar-evento");
     const carousel = template.querySelector(".carousel-dia");
