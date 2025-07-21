@@ -371,8 +371,6 @@
   };
   firebase.initializeApp(firebaseConfig);
   const db = firebase.database();
-    window.itinerarioData = {}; 
-
     db.ref().once("value")
     .then(snapshot => {
       console.log("🔥 Firebase raíz:", snapshot.val());
@@ -403,6 +401,6 @@
 <!-- Lógica de la ventana itinerario -->
 <script src="Scripts/itinerario.js"></script>
 <!-- Lógica de la ventana gastos -->
-<script src="Scripts/gastos.js"></script>
+<script src="https://charlydob.github.io/suiza/Scripts/gastos.js?v=20250721b"></script>
 </body>
 </html>
