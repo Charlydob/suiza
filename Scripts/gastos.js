@@ -7,52 +7,6 @@ const tasasCambio = {
   CHF: 0.9318,
   USD: 1.09
 };
-function mostrarPagina(id) {
-  document.querySelectorAll(".pagina").forEach(p => p.style.display = "none");
-  document.getElementById(id).style.display = "block";
-
-  if (id === "pagina-gastos") {
-    console.log("👀 Mostrando sección de gastos...");
-    renderizarResumenGastos();
-  }
-}
-function convertirMoneda(cantidad, desde, hacia) {
-  if (!desde || !cantidad) return 0;
-  if (desde === hacia) return parseFloat(cantidad);
-  const cantidadEUR = parseFloat(cantidad) / tasasCambio[desde];
-  const resultado = cantidadEUR * tasasCambio[hacia];
-  console.log(`💱 Convertido ${cantidad} ${desde} → ${resultado.toFixed(2)} ${hacia}`);
-  return resultado;
-}
-
-function cambiarMonedaDestino() {
-  const select = document.getElementById("monedaDestino");
-  monedaDestino = select.value;
-  console.log("🪙 Moneda destino cambiada a:", monedaDestino);
-  guardarGastosFirebase();
-  renderizarResumenGastos();
-}
-
-function añadirGastoManual(fecha, btn) {
-  const inputs = btn.parentElement.querySelectorAll("input");
-  const select = btn.parentElement.querySelector("select");
-  const concepto = inputs[0].value.trim();
-  const cantidad = parseFloat(inputs[1].value);
-  const moneda = select.value;
-
-  if (!concepto || isNaN(cantidad)) {
-    console.warn("⚠️ Gasto manual inválido:", concepto, cantidad);
-    return;
-  }
-
-  if (!gastosExtra[fecha]) gastosExtra[fecha] = [];
-  gastosExtra[fecha].push({ concepto, cantidad, moneda });
-  console.log("📝 Gasto manual añadido:", concepto, cantidad, moneda, "→", fecha);
-
-  guardarGastosFirebase();
-  renderizarResumenGastos();
-}
-
 function renderizarResumenGastos() {
   const contenedor = document.getElementById("contenedor-gastos-dias");
   contenedor.innerHTML = "";
@@ -153,6 +107,53 @@ function renderizarResumenGastos() {
   console.log("💰 Total general:", totalGeneral.toFixed(2), monedaDestino);
   document.getElementById("gastos-total").textContent = `${totalGeneral.toFixed(2)} ${monedaDestino}`;
 }
+function mostrarPagina(id) {
+  document.querySelectorAll(".pagina").forEach(p => p.style.display = "none");
+  document.getElementById(id).style.display = "block";
+
+  if (id === "pagina-gastos") {
+    console.log("👀 Mostrando sección de gastos...");
+    renderizarResumenGastos();
+  }
+}
+function convertirMoneda(cantidad, desde, hacia) {
+  if (!desde || !cantidad) return 0;
+  if (desde === hacia) return parseFloat(cantidad);
+  const cantidadEUR = parseFloat(cantidad) / tasasCambio[desde];
+  const resultado = cantidadEUR * tasasCambio[hacia];
+  console.log(`💱 Convertido ${cantidad} ${desde} → ${resultado.toFixed(2)} ${hacia}`);
+  return resultado;
+}
+
+function cambiarMonedaDestino() {
+  const select = document.getElementById("monedaDestino");
+  monedaDestino = select.value;
+  console.log("🪙 Moneda destino cambiada a:", monedaDestino);
+  guardarGastosFirebase();
+  renderizarResumenGastos();
+}
+
+function añadirGastoManual(fecha, btn) {
+  const inputs = btn.parentElement.querySelectorAll("input");
+  const select = btn.parentElement.querySelector("select");
+  const concepto = inputs[0].value.trim();
+  const cantidad = parseFloat(inputs[1].value);
+  const moneda = select.value;
+
+  if (!concepto || isNaN(cantidad)) {
+    console.warn("⚠️ Gasto manual inválido:", concepto, cantidad);
+    return;
+  }
+
+  if (!gastosExtra[fecha]) gastosExtra[fecha] = [];
+  gastosExtra[fecha].push({ concepto, cantidad, moneda });
+  console.log("📝 Gasto manual añadido:", concepto, cantidad, moneda, "→", fecha);
+
+  guardarGastosFirebase();
+  renderizarResumenGastos();
+}
+
+
 
 function guardarGastosFirebase() {
   if (!navigator.onLine || typeof db === "undefined") {
