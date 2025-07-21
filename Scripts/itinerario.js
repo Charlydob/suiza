@@ -381,59 +381,64 @@ if (!tarjeta) {
   if (!insertado) contenedor.appendChild(tarjeta);
 
   // Evento de clic para editar
-  tarjeta.addEventListener("click", () => {
-    const eventoActual = window._eventoEditando;
+ tarjeta.addEventListener("click", () => {
+  window._tarjetaEditando = tarjeta;
 
-    mostrarModal(`
-      <div class="modal-formulario">
-        <h3>Editar ${tipo}</h3>
-        <input id="titulo-evento" placeholder="Título" value="${eventoActual.titulo || ""}">
-        <input id="hora-evento" type="time" value="${eventoActual.hora || ""}">
-        <select id="etiqueta-evento">
-          <option value="alojamiento" ${eventoActual.etiquetaEvento === "alojamiento" ? "selected" : ""}>Alojamiento</option>
-          <option value="transporte" ${eventoActual.etiquetaEvento === "transporte" ? "selected" : ""}>Transporte</option>
-          <option value="comida" ${eventoActual.etiquetaEvento === "comida" ? "selected" : ""}>Comida</option>
-          <option value="atraccion" ${eventoActual.etiquetaEvento === "atraccion" ? "selected" : ""}>Atracción</option>
-          <option value="otros" ${eventoActual.etiquetaEvento === "otros" ? "selected" : ""}>Otros</option>
-        </select>
-        <textarea id="notas-evento" placeholder="Notas">${eventoActual.notas || ""}</textarea>
-        <input id="precio-evento" placeholder="Precio" value="${eventoActual.precio || ""}">
-        <select id="moneda-evento">
-          <option value="EUR" ${eventoActual.moneda === "EUR" ? "selected" : ""}>EUR</option>
-          <option value="CHF" ${eventoActual.moneda === "CHF" ? "selected" : ""}>CHF</option>
-          <option value="USD" ${eventoActual.moneda === "USD" ? "selected" : ""}>USD</option>
-        </select>
-        <div>
-          <button onclick="actualizarTarjeta(this)">Guardar cambios</button>
-          <button onclick="borrarTarjeta(window._tarjetaEditando)">Eliminar</button>
-          <button onclick="cerrarModal()">Cancelar</button>
-        </div>
-      </div>
-    `);
+  const seccion = tarjeta.closest(".seccion-ubicacion");
+  const tituloUbicacion = seccion?.querySelector(".titulo-ubicacion")?.textContent;
+  const fecha = tituloUbicacion?.replace("Día ", "").trim();
 
+  if (fecha && itinerarioData[fecha]) {
+    const evento = itinerarioData[fecha].eventos.find(
+      e => e.titulo === tarjeta.dataset.originalTitulo && e.hora === tarjeta.dataset.originalHora
+    );
 
-    window._tarjetaEditando = tarjeta;
-
-    const seccion = tarjeta.closest(".seccion-ubicacion");
-    const tituloUbicacion = seccion?.querySelector(".titulo-ubicacion")?.textContent;
-    const fecha = tituloUbicacion?.replace("Día ", "").trim();
-
-    if (fecha && itinerarioData[fecha]) {
-      const evento = itinerarioData[fecha].eventos.find(
-        e => e.titulo === titulo && e.hora === hora
-      );
-
-      if (evento) {
-        window._eventoEditando = evento;
-      } else {
-        console.warn("⚠️ No se encontró el evento al hacer clic en la tarjeta.");
-        window._eventoEditando = null;
-      }
+    if (evento) {
+      window._eventoEditando = evento;
     } else {
-      console.warn("⚠️ No se pudo determinar la fecha de la tarjeta.");
+      console.warn("⚠️ No se encontró el evento al hacer clic en la tarjeta.");
       window._eventoEditando = null;
     }
-  });
+  } else {
+    console.warn("⚠️ No se pudo determinar la fecha de la tarjeta.");
+    window._eventoEditando = null;
+  }
+
+  const eventoActual = window._eventoEditando;
+
+  if (!eventoActual) {
+    alert("❌ No se pudo cargar la información del evento.");
+    return;
+  }
+
+  mostrarModal(`
+    <div class="modal-formulario">
+      <h3>Editar ${tipo}</h3>
+      <input id="titulo-evento" placeholder="Título" value="${eventoActual.titulo || ""}">
+      <input id="hora-evento" type="time" value="${eventoActual.hora || ""}">
+      <select id="etiqueta-evento">
+        <option value="alojamiento" ${eventoActual.etiquetaEvento === "alojamiento" ? "selected" : ""}>Alojamiento</option>
+        <option value="transporte" ${eventoActual.etiquetaEvento === "transporte" ? "selected" : ""}>Transporte</option>
+        <option value="comida" ${eventoActual.etiquetaEvento === "comida" ? "selected" : ""}>Comida</option>
+        <option value="atraccion" ${eventoActual.etiquetaEvento === "atraccion" ? "selected" : ""}>Atracción</option>
+        <option value="otros" ${eventoActual.etiquetaEvento === "otros" ? "selected" : ""}>Otros</option>
+      </select>
+      <textarea id="notas-evento" placeholder="Notas">${eventoActual.notas || ""}</textarea>
+      <input id="precio-evento" placeholder="Precio" value="${eventoActual.precio || ""}">
+      <select id="moneda-evento">
+        <option value="EUR" ${eventoActual.moneda === "EUR" ? "selected" : ""}>EUR</option>
+        <option value="CHF" ${eventoActual.moneda === "CHF" ? "selected" : ""}>CHF</option>
+        <option value="USD" ${eventoActual.moneda === "USD" ? "selected" : ""}>USD</option>
+      </select>
+      <div>
+        <button onclick="actualizarTarjeta(this)">Guardar cambios</button>
+        <button onclick="borrarTarjeta(window._tarjetaEditando)">Eliminar</button>
+        <button onclick="cerrarModal()">Cancelar</button>
+      </div>
+    </div>
+  `);
+});
+
 
   return tarjeta;
 }
