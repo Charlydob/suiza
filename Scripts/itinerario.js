@@ -14,6 +14,23 @@ window.rutaItinerario = `itinerario/${usuarioId}`;
   }
   window.mostrarModal = mostrarModal;
 
+window.confirmarAccion = function (mensaje, callbackAceptar) {
+  mostrarModal(`
+    <div class="modal-formulario">
+      <h3>${mensaje}</h3>
+      <div>
+        <button id="btn-confirmar-aceptar">Sí</button>
+        <button onclick="cerrarModal()">Cancelar</button>
+      </div>
+    </div>
+  `);
+
+  document.getElementById("btn-confirmar-aceptar").addEventListener("click", () => {
+    cerrarModal();
+    callbackAceptar();
+  });
+};
+
   function cerrarModal() {
     modalFondo.style.display = "none";
     modalContenido.innerHTML = "";
@@ -33,13 +50,14 @@ function crearUbicacion(nombreUbicacion) {
 
   if (btnCerrar) {
     btnCerrar.addEventListener("click", () => {
-      if (confirm(`¿Eliminar toda la ubicación "${nombreUbicacion}"?`)) {
-        delete itinerarioData[nombreUbicacion];
-        seccion.remove();
-        guardarItinerarioLocal();
-        guardarItinerarioFirebase();
-        console.log("🗑️ Ubicación eliminada:", nombreUbicacion);
-      }
+      confirmarAccion(`¿Eliminar toda la ubicación "${nombreUbicacion}"?`, () => {
+  delete itinerarioData[nombreUbicacion];
+  seccion.remove();
+  guardarItinerarioLocal();
+  guardarItinerarioFirebase();
+  console.log("🗑️ Ubicación eliminada:", nombreUbicacion);
+});
+
     });
   }
 
@@ -133,13 +151,14 @@ function guardarNuevoDia() {
 
     if (btnEliminarDia) {
       btnEliminarDia.addEventListener("click", () => {
-        if (confirm(`¿Eliminar el día "${fechaFormateada}" y todos sus eventos?`)) {
-          delete itinerarioData[fecha];
-          wrapper.remove();
-          guardarItinerarioLocal();
-          guardarItinerarioFirebase();
-          console.log("🗑️ Día eliminado:", fecha);
-        }
+        confirmarAccion(`¿Eliminar el día "${fechaFormateada}" y todos sus eventos?`, () => {
+  delete itinerarioData[fecha];
+  wrapper.remove();
+  guardarItinerarioLocal();
+  guardarItinerarioFirebase();
+  console.log("🗑️ Día eliminado:", fecha);
+});
+
       });
     }
 

@@ -182,3 +182,49 @@ body, html {
   border: 2px solid #dd07077c !important;
 
 }
+#pagina-itinerario .dia-itinerario, .seccion-ubicacion {
+  position: relative;
+}
+button.btn-cerrar-ubicacion {
+  position: absolute;
+  top: 5px;
+  right: 1px;
+  background-color: transparent;
+  border: none;
+  font-size: 24px;
+  color: #333;
+  cursor: pointer;
+}
+
+button.btn-cerrar-dia{
+  position: absolute;
+  top: 0px;
+  right: 2px;
+  background-color: transparent;
+  border: none;
+  font-size: 16px;
+  color: #333;
+  cursor: pointer;
+}
+div.info-tarjeta {
+  font-size: 16px;
+}
+h3.titulo-dia{
+  font-size: 24px;
+  margin:0;
+  text-align: start;
+}
+
+
+.modal-formulario button#btn-confirmar-aceptar {
+  background-color: #e74c3c;
+  width: 40px;
+  padding: 4px;
+  font-size: 20px;
+  border-radius: 8px;
+  color: white;
+}
+
+.modal-formulario button:hover {
+  opacity: 0.9;
+}
