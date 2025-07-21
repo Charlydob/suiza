@@ -417,20 +417,18 @@ function guardarItinerarioLocal() {
   }
 }
 window.guardarItinerarioLocal = guardarItinerarioLocal;
+
 function actualizarTarjeta(boton) {
   const tarjeta = window._tarjetaEditando;
   const evento = window._eventoEditando;
 
-  if (!tarjeta) {
-    console.warn("❌ No hay tarjeta editando (window._tarjetaEditando)");
-    return;
-  }
-  if (!evento) {
-    console.warn("❌ No hay evento editando (window._eventoEditando)");
+  if (!tarjeta || !evento) {
+    console.warn("❌ Faltan referencias para actualizar");
     return;
   }
 
   const modal = boton.closest(".modal-formulario");
+
   const nuevoTitulo = modal.querySelector("#titulo-evento")?.value.trim();
   const nuevaHora = modal.querySelector("#hora-evento")?.value;
   const nuevasNotas = modal.querySelector("#notas-evento")?.value.trim();
@@ -438,7 +436,11 @@ function actualizarTarjeta(boton) {
   const nuevoPrecio = modal.querySelector("#precio-evento")?.value;
   const nuevaMoneda = modal.querySelector("#moneda-evento")?.value;
 
-  if (!nuevoTitulo) return alert("Título obligatorio");
+  // Validación básica
+  if (!nuevoTitulo) {
+    alert("El título no puede estar vacío.");
+    return;
+  }
 
   // Actualizar DOM
   tarjeta.querySelector(".titulo-evento").textContent = nuevoTitulo;
@@ -448,11 +450,23 @@ function actualizarTarjeta(boton) {
   tarjeta.setAttribute("data-moneda", nuevaMoneda);
   tarjeta.title = nuevasNotas;
 
-  const etiqueta = tarjeta.querySelector(".etiqueta-evento");
-  const tipo = etiqueta.textContent.includes("Favorito") ? "favorito" : "evento";
-  etiqueta.textContent = tipo.charAt(0).toUpperCase() + tipo.slice(1) + (nuevaHora ? ` · ${nuevaHora}` : "");
+  const tipo = tarjeta.classList.contains("color-favorito") ? "favorito" : "evento";
+  const etiquetaTexto = tipo.charAt(0).toUpperCase() + tipo.slice(1) + (nuevaHora ? ` · ${nuevaHora}` : "");
+  tarjeta.querySelector(".etiqueta-evento").textContent = etiquetaTexto;
 
-  // Actualizar en datos originales
+  // Actualizar clase color
+  tarjeta.classList.remove("color-alojamiento", "color-transporte", "color-comida", "color-atraccion", "color-otros");
+  let nuevaClase = "";
+  switch (nuevaEtiqueta) {
+    case "alojamiento": nuevaClase = "color-alojamiento"; break;
+    case "transporte": nuevaClase = "color-transporte"; break;
+    case "comida": nuevaClase = "color-comida"; break;
+    case "atraccion": nuevaClase = "color-atraccion"; break;
+    default: nuevaClase = "color-otros";
+  }
+  tarjeta.classList.add(nuevaClase);
+
+  // Actualizar objeto original
   evento.titulo = nuevoTitulo;
   evento.hora = nuevaHora;
   evento.notas = nuevasNotas;
@@ -467,6 +481,7 @@ function actualizarTarjeta(boton) {
 
   console.log("📝 Tarjeta actualizada:", nuevoTitulo);
 }
+
 
 window.actualizarTarjeta = actualizarTarjeta;
 
