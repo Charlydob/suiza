@@ -101,7 +101,7 @@ window.guardarNuevaUbicacion = guardarNuevaUbicacion;
 function formatearFechaBonita(fechaISO) {
   const fecha = new Date(fechaISO + "T00:00:00");
   const dias = ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"];
-  const meses = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sept", "Oct", "Nov", "Dic"];
+  const meses = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sept", "oct", "nov", "dic"];
 
   const diaSemana = dias[fecha.getDay()];
   const dia = fecha.getDate();
@@ -111,29 +111,46 @@ function formatearFechaBonita(fechaISO) {
 }
 
 
+
 function guardarNuevoDia() {
   const fecha = document.getElementById("input-nuevo-dia").value;
   if (fecha) {
     const contenedor = window._contenedorDiasActual;
     const template = document.getElementById("template-dia").content.cloneNode(true);
-const tituloFormateado = formatearFechaBonita(fecha);
-template.querySelector(".titulo-dia").textContent = tituloFormateado;
+
+    const fechaFormateada = formatearFechaBonita(fecha);
+    template.querySelector(".titulo-dia").textContent = fechaFormateada;
 
     const btnAgregarEvento = template.querySelector(".btn-agregar-evento");
+    const btnEliminarDia = template.querySelector(".btn-cerrar-dia");
     const carousel = template.querySelector(".carousel-dia");
 
     btnAgregarEvento.addEventListener("click", () => mostrarFormularioEvento(carousel));
 
-    contenedor.appendChild(template);
+    // Creamos un wrapper DOM real para poder eliminarlo luego
+    const wrapper = document.createElement("div");
+    wrapper.appendChild(template);
 
-    // Actualizar estructura de datos
+    if (btnEliminarDia) {
+      btnEliminarDia.addEventListener("click", () => {
+        if (confirm(`¿Eliminar el día "${fechaFormateada}" y todos sus eventos?`)) {
+          delete itinerarioData[fecha];
+          wrapper.remove();
+          guardarItinerarioLocal();
+          guardarItinerarioFirebase();
+          console.log("🗑️ Día eliminado:", fecha);
+        }
+      });
+    }
+
+    contenedor.appendChild(wrapper);
+
     if (!itinerarioData[fecha]) {
       itinerarioData[fecha] = { eventos: [] };
     }
 
     guardarItinerarioLocal();
     guardarItinerarioFirebase();
-
     cerrarModal();
 
     console.log("📅 Día creado:", fecha);
@@ -142,6 +159,7 @@ template.querySelector(".titulo-dia").textContent = tituloFormateado;
   }
 }
 window.guardarNuevoDia = guardarNuevoDia;
+
 
 
   function mostrarFormularioEvento(carousel) {
@@ -240,8 +258,7 @@ function renderizarItinerario() {
   contenedorUbicaciones.innerHTML = "";
 
   for (const [fecha, entrada] of Object.entries(itinerarioData)) {
-    const nombreUbicacion  = `${fecha}`;
-    const seccion = crearUbicacion(nombreUbicacion);
+    const seccion = crearUbicacion(`Día ${fecha}`);
     const contenedorDias = seccion.querySelector(".contenedor-dias");
 
     const templateDia = document.getElementById("template-dia");
@@ -251,7 +268,8 @@ function renderizarItinerario() {
     }
 
     const clonDia = templateDia.content.cloneNode(true);
-    clonDia.querySelector(".titulo-dia").textContent = fecha;
+    const fechaFormateada = formatearFechaBonita(fecha);
+    clonDia.querySelector(".titulo-dia").textContent = fechaFormateada;
 
     const carousel = clonDia.querySelector(".carousel-dia");
     const btnAgregarEvento = clonDia.querySelector(".btn-agregar-evento");
@@ -266,22 +284,18 @@ function renderizarItinerario() {
 
     btnAgregarEvento.addEventListener("click", () => mostrarFormularioEvento(carousel));
 
-    // 🗑️ Botón para eliminar el día completo
     const clonDiaWrapper = document.createElement("div");
     clonDiaWrapper.appendChild(clonDia);
 
     if (btnCerrarDia) {
       btnCerrarDia.addEventListener("click", () => {
-        if (confirm(`¿Eliminar el día "${fecha}" y todos sus eventos?`)) {
-          delete itinerarioData[fecha]; // si usas la fecha como clave
-          // O si la clave es `Día ${fecha}` en itinerarioData:
-          delete itinerarioData[nombreUbicacion];
+        if (confirm(`¿Eliminar el día "${fechaFormateada}" y todos sus eventos?`)) {
+          delete itinerarioData[fecha];
           clonDiaWrapper.remove();
           guardarItinerarioLocal();
           guardarItinerarioFirebase();
           console.log("🗑️ Día eliminado:", fecha);
           console.log("🧠 Estado actual itinerarioData:", itinerarioData);
-
         }
       });
     }
@@ -305,9 +319,8 @@ function renderizarItinerario() {
 
   console.log("✅ Itinerario renderizado desde objeto.");
 }
-
-
 window.renderizarItinerario = renderizarItinerario;
+
 
 
 //👇👇👇👇👇👇
