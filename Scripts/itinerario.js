@@ -446,6 +446,7 @@ function borrarTarjeta(tarjeta) {
 
   tarjeta.remove();
 
+  cerrarModal();
   guardarItinerarioLocal();
   guardarItinerarioFirebase();
 
