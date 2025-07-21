@@ -292,9 +292,10 @@ function crearTarjeta(titulo, tipo, hora = null, notas = "", etiquetaEvento = ""
   const etiqueta = tarjeta.querySelector(".etiqueta-evento");
   const strong = tarjeta.querySelector(".titulo-evento");
 
+  // Guardar texto en el DOM
   strong.textContent = titulo;
 
-  // Establecer etiqueta visual
+  // Establecer texto etiqueta
   let textoEtiqueta = tipo === "evento" ? "Evento" : "Favorito";
   if (hora) {
     tarjeta.setAttribute("data-hora", hora);
@@ -302,38 +303,33 @@ function crearTarjeta(titulo, tipo, hora = null, notas = "", etiquetaEvento = ""
   }
   etiqueta.textContent = textoEtiqueta;
 
-  // Guardar notas si hay
+  // Guardar notas como atributo y tooltip
   if (notas) {
     tarjeta.setAttribute("data-notas", notas);
     tarjeta.title = notas;
   }
 
-  // Aplicar color según etiqueta
+  // Guardar valores originales para futuras ediciones/borrados
+  tarjeta.dataset.originalTitulo = titulo;
+  tarjeta.dataset.originalHora = hora;
+
+  // Aplicar color según tipo de etiqueta
   let claseColor = "";
   switch (etiquetaEvento) {
-    case "alojamiento":
-      claseColor = "color-alojamiento";
-      break;
-    case "transporte":
-      claseColor = "color-transporte";
-      break;
-    case "comida":
-      claseColor = "color-comida";
-      break;
-    case "atraccion":
-      claseColor = "color-atraccion";
-      break;
-    default:
-      claseColor = "color-otros";
+    case "alojamiento": claseColor = "color-alojamiento"; break;
+    case "transporte": claseColor = "color-transporte"; break;
+    case "comida": claseColor = "color-comida"; break;
+    case "atraccion": claseColor = "color-atraccion"; break;
+    default: claseColor = "color-otros";
   }
   tarjeta.classList.add(claseColor);
 
-  // Insertar ordenado por hora
+  // Insertar ordenado por hora si hay
   const contenedor = window._carouselActual;
   const nuevaHora = parseHora(hora);
   let insertado = false;
-  const tarjetas = contenedor.querySelectorAll(".tarjeta-itinerario");
 
+  const tarjetas = contenedor.querySelectorAll(".tarjeta-itinerario");
   for (let t of tarjetas) {
     const horaExistente = t.getAttribute("data-hora");
     if (horaExistente) {
@@ -345,18 +341,10 @@ function crearTarjeta(titulo, tipo, hora = null, notas = "", etiquetaEvento = ""
       }
     }
   }
-
   if (!insertado) contenedor.appendChild(tarjeta);
 
-  console.log(`🧩 ${tipo} añadido:`, titulo, hora || "(sin hora)");
-
-  // Evento para abrir el modal de edición
+  // Evento para abrir editor modal
   tarjeta.addEventListener("click", () => {
-    const titulo = strong.textContent;
-    const hora = tarjeta.getAttribute("data-hora") || "";
-    const notas = tarjeta.getAttribute("data-notas") || "";
-    const tipo = etiqueta.textContent.includes("Favorito") ? "favorito" : "evento";
-
     mostrarModal(`
       <div class="modal-formulario">
         <h3>Editar ${tipo}</h3>
@@ -372,22 +360,20 @@ function crearTarjeta(titulo, tipo, hora = null, notas = "", etiquetaEvento = ""
         <textarea id="notas-evento" placeholder="Notas">${notas}</textarea>
         <div>
           <button onclick="actualizarTarjeta(this)">Guardar cambios</button>
+          <button onclick="borrarTarjeta(document._tarjetaEditando)">Eliminar</button>
           <button onclick="cerrarModal()">Cancelar</button>
         </div>
       </div>
     `);
-
-    window._tarjetaEditando = tarjeta;
+    document._tarjetaEditando = tarjeta;
   });
+
+  console.log(`🧩 ${tipo} añadido:`, titulo, hora || "(sin hora)");
 
   return tarjeta;
 }
+window.crearTarjeta = crearTarjeta;
 
-
-
-
-
-  window.crearTarjeta = crearTarjeta;
 })();
 
 let itinerarioData = {};
@@ -408,6 +394,7 @@ function actualizarTarjeta(boton) {
   const nuevoTitulo = document.getElementById("titulo-evento").value.trim();
   const nuevaHora = document.getElementById("hora-evento").value;
   const nuevasNotas = document.getElementById("notas-evento").value.trim();
+  const nuevaEtiqueta = document.getElementById("etiqueta-evento").value;
 
   tarjeta.querySelector(".titulo-evento").textContent = nuevoTitulo;
   tarjeta.setAttribute("data-hora", nuevaHora);
@@ -415,10 +402,28 @@ function actualizarTarjeta(boton) {
   tarjeta.title = nuevasNotas;
 
   const etiqueta = tarjeta.querySelector(".etiqueta-evento");
-  const tipo = etiqueta.textContent.includes("Favorito") ? "Favorito" : "Evento";
-  etiqueta.textContent = tipo + (nuevaHora ? ` · ${nuevaHora}` : "");
+  const tipo = etiqueta.textContent.includes("Favorito") ? "favorito" : "evento";
+  etiqueta.textContent = tipo.charAt(0).toUpperCase() + tipo.slice(1) + (nuevaHora ? ` · ${nuevaHora}` : "");
 
-  // Limpieza y guardado
+  // 🔁 Actualizar en itinerarioData
+  const seccion = tarjeta.closest(".seccion-ubicacion");
+  const tituloUbicacion = seccion?.querySelector(".titulo-ubicacion")?.textContent;
+  const fecha = tituloUbicacion?.replace("Día ", "").trim();
+
+  if (fecha && itinerarioData[fecha]) {
+    const eventos = itinerarioData[fecha].eventos;
+    const index = eventos.findIndex(e => e.titulo === tarjeta.dataset.originalTitulo && e.hora === tarjeta.dataset.originalHora);
+    if (index !== -1) {
+      eventos[index] = {
+        titulo: nuevoTitulo,
+        tipo,
+        hora: nuevaHora,
+        notas: nuevasNotas,
+        etiquetaEvento: nuevaEtiqueta
+      };
+    }
+  }
+
   cerrarModal();
   guardarItinerarioLocal();
   guardarItinerarioFirebase();
@@ -426,6 +431,27 @@ function actualizarTarjeta(boton) {
   console.log("📝 Tarjeta actualizada:", nuevoTitulo);
 }
 window.actualizarTarjeta = actualizarTarjeta;
+
+function borrarTarjeta(tarjeta) {
+  const titulo = tarjeta.querySelector(".titulo-evento")?.textContent;
+  const hora = tarjeta.getAttribute("data-hora");
+
+  const seccion = tarjeta.closest(".seccion-ubicacion");
+  const tituloUbicacion = seccion?.querySelector(".titulo-ubicacion")?.textContent;
+  const fecha = tituloUbicacion?.replace("Día ", "").trim();
+
+  if (fecha && itinerarioData[fecha]) {
+    itinerarioData[fecha].eventos = itinerarioData[fecha].eventos.filter(e => !(e.titulo === titulo && e.hora === hora));
+  }
+
+  tarjeta.remove();
+
+  guardarItinerarioLocal();
+  guardarItinerarioFirebase();
+
+  console.log("🗑️ Evento eliminado:", titulo, hora);
+}
+window.borrarTarjeta = borrarTarjeta;
 
 function cargarItinerarioLocal() {
   try {
