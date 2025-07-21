@@ -227,7 +227,8 @@ function renderizarItinerario() {
   contenedorUbicaciones.innerHTML = "";
 
   for (const [fecha, entrada] of Object.entries(itinerarioData)) {
-    const seccion = crearUbicacion(`Día ${fecha}`);
+    const nombreUbicacion  = `${fecha}`;
+    const seccion = crearUbicacion(nombreUbicacion);
     const contenedorDias = seccion.querySelector(".contenedor-dias");
 
     const templateDia = document.getElementById("template-dia");
@@ -259,11 +260,15 @@ function renderizarItinerario() {
     if (btnCerrarDia) {
       btnCerrarDia.addEventListener("click", () => {
         if (confirm(`¿Eliminar el día "${fecha}" y todos sus eventos?`)) {
-          delete itinerarioData[fecha];
+          delete itinerarioData[fecha]; // si usas la fecha como clave
+          // O si la clave es `Día ${fecha}` en itinerarioData:
+          delete itinerarioData[nombreUbicacion];
           clonDiaWrapper.remove();
           guardarItinerarioLocal();
           guardarItinerarioFirebase();
           console.log("🗑️ Día eliminado:", fecha);
+          console.log("🧠 Estado actual itinerarioData:", itinerarioData);
+
         }
       });
     }
