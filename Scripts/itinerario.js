@@ -207,11 +207,24 @@ function renderizarItinerario() {
     const seccion = crearUbicacion(`Día ${fecha}`);
     const contenedorDias = seccion.querySelector(".contenedor-dias");
 
-    const templateDia = document.getElementById("template-dia").content.cloneNode(true);
-    templateDia.querySelector(".titulo-dia").textContent = fecha;
+    const templateDia = document.getElementById("template-dia");
+    if (!templateDia) {
+      console.error("❌ No se encontró el template-dia en el DOM.");
+      continue;
+    }
 
-    const carousel = templateDia.querySelector(".carousel-dia");
-    const btnAgregarEvento = templateDia.querySelector(".btn-agregar-evento");
+    const clonDia = templateDia.content.cloneNode(true);
+    clonDia.querySelector(".titulo-dia").textContent = fecha;
+
+    const carousel = clonDia.querySelector(".carousel-dia");
+    const btnAgregarEvento = clonDia.querySelector(".btn-agregar-evento");
+
+    if (!carousel) {
+      console.error("❌ No se encontró .carousel-dia en el template clonado.");
+      continue;
+    }
+
+    window._carouselActual = carousel;
 
     btnAgregarEvento.addEventListener("click", () => mostrarFormularioEvento(carousel));
 
@@ -221,17 +234,22 @@ function renderizarItinerario() {
         evento.tipo,
         evento.hora,
         evento.notas,
-        evento.etiquetaEvento
+        evento.etiquetaEvento,
+        evento.precio,
+        evento.moneda
       );
-      carousel.appendChild(tarjeta);
+
+      if (tarjeta) carousel.appendChild(tarjeta);
     }
 
-    contenedorDias.appendChild(templateDia);
+    contenedorDias.appendChild(clonDia);
   }
 
   console.log("✅ Itinerario renderizado desde objeto.");
 }
+
 window.renderizarItinerario = renderizarItinerario;
+
 
 //👇👇👇👇👇👇
 
@@ -341,6 +359,11 @@ if (!tarjeta) {
 
   // Orden por hora
   const contenedor = window._carouselActual;
+  if (!contenedor) {
+  console.error("❌ No se ha definido window._carouselActual. No se puede insertar la tarjeta.");
+  return;
+}
+
   const nuevaHora = parseHora(hora);
   let insertado = false;
   const tarjetas = contenedor.querySelectorAll(".tarjeta-itinerario");
