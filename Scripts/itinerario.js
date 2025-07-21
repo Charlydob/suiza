@@ -293,8 +293,19 @@ window.guardarNuevoEvento = function () {
 }
 
 function crearTarjeta(titulo, tipo, hora = null, notas = "", etiquetaEvento = "", precio = "", moneda = "EUR") {
-  const template = document.getElementById("template-tarjeta-itinerario").content.cloneNode(true);
-  const tarjeta = template.querySelector(".tarjeta-itinerario");
+const template = document.getElementById("template-tarjeta-itinerario");
+if (!template) {
+  console.error("❌ No se encontró el template-tarjeta-itinerario en el DOM");
+  return;
+}
+
+const clone = template.content.cloneNode(true);
+const tarjeta = clone.querySelector(".tarjeta-itinerario");
+if (!tarjeta) {
+  console.error("❌ El clon no contiene .tarjeta-itinerario");
+  return;
+}
+
   const etiqueta = tarjeta.querySelector(".etiqueta-evento");
   const strong = tarjeta.querySelector(".titulo-evento");
 
@@ -348,24 +359,26 @@ function crearTarjeta(titulo, tipo, hora = null, notas = "", etiquetaEvento = ""
 
   // Evento de clic para editar
   tarjeta.addEventListener("click", () => {
+    const eventoActual = window._eventoEditando;
+
     mostrarModal(`
       <div class="modal-formulario">
         <h3>Editar ${tipo}</h3>
-        <input id="titulo-evento" placeholder="Título" value="${titulo}">
-        <input id="hora-evento" type="time" value="${hora}">
+        <input id="titulo-evento" placeholder="Título" value="${eventoActual.titulo || ""}">
+        <input id="hora-evento" type="time" value="${eventoActual.hora || ""}">
         <select id="etiqueta-evento">
-          <option value="alojamiento">Alojamiento</option>
-          <option value="transporte">Transporte</option>
-          <option value="comida">Comida</option>
-          <option value="atraccion">Atracción</option>
-          <option value="otros">Otros</option>
+          <option value="alojamiento" ${eventoActual.etiquetaEvento === "alojamiento" ? "selected" : ""}>Alojamiento</option>
+          <option value="transporte" ${eventoActual.etiquetaEvento === "transporte" ? "selected" : ""}>Transporte</option>
+          <option value="comida" ${eventoActual.etiquetaEvento === "comida" ? "selected" : ""}>Comida</option>
+          <option value="atraccion" ${eventoActual.etiquetaEvento === "atraccion" ? "selected" : ""}>Atracción</option>
+          <option value="otros" ${eventoActual.etiquetaEvento === "otros" ? "selected" : ""}>Otros</option>
         </select>
-        <textarea id="notas-evento" placeholder="Notas">${notas}</textarea>
-        <input id="precio-evento" placeholder="Precio" value="${precio}">
+        <textarea id="notas-evento" placeholder="Notas">${eventoActual.notas || ""}</textarea>
+        <input id="precio-evento" placeholder="Precio" value="${eventoActual.precio || ""}">
         <select id="moneda-evento">
-          <option value="EUR" ${moneda === "EUR" ? "selected" : ""}>EUR</option>
-          <option value="CHF" ${moneda === "CHF" ? "selected" : ""}>CHF</option>
-          <option value="USD" ${moneda === "USD" ? "selected" : ""}>USD</option>
+          <option value="EUR" ${eventoActual.moneda === "EUR" ? "selected" : ""}>EUR</option>
+          <option value="CHF" ${eventoActual.moneda === "CHF" ? "selected" : ""}>CHF</option>
+          <option value="USD" ${eventoActual.moneda === "USD" ? "selected" : ""}>USD</option>
         </select>
         <div>
           <button onclick="actualizarTarjeta(this)">Guardar cambios</button>
@@ -374,6 +387,7 @@ function crearTarjeta(titulo, tipo, hora = null, notas = "", etiquetaEvento = ""
         </div>
       </div>
     `);
+
 
     window._tarjetaEditando = tarjeta;
 
