@@ -37,7 +37,7 @@
                 <button onclick="buscar('__libre__')">🔍📍</button>
               </div>
 
-              <label>v.1.4.8</label>
+              <label>v.1.5</label>
               <label for="radiusSlider" class="slider-label">Radio búsqueda: <span id="radiusValue">1000</span>m</label>
               <input type="range" id="radiusSlider" min="0" max="10000" value="1000" step="100">
             </div>
@@ -307,6 +307,14 @@
   <div id="contenedor-gastos-dias">
     <!-- Aquí se insertan los días y sus gastos -->
   </div>
+<div id="selector-moneda">
+  <label for="monedaDestino">Mostrar totales en:</label>
+  <select id="monedaDestino" onchange="cambiarMonedaDestino()">
+    <option value="CHF">CHF</option>
+    <option value="EUR">EUR</option>
+    <option value="USD">USD</option>
+  </select>
+</div>
 
   <div id="gastos-total-final">
     <h3>Total estimado del viaje: <span id="gastos-total">0 CHF</span></h3>
@@ -371,6 +379,8 @@
   const rutaFavoritos = "favoritos/charlyylaura";
   const rutaIgnorados = "ignorados/charlyylaura";
   const rutaItinerario = "itinerario/charlyylaura"; 
+  const rutaGastos = "gastos/charlyylaura";
+  const rutaNotas = "notas/charlyylaura";
 </script>
 <!-- Script variables -->
 <script src="Scripts/variables.js"></script>
