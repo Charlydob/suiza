@@ -418,9 +418,11 @@ function toggleFavorito(id, tipo, coords, name, btn) {
       }
     };
 
-    // 🔁 Hacer geocoding inverso
+    // 🔁 Esperar a obtener la dirección antes de guardar/renderizar
     const geocoder = new google.maps.Geocoder();
     geocoder.geocode({ location: { lat: coords[0], lng: coords[1] } }, (results, status) => {
+      console.log("🌍 Geocoder status:", status, results);
+
       if (status === "OK" && results[0]) {
         nuevoFavorito.ubicacion = results[0].formatted_address;
       } else {
@@ -428,6 +430,7 @@ function toggleFavorito(id, tipo, coords, name, btn) {
         console.warn("No se pudo obtener dirección:", status);
       }
 
+      // Solo aquí añadimos el favorito una vez está completo
       favoritos.push(nuevoFavorito);
       GestorFavoritos.guardarLocal();
       GestorFavoritos.guardarFirebase(nuevoFavorito);
@@ -441,16 +444,15 @@ function toggleFavorito(id, tipo, coords, name, btn) {
         mostrarEditorFavoritoDesde("sidebar", id);
       }
 
-      btn.innerText = "⭐ Favorito";
+      if (btn) btn.innerText = "⭐ Favorito";
     });
 
   } else {
-    // Eliminar favorito existente
+    // 🔴 Eliminar favorito existente
     const favoritoEliminado = favoritos[index];
     favoritos.splice(index, 1);
-    btn.innerText = "☆ Favorito";
+    if (btn) btn.innerText = "☆ Favorito";
 
-    // 🔴 También eliminar de Firebase
     if (navigator.onLine && typeof db !== "undefined") {
       db.ref(`${rutaFavoritos}/${favoritoEliminado.id}`).remove()
         .then(() => console.log("🗑️ Favorito eliminado de Firebase"))
@@ -463,6 +465,7 @@ function toggleFavorito(id, tipo, coords, name, btn) {
     mostrarMarcadoresFavoritos();
   }
 }
+
 
 window.toggleFavorito = toggleFavorito;
 let favoritoEditandoId = null;
