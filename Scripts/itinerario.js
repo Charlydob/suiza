@@ -744,7 +744,52 @@ console.log("❎ Modal cerrado");
 
 }
 
-window.actualizarTarjeta = actualizarTarjeta;
+window.actualizarTarjeta = function (btn) {
+  if (!window._tarjetaEditando || !window._eventoEditando) {
+    alert("❌ No se ha seleccionado correctamente la tarjeta o el evento.");
+    return;
+  }
+
+  const tarjeta = window._tarjetaEditando;
+  const evento = window._eventoEditando;
+
+  // Nuevos valores del formulario
+  const nuevoTitulo = document.getElementById("titulo-evento").value.trim();
+  const nuevaHora = document.getElementById("hora-evento").value.trim();
+  const nuevaEtiqueta = document.getElementById("etiqueta-evento").value;
+  const nuevasNotas = document.getElementById("notas-evento").value.trim();
+  const nuevoPrecio = document.getElementById("precio-evento")?.value?.trim() || "";
+  const nuevaMoneda = document.getElementById("moneda-evento")?.value || "EUR";
+
+  // Actualizar datos en memoria
+  evento.titulo = nuevoTitulo;
+  evento.hora = nuevaHora;
+  evento.etiquetaEvento = nuevaEtiqueta;
+  evento.notas = nuevasNotas;
+  evento.precio = nuevoPrecio;
+  evento.moneda = nuevaMoneda;
+
+  // Actualizar tarjeta DOM
+  const strong = tarjeta.querySelector(".titulo-evento");
+  const etiqueta = tarjeta.querySelector(".etiqueta-evento");
+
+  if (strong) strong.textContent = nuevoTitulo;
+
+  let textoEtiqueta = "Evento";
+  if (nuevaHora) textoEtiqueta += ` · ${nuevaHora}`;
+  if (etiqueta) etiqueta.textContent = textoEtiqueta;
+
+  tarjeta.dataset.originalTitulo = nuevoTitulo;
+  tarjeta.dataset.originalHora = nuevaHora;
+  tarjeta.setAttribute("data-notas", nuevasNotas);
+  tarjeta.setAttribute("data-precio", nuevoPrecio);
+
+  guardarItinerarioLocal();
+  guardarItinerarioFirebase();
+  cerrarModal();
+
+  console.log("✏️ Evento actualizado:", evento);
+};
 
 
 function borrarTarjeta(tarjeta) {
