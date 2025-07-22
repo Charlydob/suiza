@@ -130,15 +130,14 @@ function formatearFechaBonita(fechaISO) {
 
 
 function guardarNuevoDia() {
-  const fecha = document.getElementById("input-nuevo-dia").value;
-  const ubicacion = document.getElementById("input-nueva-ubicacion").value;
+  const fecha = document.getElementById("input-nueva-fecha")?.value;
+  const ubicacion = document.getElementById("input-nueva-ubicacion")?.value;
 
   if (!fecha || !ubicacion) {
     alert("Por favor, selecciona una fecha y una ubicación.");
     return;
   }
 
-  // Inicializamos si no existen
   if (!itinerarioData[ubicacion]) {
     itinerarioData[ubicacion] = {};
   }
@@ -146,7 +145,7 @@ function guardarNuevoDia() {
     itinerarioData[ubicacion][fecha] = { eventos: [] };
   }
 
-  renderizarItinerario();  // Re-renderiza todo
+  renderizarItinerario();
   guardarItinerarioLocal();
   guardarItinerarioFirebase();
   cerrarModal();
@@ -154,6 +153,7 @@ function guardarNuevoDia() {
   console.log(`📅 Nuevo día creado: ${fecha} en ${ubicacion}`);
 }
 window.guardarNuevoDia = guardarNuevoDia;
+
 
 
 
