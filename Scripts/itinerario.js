@@ -3,7 +3,7 @@ const usuarioId = "charlyylaura"; // en el futuro esto podría ser un usuario re
 window.rutaItinerario = `itinerario/${usuarioId}`;
 
 (function() {
-  const contenedorUbicaciones = document.getElementById("contenedor-ubicaciones-itinerario");
+const contenedor = document.getElementById("contenedor-ubicaciones-itinerario");
   const botonNuevaUbicacion = document.getElementById("btn-nueva-ubicacion");
   const modalFondo = document.getElementById("modal-fondo");
   const modalContenido = document.getElementById("modal-contenido");
