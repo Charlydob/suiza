@@ -420,6 +420,9 @@ window.guardarNuevoEvento = function () {
     alert("Error: faltan datos para guardar el evento.");
     return;
   }
+  console.log("🌍 Ubicación:", ubicacion);
+console.log("📅 Fecha:", fecha);
+
 
   if (!itinerarioData[ubicacion]) {
     itinerarioData[ubicacion] = {};
