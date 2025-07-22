@@ -435,7 +435,7 @@ if (!itinerarioData[ubicacion][fecha]) {
 
   crearTarjeta(titulo, "evento", hora, notas, etiqueta);
 
-  itinerarioData[fecha].eventos.push(nuevoEvento);
+  itinerarioData[ubicacion][fecha].eventos.push(nuevoEvento);
 
   guardarItinerarioLocal();
   guardarItinerarioFirebase();
