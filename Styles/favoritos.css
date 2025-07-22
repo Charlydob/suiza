@@ -1,6 +1,7 @@
-#favorito-tarjeta img {
+.favorito-tarjeta img {
   display: none;
 }
+
 .favorito-tarjeta {
   background: #ffffffcc;
   backdrop-filter: blur(4px);

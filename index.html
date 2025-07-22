@@ -246,7 +246,13 @@
       <!-- Plantilla de tarjeta individual -->
       <template id="template-favorito">
         <div class="favorito-tarjeta">
-    
+          <!-- Imagen del lugar -->
+          <div class="favorito-imagen">
+            <img src="" 
+              alt="Imagen del lugar" 
+              onerror="this.onerror=null; this.src='Recursos/img/default.jpg';">
+
+          </div>
 
           <!-- Contenedor de la info -->
           <div class="favorito-info">
@@ -279,7 +285,7 @@
      <div id="modal-fondo-editor" style="display: none;">
   <div id="editorFavoritoLista" class="modal-formulario-favorito-lista">
     <h3>Editar lugar</h3>
-    <input type="text" id="editNombreLista" placeholder="Nombre personalizado:">
+    <input type="text" id="editNombreLista" placeholder="">
 <div class="selectores">
 <input type="text" id="editPrecioLista">
     <select id="editMonedaLista">

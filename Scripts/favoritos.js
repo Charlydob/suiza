@@ -402,37 +402,45 @@ function crearTarjetaFavorito(f) {
 function toggleFavorito(id, tipo, coords, name, btn) {
   const index = favoritos.findIndex(f => f.id === id);
 
-if (index === -1) {
-  const nuevoFavorito = {
-    id,
-    tipo,
-    lat: coords[0],
-    lon: coords[1],
-    datosPersonalizados: {
-      nombre: name,
-      precio: '',
-      horario: '',
-      notas: ''
-    }
-  };
-  favoritos.push(nuevoFavorito);
+  if (index === -1) {
+    const nuevoFavorito = {
+      id,
+      tipo,
+      lat: coords[0],
+      lon: coords[1],
+      datosPersonalizados: {
+        nombre: name,
+        precio: '',
+        horario: '',
+        notas: ''
+      }
+    };
 
-  // Mostrar editor según vista actual
-  if (document.getElementById("pagina-favoritos").style.display !== "none") {
-    mostrarEditorFavoritoDesde("lista", id);
-  } else {
-    mostrarEditorFavoritoDesde("sidebar", id);
-  }
+    // 🔁 Hacer geocoding inverso
+    const geocoder = new google.maps.Geocoder();
+    geocoder.geocode({ location: { lat: coords[0], lng: coords[1] } }, (results, status) => {
+      if (status === "OK" && results[0]) {
+        nuevoFavorito.ubicacion = results[0].formatted_address;
+      } else {
+        nuevoFavorito.ubicacion = "Ubicación desconocida";
+        console.warn("No se pudo obtener dirección:", status);
+      }
 
-  btn.innerText = "⭐ Favorito";
+      favoritos.push(nuevoFavorito);
+      GestorFavoritos.guardarLocal();
+      GestorFavoritos.guardarFirebase(nuevoFavorito);
+      renderizarFavoritosEn("lista");
+      renderizarFavoritosEn("sidebar");
+      mostrarMarcadoresFavoritos();
 
+      if (document.getElementById("pagina-favoritos").style.display !== "none") {
+        mostrarEditorFavoritoDesde("lista", id);
+      } else {
+        mostrarEditorFavoritoDesde("sidebar", id);
+      }
 
-    // 🟢 También guardar en Firebase
-    if (navigator.onLine && typeof db !== "undefined") {
-      db.ref(`${rutaFavoritos}/${id}`).set(nuevoFavorito)
-        .then(() => console.log("✅ Favorito guardado en Firebase"))
-        .catch(err => console.error("Error guardando en Firebase:", err));
-    }
+      btn.innerText = "⭐ Favorito";
+    });
 
   } else {
     // Eliminar favorito existente
@@ -446,13 +454,14 @@ if (index === -1) {
         .then(() => console.log("🗑️ Favorito eliminado de Firebase"))
         .catch(err => console.error("Error eliminando de Firebase:", err));
     }
-  }
 
-  GestorFavoritos.guardarLocal();
-  renderizarFavoritosEn("lista");
-  renderizarFavoritosEn("sidebar");
-  mostrarMarcadoresFavoritos();
+    GestorFavoritos.guardarLocal();
+    renderizarFavoritosEn("lista");
+    renderizarFavoritosEn("sidebar");
+    mostrarMarcadoresFavoritos();
+  }
 }
+
 window.toggleFavorito = toggleFavorito;
 let favoritoEditandoId = null;
 // 🛡️ Sanitizar ID para rutas Firebase
