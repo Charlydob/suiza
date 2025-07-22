@@ -555,12 +555,16 @@ if (!tarjeta) {
  tarjeta.addEventListener("click", () => {
   window._tarjetaEditando = tarjeta;
 
-  const seccion = tarjeta.closest(".seccion-ubicacion");
-  const tituloUbicacion = seccion?.querySelector(".titulo-ubicacion")?.textContent;
-  const fecha = tituloUbicacion?.replace("Día ", "").trim();
+ const seccion = tarjeta.closest(".seccion-ubicacion");
+const ubicacion = seccion?.querySelector(".titulo-ubicacion")?.textContent?.trim();
 
-  if (fecha && itinerarioData[fecha]) {
-    const evento = itinerarioData[fecha].eventos.find(
+const diaContenedor = tarjeta.closest(".dia-itinerario");
+const fecha = diaContenedor?.getAttribute("data-fecha");
+
+
+if (fecha && ubicacion && itinerarioData[ubicacion]?.[fecha]) {
+  const evento = itinerarioData[ubicacion][fecha].eventos.find(
+
       e => e.titulo === tarjeta.dataset.originalTitulo && e.hora === tarjeta.dataset.originalHora
     );
 
