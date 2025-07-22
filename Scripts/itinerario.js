@@ -307,7 +307,28 @@ window.guardarFavoritoSeleccionado = function () {
   guardarItinerarioFirebase();
   cerrarModal();
 };
+function cargarItinerarioFirebase() {
+  if (!navigator.onLine || typeof db === "undefined") {
+    console.warn("📴 Sin conexión, no se carga de Firebase.");
+    return;
+  }
 
+  db.ref(window.rutaItinerario).once("value")
+    .then(snapshot => {
+      const data = snapshot.val();
+      if (data) {
+itinerarioData = data;
+
+        console.log("🧩 ItinerarioData cargado desde Firebase:", itinerarioData);
+
+        renderizarItinerario();
+        guardarItinerarioLocal(); // backup
+        console.log("📥 Itinerario cargado desde Firebase.");
+      }
+    })
+    .catch(err => console.error("❌ Error al cargar de Firebase:", err));
+}
+window.cargarItinerarioFirebase = cargarItinerarioFirebase;
 
 ;
 function renderizarItinerario() {
@@ -948,28 +969,7 @@ console.log("💾 Guardando itinerario en ruta:", window.rutaItinerario);
 }
 window.guardarItinerarioFirebase = guardarItinerarioFirebase;
 
-function cargarItinerarioFirebase() {
-  if (!navigator.onLine || typeof db === "undefined") {
-    console.warn("📴 Sin conexión, no se carga de Firebase.");
-    return;
-  }
 
-  db.ref(window.rutaItinerario).once("value")
-    .then(snapshot => {
-      const data = snapshot.val();
-      if (data) {
-itinerarioData = data;
-
-        console.log("🧩 ItinerarioData cargado desde Firebase:", itinerarioData);
-
-        renderizarItinerario();
-        guardarItinerarioLocal(); // backup
-        console.log("📥 Itinerario cargado desde Firebase.");
-      }
-    })
-    .catch(err => console.error("❌ Error al cargar de Firebase:", err));
-}
-window.cargarItinerarioFirebase = cargarItinerarioFirebase;
 
 document.addEventListener("DOMContentLoaded", () => {
   if (navigator.onLine) {
