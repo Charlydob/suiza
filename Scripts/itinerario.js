@@ -411,19 +411,22 @@ window.guardarNuevoEvento = function () {
 
   const fecha = window.fechaEventoActual;
 
-  if (!fecha) {
-    console.warn("❌ No se pudo determinar la fecha del evento.");
-    alert("Error: no se pudo determinar a qué día pertenece el evento.");
+  // 🔧 Obtener ubicación actual desde la tarjeta activa
+  const seccion = window._carouselActual?.closest(".seccion-ubicacion");
+  const ubicacion = seccion?.querySelector(".titulo-ubicacion")?.textContent?.trim();
+
+  if (!fecha || !ubicacion) {
+    console.warn("❌ No se pudo determinar la fecha o ubicación del evento.");
+    alert("Error: faltan datos para guardar el evento.");
     return;
   }
 
- if (!itinerarioData[ubicacion]) {
-  itinerarioData[ubicacion] = {};
-}
-if (!itinerarioData[ubicacion][fecha]) {
-  itinerarioData[ubicacion][fecha] = { eventos: [] };
-}
-
+  if (!itinerarioData[ubicacion]) {
+    itinerarioData[ubicacion] = {};
+  }
+  if (!itinerarioData[ubicacion][fecha]) {
+    itinerarioData[ubicacion][fecha] = { eventos: [] };
+  }
 
   const nuevoEvento = {
     titulo,
@@ -434,15 +437,16 @@ if (!itinerarioData[ubicacion][fecha]) {
   };
 
   crearTarjeta(titulo, "evento", hora, notas, etiqueta);
-
   itinerarioData[ubicacion][fecha].eventos.push(nuevoEvento);
 
   guardarItinerarioLocal();
   guardarItinerarioFirebase();
   cerrarModal();
 
-  console.log(`✅ Evento añadido a ${fecha}:`, nuevoEvento);
+  console.log(`✅ Evento añadido a ${ubicacion} - ${fecha}:`, nuevoEvento);
 };
+
+
 
 
 
