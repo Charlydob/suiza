@@ -385,32 +385,58 @@ function mostrarEditorEvento() {
 
 
 window.guardarNuevoEvento = function () {
-  const titulo = document.getElementById("titulo-evento").value;
-  const hora = document.getElementById("hora-evento").value;
-  const notas = document.getElementById("notas-evento").value;
+  const titulo = document.getElementById("titulo-evento").value.trim();
+  const hora = document.getElementById("hora-evento").value.trim();
+  const notas = document.getElementById("notas-evento").value.trim();
   const etiqueta = document.getElementById("etiqueta-evento").value;
 
+  if (!titulo) {
+    alert("El título del evento es obligatorio.");
+    return;
+  }
+
+  // 🔍 Identificar la sección visible o activa correctamente
+  const modales = document.querySelectorAll(".seccion-ubicacion");
+  let fecha = null;
+
+  modales.forEach(seccion => {
+    if (seccion.contains(document.querySelector(".modal-formulario-evento-edit"))) {
+      const tituloUbicacion = seccion.querySelector(".titulo-ubicacion")?.textContent;
+      fecha = tituloUbicacion?.replace("Día ", "").trim();
+    }
+  });
+
+  if (!fecha) {
+    console.warn("❌ No se pudo determinar la fecha del evento.");
+    alert("Error: no se pudo determinar a qué día pertenece el evento.");
+    return;
+  }
+
+  if (!itinerarioData[fecha]) {
+    itinerarioData[fecha] = { eventos: [] };
+  }
+
+  const nuevoEvento = {
+    titulo,
+    tipo: "evento",
+    hora,
+    notas,
+    etiquetaEvento: etiqueta
+  };
+
+  // ✅ Agrega al DOM (esto ya lo haces bien)
   crearTarjeta(titulo, "evento", hora, notas, etiqueta);
 
-  // Obtener fecha del día actual
-  const seccion = document.querySelector(".seccion-ubicacion:last-child");
-  const tituloUbicacion = seccion?.querySelector(".titulo-ubicacion")?.textContent;
-  const fecha = tituloUbicacion?.replace("Día ", "").trim();
-
-  if (fecha && itinerarioData[fecha]) {
-    itinerarioData[fecha].eventos.push({
-      titulo,
-      tipo: "evento",
-      hora,
-      notas,
-      etiquetaEvento: etiqueta
-    });
-  }
+  // ✅ Guarda en datos
+  itinerarioData[fecha].eventos.push(nuevoEvento);
 
   guardarItinerarioLocal();
   guardarItinerarioFirebase();
   cerrarModal();
+
+  console.log(`✅ Evento añadido a ${fecha}:`, nuevoEvento);
 };
+
 
 
   function parseHora(hora) {
