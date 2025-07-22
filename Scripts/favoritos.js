@@ -283,13 +283,15 @@ function renderizarFavoritosEn(origen) {
     const lon1 = Array.isArray(userPos) ? userPos[1] : userPos.lng;
 
     listaFinal = favoritos
-      .map(f => ({ ...f, distanciaKm: calcularDistancia(lat1, lon1, f.lat, f.lon) }))
-      .filter(f => {
-        const texto = `${f.datosPersonalizados?.nombre || ""} ${f.datosPersonalizados?.notas || ""}`.toLowerCase();
-        const coincideTexto = texto.includes(filtroTexto);
-        const coincideTipo = filtroTipo === "" || f.tipo === filtroTipo;
-        return coincideTexto && coincideTipo;
-      });
+  .filter(f => f.lat != null && f.lon != null)  // ← ESTA LÍNEA EVITA EL CRASH
+  .map(f => ({ ...f, distanciaKm: calcularDistancia(lat1, lon1, f.lat, f.lon) }))
+  .filter(f => {
+    const texto = `${f.datosPersonalizados?.nombre || ""} ${f.datosPersonalizados?.notas || ""}`.toLowerCase();
+    const coincideTexto = texto.includes(filtroTexto);
+    const coincideTipo = filtroTipo === "" || f.tipo === filtroTipo;
+    return coincideTexto && coincideTipo;
+  });
+
 
     if (orden === "distanciaAsc") {
       listaFinal.sort((a, b) => a.distanciaKm - b.distanciaKm);
