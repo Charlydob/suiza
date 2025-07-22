@@ -137,6 +137,9 @@ function guardarNuevoDia() {
     const template = document.getElementById("template-dia").content.cloneNode(true);
 
     const fechaFormateada = formatearFechaBonita(fecha);
+    const diaItinerario = template.querySelector(".dia-itinerario");
+    diaItinerario.setAttribute("data-fecha", fecha); // ⬅️ Guardar fecha real
+
     template.querySelector(".titulo-dia").textContent = fechaFormateada;
 
     const btnAgregarEvento = template.querySelector(".btn-agregar-evento");
@@ -145,27 +148,39 @@ function guardarNuevoDia() {
 
     btnAgregarEvento.addEventListener("click", () => mostrarFormularioEvento(carousel));
 
-    // Creamos un wrapper DOM real para poder eliminarlo luego
+    // Creamos un wrapper DOM real
     const wrapper = document.createElement("div");
     wrapper.appendChild(template);
 
     if (btnEliminarDia) {
       btnEliminarDia.addEventListener("click", () => {
         confirmarAccion(`¿Eliminar el día "${fechaFormateada}" y todos sus eventos?`, () => {
-  delete itinerarioData[fecha];
-  wrapper.remove();
-  guardarItinerarioLocal();
-  guardarItinerarioFirebase();
-  console.log("🗑️ Día eliminado:", fecha);
-});
-
+          const seccion = wrapper.closest(".seccion-ubicacion");
+          const ubicacion = seccion?.querySelector(".titulo-ubicacion")?.textContent?.trim();
+          if (ubicacion && itinerarioData[ubicacion]) {
+            delete itinerarioData[ubicacion][fecha];
+          }
+          wrapper.remove();
+          guardarItinerarioLocal();
+          guardarItinerarioFirebase();
+          console.log("🗑️ Día eliminado:", fecha);
+        });
       });
     }
 
     contenedor.appendChild(wrapper);
 
-    if (!itinerarioData[fecha]) {
-      itinerarioData[fecha] = { eventos: [] };
+    // Guardar la estructura base en itinerarioData
+    const seccion = contenedor.closest(".seccion-ubicacion");
+    const ubicacion = seccion?.querySelector(".titulo-ubicacion")?.textContent?.trim();
+
+    if (ubicacion) {
+      if (!itinerarioData[ubicacion]) {
+        itinerarioData[ubicacion] = {};
+      }
+      if (!itinerarioData[ubicacion][fecha]) {
+        itinerarioData[ubicacion][fecha] = { eventos: [] };
+      }
     }
 
     guardarItinerarioLocal();
@@ -181,17 +196,22 @@ window.guardarNuevoDia = guardarNuevoDia;
 
 
 
- function mostrarFormularioEvento(carousel) {
-  const seccionDia = carousel.closest(".seccion-ubicacion");
-  const tituloUbicacion = seccionDia.querySelector(".titulo-ubicacion")?.textContent;
-  const fecha = tituloUbicacion?.replace("Día ", "").trim();
 
-  if (fecha) {
-    window.fechaEventoActual = fecha; // Guardamos fecha actual
-  } else {
-    console.warn("⚠️ No se pudo extraer la fecha de la sección activa.");
+function mostrarFormularioEvento(carousel) {
+  const diaContenedor = carousel.closest(".dia-itinerario");
+  const fecha = diaContenedor?.getAttribute("data-fecha");
+
+  const seccion = diaContenedor.closest(".seccion-ubicacion");
+  const ubicacion = seccion?.querySelector(".titulo-ubicacion")?.textContent?.trim();
+
+  if (!fecha || !ubicacion) {
+    console.warn("❌ No se pudo obtener fecha o ubicación");
+    alert("Error: no se pudo determinar en qué día o ubicación estás.");
+    return;
   }
 
+  window.fechaEventoActual = fecha;
+  window.ubicacionEventoActual = ubicacion;
   window._carouselActual = carousel;
 
   mostrarModal(`
@@ -208,6 +228,7 @@ window.guardarNuevoDia = guardarNuevoDia;
     </div>
   `);
 }
+
 
 
   window.seleccionarTipoEvento = function() {
