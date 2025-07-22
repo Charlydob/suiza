@@ -555,32 +555,32 @@ if (!tarjeta) {
  tarjeta.addEventListener("click", () => {
   window._tarjetaEditando = tarjeta;
 
- const seccion = tarjeta.closest(".seccion-ubicacion");
+const seccion = tarjeta.closest(".seccion-ubicacion");
 const ubicacion = seccion?.querySelector(".titulo-ubicacion")?.textContent?.trim();
 
 const diaContenedor = tarjeta.closest(".dia-itinerario");
 const fecha = diaContenedor?.getAttribute("data-fecha");
-console.log("📦 Buscando evento en:", itinerarioData[ubicacion][fecha].eventos);
-console.log("🎯 originalTitulo:", tarjeta.dataset.originalTitulo);
-console.log("🕒 originalHora:", tarjeta.dataset.originalHora);
-
 
 if (fecha && ubicacion && itinerarioData[ubicacion]?.[fecha]) {
+  console.log("📦 Buscando evento en:", itinerarioData[ubicacion][fecha].eventos);
+  console.log("🎯 originalTitulo:", tarjeta.dataset.originalTitulo);
+  console.log("🕒 originalHora:", tarjeta.dataset.originalHora);
+
   const evento = itinerarioData[ubicacion][fecha].eventos.find(
+    e => e.titulo === tarjeta.dataset.originalTitulo &&
+         (e.hora || "") === (tarjeta.dataset.originalHora || "")
+  );
 
-      e => e.titulo === tarjeta.dataset.originalTitulo && e.hora === tarjeta.dataset.originalHora
-    );
-
-    if (evento) {
-      window._eventoEditando = evento;
-    } else {
-      console.warn("⚠️ No se encontró el evento al hacer clic en la tarjeta.");
-      window._eventoEditando = null;
-    }
+  if (evento) {
+    window._eventoEditando = evento;
   } else {
-    console.warn("⚠️ No se pudo determinar la fecha de la tarjeta.");
+    console.warn("⚠️ No se encontró el evento al hacer clic en la tarjeta.");
     window._eventoEditando = null;
   }
+} else {
+  console.warn("⚠️ No se pudo determinar la fecha o ubicación de la tarjeta.");
+  window._eventoEditando = null;
+}
 
   const eventoActual = window._eventoEditando;
 
