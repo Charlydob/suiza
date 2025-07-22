@@ -327,6 +327,7 @@ function renderizarItinerario() {
     for (const [fecha, entrada] of Object.entries(fechas)) {
       const clonDia = templateDia.content.cloneNode(true);
       const fechaFormateada = formatearFechaBonita(fecha);
+        clonDia.querySelector(".dia-itinerario")?.setAttribute("data-fecha", fecha);
       clonDia.querySelector(".titulo-dia").textContent = `${fechaFormateada}`;
 
       const carousel = clonDia.querySelector(".carousel-dia");
