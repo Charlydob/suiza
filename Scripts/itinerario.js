@@ -816,6 +816,9 @@ cargarItinerarioDesdeFirebase: () => {
 function guardarItinerarioFirebase() {
   if (!navigator.onLine || typeof db === "undefined") {
     console.warn("📴 Sin conexión, no se guarda en Firebase.");
+    console.log("🌐 Online:", navigator.onLine);
+console.log("🧪 DB definido:", typeof db);
+
     return;
   }
 console.log("💾 Guardando itinerario en ruta:", window.rutaItinerario);
