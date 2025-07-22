@@ -181,22 +181,34 @@ window.guardarNuevoDia = guardarNuevoDia;
 
 
 
-  function mostrarFormularioEvento(carousel) {
-    mostrarModal(`
-      <div class="modal-formulario-evento">
-    <h3>¿Qué deseas añadir?</h3>
-    <select id="selector-tipo">
-      <option value="evento">Evento</option>
-      <option value="favorito">Favorito</option>
-    </select>
-    <div>
-      <button id="btn-generico" onclick="seleccionarTipoEvento()">Continuar</button>
-      <button id="btn-generico" onclick="cerrarModal()">Cancelar</button>
-    </div>
-  </div>
-    `);
-    window._carouselActual = carousel;
+ function mostrarFormularioEvento(carousel) {
+  const seccionDia = carousel.closest(".seccion-ubicacion");
+  const tituloUbicacion = seccionDia.querySelector(".titulo-ubicacion")?.textContent;
+  const fecha = tituloUbicacion?.replace("Día ", "").trim();
+
+  if (fecha) {
+    window.fechaEventoActual = fecha; // Guardamos fecha actual
+  } else {
+    console.warn("⚠️ No se pudo extraer la fecha de la sección activa.");
   }
+
+  window._carouselActual = carousel;
+
+  mostrarModal(`
+    <div class="modal-formulario-evento">
+      <h3>¿Qué deseas añadir?</h3>
+      <select id="selector-tipo">
+        <option value="evento">Evento</option>
+        <option value="favorito">Favorito</option>
+      </select>
+      <div>
+        <button id="btn-generico" onclick="seleccionarTipoEvento()">Continuar</button>
+        <button id="btn-generico" onclick="cerrarModal()">Cancelar</button>
+      </div>
+    </div>
+  `);
+}
+
 
   window.seleccionarTipoEvento = function() {
     const tipo = document.getElementById("selector-tipo").value;
@@ -395,16 +407,7 @@ window.guardarNuevoEvento = function () {
     return;
   }
 
-  // 🔍 Identificar la sección visible o activa correctamente
-  const modales = document.querySelectorAll(".seccion-ubicacion");
-  let fecha = null;
-
-  modales.forEach(seccion => {
-    if (seccion.contains(document.querySelector(".modal-formulario-evento-edit"))) {
-      const tituloUbicacion = seccion.querySelector(".titulo-ubicacion")?.textContent;
-      fecha = tituloUbicacion?.replace("Día ", "").trim();
-    }
-  });
+  const fecha = window.fechaEventoActual;
 
   if (!fecha) {
     console.warn("❌ No se pudo determinar la fecha del evento.");
@@ -424,10 +427,8 @@ window.guardarNuevoEvento = function () {
     etiquetaEvento: etiqueta
   };
 
-  // ✅ Agrega al DOM (esto ya lo haces bien)
   crearTarjeta(titulo, "evento", hora, notas, etiqueta);
 
-  // ✅ Guarda en datos
   itinerarioData[fecha].eventos.push(nuevoEvento);
 
   guardarItinerarioLocal();
@@ -436,6 +437,7 @@ window.guardarNuevoEvento = function () {
 
   console.log(`✅ Evento añadido a ${fecha}:`, nuevoEvento);
 };
+
 
 
 
