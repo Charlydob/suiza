@@ -103,19 +103,44 @@ function guardarNuevaUbicacion() {
 window.guardarNuevaUbicacion = guardarNuevaUbicacion;
 
 
-  function mostrarFormularioDia(contenedorDias) {
-    mostrarModal(`
-      <div class="modal-formulario-cuando">
-    <h3>¿Qué día?</h3>
-    <input type="date" id="input-nuevo-dia">
-    <div>
-      <button id="btn-generico" onclick="guardarNuevoDia()">Guardar</button>
-      <button id="btn-generico" onclick="cerrarModal()">Cancelar</button>
+function mostrarFormularioDia(contenedorDias, ubicacion) {
+  mostrarModal(`
+    <div class="modal-formulario-cuando">
+      <h3>¿Qué día quieres añadir a <b>${ubicacion}</b>?</h3>
+      <input type="date" id="input-nueva-fecha">
+      <div>
+        <button id="btn-generico" onclick="guardarNuevoDia('${ubicacion}')">Guardar</button>
+        <button id="btn-generico" onclick="cerrarModal()">Cancelar</button>
+      </div>
     </div>
-  </div>
-    `);
-    window._contenedorDiasActual = contenedorDias;
+  `);
+  window._contenedorDiasActual = contenedorDias;
+}
+
+function guardarNuevoDia(ubicacion) {
+  const fecha = document.getElementById("input-nueva-fecha")?.value;
+
+  if (!fecha || !ubicacion) {
+    alert("Por favor, selecciona una fecha y una ubicación.");
+    return;
   }
+
+  if (!itinerarioData[ubicacion]) {
+    itinerarioData[ubicacion] = {};
+  }
+
+  if (!itinerarioData[ubicacion][fecha]) {
+    itinerarioData[ubicacion][fecha] = { eventos: [] };
+  }
+
+  renderizarItinerario();
+  guardarItinerarioLocal();
+  guardarItinerarioFirebase();
+  cerrarModal();
+
+  console.log(`📅 Día "${fecha}" añadido a ubicación "${ubicacion}"`);
+}
+
 function formatearFechaBonita(fechaISO) {
   const fecha = new Date(fechaISO + "T00:00:00");
   const dias = ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"];
@@ -129,23 +154,36 @@ function formatearFechaBonita(fechaISO) {
 }
 
 
-function guardarNuevoDia() {
-  const fecha = document.getElementById("input-nueva-fecha")?.value;
-  const ubicacion = document.getElementById("input-nueva-ubicacion")?.value;
 
-  if (!fecha || !ubicacion) {
-    alert("Por favor, selecciona una fecha y una ubicación.");
+function guardarNuevoDia() {
+  const fecha = document.getElementById("input-nuevo-dia")?.value;
+
+  // Recuperamos el contenedor actual donde se quiere insertar el día
+  const contenedor = window._contenedorDiasActual;
+  if (!fecha || !contenedor) {
+    alert("Por favor, selecciona una fecha.");
     return;
   }
 
+  // Recuperamos la ubicación desde el contenedor padre
+  const seccionUbicacion = contenedor.closest(".seccion-ubicacion");
+  const ubicacion = seccionUbicacion?.querySelector(".titulo-ubicacion")?.textContent?.trim();
+
+  if (!ubicacion) {
+    alert("No se pudo determinar la ubicación.");
+    return;
+  }
+
+  // Inicializamos la estructura si no existe
   if (!itinerarioData[ubicacion]) {
     itinerarioData[ubicacion] = {};
   }
+
   if (!itinerarioData[ubicacion][fecha]) {
     itinerarioData[ubicacion][fecha] = { eventos: [] };
   }
 
-  renderizarItinerario();
+  renderizarItinerario();  // Re-renderiza todo
   guardarItinerarioLocal();
   guardarItinerarioFirebase();
   cerrarModal();
@@ -153,6 +191,8 @@ function guardarNuevoDia() {
   console.log(`📅 Nuevo día creado: ${fecha} en ${ubicacion}`);
 }
 window.guardarNuevoDia = guardarNuevoDia;
+
+
 
 
 
