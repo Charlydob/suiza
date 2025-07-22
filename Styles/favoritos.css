@@ -69,7 +69,7 @@
   margin: 0;
   color: #333;
 }
-.editor-favorito input,
+
 .editor-favorito textarea {
   border: 1.5px solid #ccc;
   border-radius: 12px;
@@ -88,7 +88,7 @@
   position: fixed;
   top: 0;
   left: 0;
-  width: 120PX;
+  width: 100vw;
   height: 100vh;
   background-color: rgba(0, 0, 0, 0.25);
   backdrop-filter: blur(4px);
@@ -97,74 +97,100 @@
   justify-content: center;
   z-index: 2000;
 }
-
-.modal-formulario-favorito-lista {
-  background: #ffffffcc;
-  backdrop-filter: blur(6px);
-  border-radius: 16px;
-  padding: 20px;
-  width: 90%;
-  max-width: 380px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
-  font-family: 'Arial', sans-serif;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  text-align: left;
-}
-
-.modal-formulario-favorito-lista h3 {
-  text-align: center;
-  font-size: 18px;
-  margin: 0;
-  color: #333;
-}
-
-.modal-formulario-favorito-lista label {
-  font-weight: 600;
-  font-size: 14px;
-  color: #555;
-}
-
-.modal-formulario-favorito-lista input,
-.modal-formulario-favorito-lista select,
-.modal-formulario-favorito-lista textarea {
-  border: 1.5px solid #ccc;
-  border-radius: 10px;
+#modal-fondo-editor div#editorFavoritoLista {
+  background: rgba(255, 255, 255, 0.781);
+  border-radius: 15px;
   padding: 10px;
-  font-size: 14px;
-  width: 100%;
-  box-sizing: border-box;
-  background: rgba(255, 255, 255, 0.075);
-  backdrop-filter: blur(6px);
-  color: #333;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-}
-
-.modal-formulario-favorito-lista textarea {
-  resize: none;
-  overflow: hidden;
-  min-height: 60px;
-}
-
-.fila-botones-editor {
+  margin-top: 60px;
+  margin-left: 50px;
+  width: 70%;
+  max-width: 360px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.25);
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  margin-top: 12px;
+  gap: 0px;
+  text-align: center;
 }
-
-.fila-botones-editor button {
-  background-color: #007aff;
+#modal-fondo-editor div.fila-botones-editor {
+  background: transparent;
+  border-radius: 15px;
+  padding: 0px;
+  margin-top: 15px;
+  margin-left: 68px;
+  width: 70%;
+  max-width: 360px;
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  text-align: center;
+}
+#modal-fondo-editor button{
+  background-color: transparent;
   color: white;
   border: none;
   border-radius: 10px;
   padding: 10px;
   font-size: 15px;
+  margin-top: 0px;
   cursor: pointer;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
   transition: background-color 0.2s ease;
 }
-.fila-botones-editor button:hover {
-  background-color: #005ecb;
+#modal-fondo-editor input{
+  -webkit-appearance: none;
+  position: relative;
+  appearance: none;
+  margin-left: 12px;
+  margin-top: 0px;
+  background: rgba(96, 205, 255, 0.075);
+  backdrop-filter: blur(6px);
+  border: 1.5px solid #ccc;
+  border-radius: 12px;
+  padding: 3px;
+  font-size: 15px;
+  color: #333;
+  height: 18px;
+  width: 80%;
+  text-align: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  transition: border 0.2s ease;
+  
 }
+#modal-fondo-editor select{
+-webkit-appearance: none;
+  position: relative;
+  appearance: none;
+  margin-left: 12px;
+  margin-top: 0px;
+  background: rgba(96, 205, 255, 0.075);
+  backdrop-filter: blur(6px);
+  border: 1.5px solid #ccc;
+  border-radius: 12px;
+  padding: 3px;
+  font-size: 15px;
+  color: #333;
+  height: 28px;
+  width: 20%;
+  text-align: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  transition: border 0.2s ease;
+
+}
+#modal-fondo-editor div.selectores{
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+div.selectores input#editPrecioLista {
+  background: rgba(96, 205, 255, 0.075);
+  backdrop-filter: blur(6px);
+  border: 1.5px solid #ff0000 !important;
+  border-radius: 12px;
+  padding: 3px;
+  font-size: 15px;
+  color: #333;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+
+}
+

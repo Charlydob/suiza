@@ -288,27 +288,23 @@
 
     <label for="editNombreLista">Nombre personalizado:</label>
     <input type="text" id="editNombreLista">
-
-    <label for="editPrecioLista">Precio:</label>
-    <input type="text" id="editPrecioLista">
-
-    <label for="editMonedaLista">Moneda:</label>
+<div calss="selectores">
+<input type="text" id="editPrecioLista">
     <select id="editMonedaLista">
       <option value="EUR">EUR</option>
       <option value="CHF">CHF</option>
       <option value="USD">USD</option>
     </select>
 
-    <label for="editHorarioLista">Horario:</label>
     <input type="text" id="editHorarioLista">
-
+</div>
     <label for="editNotasLista">Observaciones:</label>
     <textarea id="editNotasLista" rows="3"></textarea>
 
     <div class="fila-botones-editor">
-      <button onclick="guardarEdicionFavoritoDesde('lista')">💾 Guardar</button>
-      <button onclick="borrarFavoritoDesde('lista')">🗑️ Eliminar</button>
-      <button onclick="cerrarEditorFavoritoDesde('lista')">❌ Cancelar</button>
+      <button onclick="guardarEdicionFavoritoDesde('lista')">💾</button>
+      <button onclick="borrarFavoritoDesde('lista')">🗑️</button>
+      <button onclick="cerrarEditorFavoritoDesde('lista')">❌</button>
     </div>
   </div>
 </div>
