@@ -269,7 +269,7 @@ window.guardarFavoritoSeleccionado = function () {
   const fecha = tituloUbicacion?.replace("Día ", "").trim();
 
   if (fecha && itinerarioData[fecha]) {
-    itinerarioData[fecha].eventos.push({
+    itinerarioData[ubicacion][fecha].eventos.push({
       titulo: nombre,
       tipo: "favorito",
       hora,
@@ -417,9 +417,13 @@ window.guardarNuevoEvento = function () {
     return;
   }
 
-  if (!itinerarioData[fecha]) {
-    itinerarioData[fecha] = { eventos: [] };
-  }
+ if (!itinerarioData[ubicacion]) {
+  itinerarioData[ubicacion] = {};
+}
+if (!itinerarioData[ubicacion][fecha]) {
+  itinerarioData[ubicacion][fecha] = { eventos: [] };
+}
+
 
   const nuevoEvento = {
     titulo,
