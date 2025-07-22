@@ -129,55 +129,32 @@ function formatearFechaBonita(fechaISO) {
 }
 
 
-
 function guardarNuevoDia() {
   const fecha = document.getElementById("input-nuevo-dia").value;
-  if (fecha) {
-    const contenedor = window._contenedorDiasActual;
-    const template = document.getElementById("template-dia").content.cloneNode(true);
+  const ubicacion = document.getElementById("input-nueva-ubicacion").value;
 
-    const fechaFormateada = formatearFechaBonita(fecha);
-    template.querySelector(".titulo-dia").textContent = fechaFormateada;
+  if (!fecha || !ubicacion) {
+    alert("Por favor, selecciona una fecha y una ubicación.");
+    return;
+  }
 
-    const btnAgregarEvento = template.querySelector(".btn-agregar-evento");
-    const btnEliminarDia = template.querySelector(".btn-cerrar-dia");
-    const carousel = template.querySelector(".carousel-dia");
+  // Inicializamos si no existen
+  if (!itinerarioData[ubicacion]) {
+    itinerarioData[ubicacion] = {};
+  }
+  if (!itinerarioData[ubicacion][fecha]) {
+    itinerarioData[ubicacion][fecha] = { eventos: [] };
+  }
 
-    btnAgregarEvento.addEventListener("click", () => mostrarFormularioEvento(carousel));
-
-    // Creamos un wrapper DOM real para poder eliminarlo luego
-    const wrapper = document.createElement("div");
-    wrapper.appendChild(template);
-
-    if (btnEliminarDia) {
-      btnEliminarDia.addEventListener("click", () => {
-        confirmarAccion(`¿Eliminar el día "${fechaFormateada}" y todos sus eventos?`, () => {
-  delete itinerarioData[fecha];
-  wrapper.remove();
+  renderizarItinerario();  // Re-renderiza todo
   guardarItinerarioLocal();
   guardarItinerarioFirebase();
-  console.log("🗑️ Día eliminado:", fecha);
-});
+  cerrarModal();
 
-      });
-    }
-
-    contenedor.appendChild(wrapper);
-
-    if (!itinerarioData[fecha]) {
-      itinerarioData[fecha] = { eventos: [] };
-    }
-
-    guardarItinerarioLocal();
-    guardarItinerarioFirebase();
-    cerrarModal();
-
-    console.log("📅 Día creado:", fecha);
-  } else {
-    alert("Selecciona una fecha válida.");
-  }
+  console.log(`📅 Nuevo día creado: ${fecha} en ${ubicacion}`);
 }
 window.guardarNuevoDia = guardarNuevoDia;
+
 
 
 
@@ -285,54 +262,43 @@ window.guardarFavoritoSeleccionado = function () {
 };
 
 
-;
+
 function renderizarItinerario() {
   const contenedorUbicaciones = document.getElementById("contenedor-ubicaciones-itinerario");
   contenedorUbicaciones.innerHTML = "";
 
   for (const [ubicacion, fechas] of Object.entries(itinerarioData)) {
-    const seccion = crearUbicacion(`${ubicacion}`);
+    const seccion = crearUbicacion(ubicacion);
     const contenedorDias = seccion.querySelector(".contenedor-dias");
 
-    const templateDia = document.getElementById("template-dia");
-    if (!templateDia) {
-      console.error("❌ No se encontró el template-dia en el DOM.");
-      continue;
-    }
-
     for (const [fecha, entrada] of Object.entries(fechas)) {
+      const templateDia = document.getElementById("template-dia");
+      if (!templateDia) continue;
+
       const clonDia = templateDia.content.cloneNode(true);
       const fechaFormateada = formatearFechaBonita(fecha);
-      clonDia.querySelector(".titulo-dia").textContent = `${fechaFormateada}`;
+      clonDia.querySelector(".titulo-dia").textContent = fechaFormateada;
 
       const carousel = clonDia.querySelector(".carousel-dia");
       const btnAgregarEvento = clonDia.querySelector(".btn-agregar-evento");
       const btnCerrarDia = clonDia.querySelector(".btn-cerrar-dia");
-
-      if (!carousel) {
-        console.error("❌ No se encontró .carousel-dia en el template clonado.");
-        continue;
-      }
-
-      window._carouselActual = carousel;
 
       btnAgregarEvento.addEventListener("click", () => mostrarFormularioEvento(carousel));
 
       const clonDiaWrapper = document.createElement("div");
       clonDiaWrapper.appendChild(clonDia);
 
-      if (btnCerrarDia) {
-        btnCerrarDia.addEventListener("click", () => {
-          if (confirm(`¿Eliminar el día "${fechaFormateada}" y todos sus eventos?`)) {
-            delete itinerarioData[ubicacion][fecha];
-            clonDiaWrapper.remove();
-            guardarItinerarioLocal();
-            guardarItinerarioFirebase();
-            console.log("🗑️ Día eliminado:", fecha);
-            console.log("🧠 Estado actual itinerarioData:", itinerarioData);
+      btnCerrarDia.addEventListener("click", () => {
+        if (confirm(`¿Eliminar el día "${fechaFormateada}" de ${ubicacion}?`)) {
+          delete itinerarioData[ubicacion][fecha];
+          if (Object.keys(itinerarioData[ubicacion]).length === 0) {
+            delete itinerarioData[ubicacion];
           }
-        });
-      }
+          clonDiaWrapper.remove();
+          guardarItinerarioLocal();
+          guardarItinerarioFirebase();
+        }
+      });
 
       for (const evento of entrada.eventos || []) {
         const tarjeta = crearTarjeta(
@@ -344,7 +310,6 @@ function renderizarItinerario() {
           evento.precio,
           evento.moneda
         );
-
         if (tarjeta) carousel.appendChild(tarjeta);
       }
 
@@ -352,9 +317,10 @@ function renderizarItinerario() {
     }
   }
 
-  console.log("✅ Itinerario renderizado desde objeto.");
+  console.log("✅ Itinerario renderizado desde estructura ubicación → fecha.");
 }
 window.renderizarItinerario = renderizarItinerario;
+
 
 
 
@@ -403,42 +369,39 @@ window.guardarNuevoEvento = function () {
   const hora = document.getElementById("hora-evento").value.trim();
   const notas = document.getElementById("notas-evento").value.trim();
   const etiqueta = document.getElementById("etiqueta-evento").value;
+  const precio = document.getElementById("precio-evento")?.value || "";
+  const moneda = document.getElementById("moneda-evento")?.value || "EUR";
 
   if (!titulo) {
     alert("El título del evento es obligatorio.");
     return;
   }
 
-  const fecha = window.fechaEventoActual;
+  // Detectar en qué sección está el modal abierto
+  const tarjeta = window._tarjetaEditando;
+  const seccion = tarjeta?.closest(".seccion-ubicacion") || document.querySelector(".seccion-ubicacion:last-child");
 
-  if (!fecha) {
-    console.warn("❌ No se pudo determinar la fecha del evento.");
-    alert("Error: no se pudo determinar a qué día pertenece el evento.");
+  const ubicacion = seccion?.querySelector(".titulo-ubicacion")?.textContent?.trim();
+  const fecha = seccion?.querySelector(".titulo-dia")?.textContent?.trim();
+
+  if (!ubicacion || !fecha) {
+    alert("Error: no se pudo determinar ubicación y fecha del evento.");
     return;
   }
 
-  if (!itinerarioData[fecha]) {
-    itinerarioData[fecha] = { eventos: [] };
-  }
+  if (!itinerarioData[ubicacion]) itinerarioData[ubicacion] = {};
+  if (!itinerarioData[ubicacion][fecha]) itinerarioData[ubicacion][fecha] = { eventos: [] };
 
-  const nuevoEvento = {
-    titulo,
-    tipo: "evento",
-    hora,
-    notas,
-    etiquetaEvento: etiqueta
-  };
+  const nuevoEvento = { titulo, tipo: "evento", hora, notas, etiquetaEvento: etiqueta, precio, moneda };
 
-  crearTarjeta(titulo, "evento", hora, notas, etiqueta);
-
-  itinerarioData[fecha].eventos.push(nuevoEvento);
+  crearTarjeta(titulo, "evento", hora, notas, etiqueta, precio, moneda);
+  itinerarioData[ubicacion][fecha].eventos.push(nuevoEvento);
 
   guardarItinerarioLocal();
   guardarItinerarioFirebase();
   cerrarModal();
-
-  console.log(`✅ Evento añadido a ${fecha}:`, nuevoEvento);
 };
+
 
 
 
@@ -450,18 +413,18 @@ window.guardarNuevoEvento = function () {
 }
 
 function crearTarjeta(titulo, tipo, hora = null, notas = "", etiquetaEvento = "", precio = "", moneda = "EUR") {
-const template = document.getElementById("template-tarjeta-itinerario");
-if (!template) {
-  console.error("❌ No se encontró el template-tarjeta-itinerario en el DOM");
-  return;
-}
+  const template = document.getElementById("template-tarjeta-itinerario");
+  if (!template) {
+    console.error("❌ No se encontró el template-tarjeta-itinerario en el DOM");
+    return;
+  }
 
-const clone = template.content.cloneNode(true);
-const tarjeta = clone.querySelector(".tarjeta-itinerario");
-if (!tarjeta) {
-  console.error("❌ El clon no contiene .tarjeta-itinerario");
-  return;
-}
+  const clone = template.content.cloneNode(true);
+  const tarjeta = clone.querySelector(".tarjeta-itinerario");
+  if (!tarjeta) {
+    console.error("❌ El clon no contiene .tarjeta-itinerario");
+    return;
+  }
 
   const etiqueta = tarjeta.querySelector(".etiqueta-evento");
   const strong = tarjeta.querySelector(".titulo-evento");
@@ -496,12 +459,11 @@ if (!tarjeta) {
   }
   tarjeta.classList.add(claseColor);
 
-  // Orden por hora
   const contenedor = window._carouselActual;
   if (!contenedor) {
-  console.error("❌ No se ha definido window._carouselActual. No se puede insertar la tarjeta.");
-  return;
-}
+    console.error("❌ No se ha definido window._carouselActual. No se puede insertar la tarjeta.");
+    return;
+  }
 
   const nuevaHora = parseHora(hora);
   let insertado = false;
@@ -519,90 +481,80 @@ if (!tarjeta) {
   }
   if (!insertado) contenedor.appendChild(tarjeta);
 
-  // Evento de clic para editar
- tarjeta.addEventListener("click", () => {
-  window._tarjetaEditando = tarjeta;
+  // ✅ Evento para editar tarjeta
+  tarjeta.addEventListener("click", () => {
+    window._tarjetaEditando = tarjeta;
 
-  const seccion = tarjeta.closest(".seccion-ubicacion");
-  const tituloUbicacion = seccion?.querySelector(".titulo-ubicacion")?.textContent;
-  const fecha = tituloUbicacion?.replace("Día ", "").trim();
+    const seccion = tarjeta.closest(".seccion-ubicacion");
+    const ubicacion = seccion?.querySelector(".titulo-ubicacion")?.textContent?.trim();
+    const fecha = seccion?.querySelector(".titulo-dia")?.textContent?.trim();
 
-  if (fecha && itinerarioData[fecha]) {
-    const evento = itinerarioData[fecha].eventos.find(
-      e => e.titulo === tarjeta.dataset.originalTitulo && e.hora === tarjeta.dataset.originalHora
-    );
+    let eventoEncontrado = null;
 
-    if (evento) {
-      window._eventoEditando = evento;
-    } else {
-      console.warn("⚠️ No se encontró el evento al hacer clic en la tarjeta.");
-      window._eventoEditando = null;
+    if (ubicacion && fecha && itinerarioData[ubicacion] && itinerarioData[ubicacion][fecha]) {
+      eventoEncontrado = itinerarioData[ubicacion][fecha].eventos.find(
+        e => e.titulo === tarjeta.dataset.originalTitulo && e.hora === tarjeta.dataset.originalHora
+      );
     }
-  } else {
-    console.warn("⚠️ No se pudo determinar la fecha de la tarjeta.");
-    window._eventoEditando = null;
-  }
 
-  const eventoActual = window._eventoEditando;
+    if (!eventoEncontrado) {
+      alert("❌ No se pudo cargar la información del evento.");
+      return;
+    }
 
-  if (!eventoActual) {
-    alert("❌ No se pudo cargar la información del evento.");
-    return;
-  }
+    window._eventoEditando = eventoEncontrado;
 
-  mostrarModal(`
-    <div class="modal-formulario-tarjeta">
-      <h3>Editar ${tipo}</h3>
-      <input id="titulo-evento" placeholder="Título" value="${eventoActual.titulo || ""}">
-      
-      <div id="inputs-evento">
-        <input id="hora-evento" type="time" value="${eventoActual.hora || ""}">
+    mostrarModal(`
+      <div class="modal-formulario-tarjeta">
+        <h3>Editar ${tipo}</h3>
+        <input id="titulo-evento" placeholder="Título" value="${eventoEncontrado.titulo || ""}">
         
-        <select id="etiqueta-evento">
-          <option value="alojamiento" ${eventoActual.etiquetaEvento === "alojamiento" ? "selected" : ""}>Alojamiento</option>
-          <option value="transporte" ${eventoActual.etiquetaEvento === "transporte" ? "selected" : ""}>Transporte</option>
-          <option value="comida" ${eventoActual.etiquetaEvento === "comida" ? "selected" : ""}>Comida</option>
-          <option value="atraccion" ${eventoActual.etiquetaEvento === "atraccion" ? "selected" : ""}>Atracción</option>
-          <option value="otros" ${eventoActual.etiquetaEvento === "otros" ? "selected" : ""}>Otros</option>
-        </select>
-      </div>
+        <div id="inputs-evento">
+          <input id="hora-evento" type="time" value="${eventoEncontrado.hora || ""}">
+          
+          <select id="etiqueta-evento">
+            <option value="alojamiento" ${eventoEncontrado.etiquetaEvento === "alojamiento" ? "selected" : ""}>Alojamiento</option>
+            <option value="transporte" ${eventoEncontrado.etiquetaEvento === "transporte" ? "selected" : ""}>Transporte</option>
+            <option value="comida" ${eventoEncontrado.etiquetaEvento === "comida" ? "selected" : ""}>Comida</option>
+            <option value="atraccion" ${eventoEncontrado.etiquetaEvento === "atraccion" ? "selected" : ""}>Atracción</option>
+            <option value="otros" ${eventoEncontrado.etiquetaEvento === "otros" ? "selected" : ""}>Otros</option>
+          </select>
+        </div>
 
-      <textarea id="notas-evento" placeholder="Notas">${eventoActual.notas || ""}</textarea>
-      
-      <div id="inputs-evento">
-        <input id="precio-evento" placeholder="Precio" value="${eventoActual.precio || ""}">
-        <select id="moneda-evento">
-          <option value="EUR" ${eventoActual.moneda === "EUR" ? "selected" : ""}>EUR</option>
-          <option value="CHF" ${eventoActual.moneda === "CHF" ? "selected" : ""}>CHF</option>
-          <option value="USD" ${eventoActual.moneda === "USD" ? "selected" : ""}>USD</option>
-        </select>
-      </div>
+        <textarea id="notas-evento" placeholder="Notas">${eventoEncontrado.notas || ""}</textarea>
+        
+        <div id="inputs-evento">
+          <input id="precio-evento" placeholder="Precio" value="${eventoEncontrado.precio || ""}">
+          <select id="moneda-evento">
+            <option value="EUR" ${eventoEncontrado.moneda === "EUR" ? "selected" : ""}>EUR</option>
+            <option value="CHF" ${eventoEncontrado.moneda === "CHF" ? "selected" : ""}>CHF</option>
+            <option value="USD" ${eventoEncontrado.moneda === "USD" ? "selected" : ""}>USD</option>
+          </select>
+        </div>
 
-      <div>
-        <button id="btn-generico" onclick="actualizarTarjeta(this)">Guardar</button>
-        <button id="btn-generico" onclick="borrarTarjeta(window._tarjetaEditando)">Eliminar</button>
-        <button id="btn-generico" onclick="cerrarModal()">Cancelar</button>
+        <div>
+          <button id="btn-generico" onclick="actualizarTarjeta(this)">Guardar</button>
+          <button id="btn-generico" onclick="borrarTarjeta(window._tarjetaEditando)">Eliminar</button>
+          <button id="btn-generico" onclick="cerrarModal()">Cancelar</button>
+        </div>
       </div>
-    </div>
-  `);
-   const textarea = document.getElementById('notas-evento');
-  if (textarea) {
-    textarea.addEventListener('input', autoResize);
+    `);
 
-    function autoResize() {
-      this.style.height = 'auto';
-      this.style.height = this.scrollHeight + 'px';
+    const textarea = document.getElementById('notas-evento');
+    if (textarea) {
+      textarea.addEventListener('input', function autoResize() {
+        this.style.height = 'auto';
+        this.style.height = this.scrollHeight + 'px';
+      });
+      textarea.dispatchEvent(new Event('input'));
     }
-
-    autoResize.call(textarea);
-  }
-});
-
+  });
 
   return tarjeta;
 }
 
 window.crearTarjeta = crearTarjeta;
+
 
 
 })();
