@@ -380,10 +380,12 @@ function crearTarjetaFavorito(f) {
     establecerCentroDesdeFavorito(f.lat, f.lon);
   });
 
-  btnEliminar.addEventListener("click", e => {
-    e.stopPropagation();
-    toggleFavorito(f.id, f.tipo, [f.lat, f.lon], nombre, { innerText: "☆ Favorito" });
-  });
+btnEliminar.addEventListener("click", e => {
+  e.stopPropagation();
+  favoritoEditandoId = f.id;
+  borrarFavoritoDesde("lista");
+});
+
 
   btnEditar.addEventListener("click", e => {
     e.stopPropagation();
