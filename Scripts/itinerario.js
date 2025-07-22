@@ -129,70 +129,73 @@ function formatearFechaBonita(fechaISO) {
 }
 
 
-
 function guardarNuevoDia() {
   const fecha = document.getElementById("input-nuevo-dia").value;
-  if (fecha) {
-    const contenedor = window._contenedorDiasActual;
-    const template = document.getElementById("template-dia").content.cloneNode(true);
-
-    const fechaFormateada = formatearFechaBonita(fecha);
-    const diaItinerario = template.querySelector(".dia-itinerario");
-    diaItinerario.setAttribute("data-fecha", fecha); // ⬅️ Guardar fecha real
-
-    template.querySelector(".titulo-dia").textContent = fechaFormateada;
-
-    const btnAgregarEvento = template.querySelector(".btn-agregar-evento");
-    const btnEliminarDia = template.querySelector(".btn-cerrar-dia");
-    const carousel = template.querySelector(".carousel-dia");
-
-    btnAgregarEvento.addEventListener("click", () => mostrarFormularioEvento(carousel));
-
-    // Creamos un wrapper DOM real
-    const wrapper = document.createElement("div");
-    wrapper.appendChild(template);
-
-    if (btnEliminarDia) {
-      btnEliminarDia.addEventListener("click", () => {
-        confirmarAccion(`¿Eliminar el día "${fechaFormateada}" y todos sus eventos?`, () => {
-          const seccion = wrapper.closest(".seccion-ubicacion");
-          const ubicacion = seccion?.querySelector(".titulo-ubicacion")?.textContent?.trim();
-          if (ubicacion && itinerarioData[ubicacion]) {
-            delete itinerarioData[ubicacion][fecha];
-          }
-          wrapper.remove();
-          guardarItinerarioLocal();
-          guardarItinerarioFirebase();
-          console.log("🗑️ Día eliminado:", fecha);
-        });
-      });
-    }
-
-    contenedor.appendChild(wrapper);
-
-    // Guardar la estructura base en itinerarioData
-    const seccion = contenedor.closest(".seccion-ubicacion");
-    const ubicacion = seccion?.querySelector(".titulo-ubicacion")?.textContent?.trim();
-
-    if (ubicacion) {
-      if (!itinerarioData[ubicacion]) {
-        itinerarioData[ubicacion] = {};
-      }
-      if (!itinerarioData[ubicacion][fecha]) {
-        itinerarioData[ubicacion][fecha] = { eventos: [] };
-      }
-    }
-
-    guardarItinerarioLocal();
-    guardarItinerarioFirebase();
-    cerrarModal();
-
-    console.log("📅 Día creado:", fecha);
-  } else {
+  if (!fecha) {
     alert("Selecciona una fecha válida.");
+    return;
   }
+
+  const contenedor = window._contenedorDiasActual;
+
+  // Clonamos el template del día
+  const template = document.getElementById("template-dia").content.cloneNode(true);
+  const diaItinerario = template.querySelector(".dia-itinerario");
+  diaItinerario.setAttribute("data-fecha", fecha); // ← Guardamos la fecha ISO en el DOM
+
+  // Mostramos la fecha formateada
+  const fechaFormateada = formatearFechaBonita(fecha);
+  template.querySelector(".titulo-dia").textContent = fechaFormateada;
+
+  const btnAgregarEvento = template.querySelector(".btn-agregar-evento");
+  const btnEliminarDia = template.querySelector(".btn-cerrar-dia");
+  const carousel = template.querySelector(".carousel-dia");
+
+  // Asociamos el botón para añadir evento
+  btnAgregarEvento.addEventListener("click", () => mostrarFormularioEvento(carousel));
+
+  // Asociamos el botón para eliminar día
+  if (btnEliminarDia) {
+    btnEliminarDia.addEventListener("click", () => {
+      confirmarAccion(`¿Eliminar el día "${fechaFormateada}" y todos sus eventos?`, () => {
+        const seccion = diaItinerario.closest(".seccion-ubicacion");
+        const ubicacion = seccion?.querySelector(".titulo-ubicacion")?.textContent?.trim();
+        if (ubicacion && itinerarioData[ubicacion]) {
+          delete itinerarioData[ubicacion][fecha];
+        }
+        diaItinerario.remove();
+        guardarItinerarioLocal();
+        guardarItinerarioFirebase();
+        console.log("🗑️ Día eliminado:", fecha);
+      });
+    });
+  }
+
+  // Insertamos el clon directamente en el contenedor
+  contenedor.appendChild(template);
+
+  // Creamos la estructura en itinerarioData
+  const seccion = contenedor.closest(".seccion-ubicacion");
+  const ubicacion = seccion?.querySelector(".titulo-ubicacion")?.textContent?.trim();
+
+  if (ubicacion) {
+    if (!itinerarioData[ubicacion]) {
+      itinerarioData[ubicacion] = {};
+    }
+    if (!itinerarioData[ubicacion][fecha]) {
+      itinerarioData[ubicacion][fecha] = { eventos: [] };
+    }
+  }
+
+  guardarItinerarioLocal();
+  guardarItinerarioFirebase();
+  cerrarModal();
+
+  console.log("📅 Día creado:", fecha);
 }
 window.guardarNuevoDia = guardarNuevoDia;
+
+
 
 
 
