@@ -290,8 +290,8 @@ function renderizarItinerario() {
   const contenedorUbicaciones = document.getElementById("contenedor-ubicaciones-itinerario");
   contenedorUbicaciones.innerHTML = "";
 
-  for (const [fecha, entrada] of Object.entries(itinerarioData)) {
-    const seccion = crearUbicacion(`Día ${fecha}`);
+  for (const [ubicacion, fechas] of Object.entries(itinerarioData)) {
+    const seccion = crearUbicacion(`${ubicacion}`);
     const contenedorDias = seccion.querySelector(".contenedor-dias");
 
     const templateDia = document.getElementById("template-dia");
@@ -300,54 +300,56 @@ function renderizarItinerario() {
       continue;
     }
 
-    const clonDia = templateDia.content.cloneNode(true);
-    const fechaFormateada = formatearFechaBonita(fecha);
-    clonDia.querySelector(".titulo-dia").textContent = fechaFormateada;
+    for (const [fecha, entrada] of Object.entries(fechas)) {
+      const clonDia = templateDia.content.cloneNode(true);
+      const fechaFormateada = formatearFechaBonita(fecha);
+      clonDia.querySelector(".titulo-dia").textContent = `${fechaFormateada}`;
 
-    const carousel = clonDia.querySelector(".carousel-dia");
-    const btnAgregarEvento = clonDia.querySelector(".btn-agregar-evento");
-    const btnCerrarDia = clonDia.querySelector(".btn-cerrar-dia");
+      const carousel = clonDia.querySelector(".carousel-dia");
+      const btnAgregarEvento = clonDia.querySelector(".btn-agregar-evento");
+      const btnCerrarDia = clonDia.querySelector(".btn-cerrar-dia");
 
-    if (!carousel) {
-      console.error("❌ No se encontró .carousel-dia en el template clonado.");
-      continue;
+      if (!carousel) {
+        console.error("❌ No se encontró .carousel-dia en el template clonado.");
+        continue;
+      }
+
+      window._carouselActual = carousel;
+
+      btnAgregarEvento.addEventListener("click", () => mostrarFormularioEvento(carousel));
+
+      const clonDiaWrapper = document.createElement("div");
+      clonDiaWrapper.appendChild(clonDia);
+
+      if (btnCerrarDia) {
+        btnCerrarDia.addEventListener("click", () => {
+          if (confirm(`¿Eliminar el día "${fechaFormateada}" y todos sus eventos?`)) {
+            delete itinerarioData[ubicacion][fecha];
+            clonDiaWrapper.remove();
+            guardarItinerarioLocal();
+            guardarItinerarioFirebase();
+            console.log("🗑️ Día eliminado:", fecha);
+            console.log("🧠 Estado actual itinerarioData:", itinerarioData);
+          }
+        });
+      }
+
+      for (const evento of entrada.eventos || []) {
+        const tarjeta = crearTarjeta(
+          evento.titulo,
+          evento.tipo,
+          evento.hora,
+          evento.notas,
+          evento.etiquetaEvento,
+          evento.precio,
+          evento.moneda
+        );
+
+        if (tarjeta) carousel.appendChild(tarjeta);
+      }
+
+      contenedorDias.appendChild(clonDiaWrapper);
     }
-
-    window._carouselActual = carousel;
-
-    btnAgregarEvento.addEventListener("click", () => mostrarFormularioEvento(carousel));
-
-    const clonDiaWrapper = document.createElement("div");
-    clonDiaWrapper.appendChild(clonDia);
-
-    if (btnCerrarDia) {
-      btnCerrarDia.addEventListener("click", () => {
-        if (confirm(`¿Eliminar el día "${fechaFormateada}" y todos sus eventos?`)) {
-          delete itinerarioData[fecha];
-          clonDiaWrapper.remove();
-          guardarItinerarioLocal();
-          guardarItinerarioFirebase();
-          console.log("🗑️ Día eliminado:", fecha);
-          console.log("🧠 Estado actual itinerarioData:", itinerarioData);
-        }
-      });
-    }
-
-    for (const evento of entrada.eventos || []) {
-      const tarjeta = crearTarjeta(
-        evento.titulo,
-        evento.tipo,
-        evento.hora,
-        evento.notas,
-        evento.etiquetaEvento,
-        evento.precio,
-        evento.moneda
-      );
-
-      if (tarjeta) carousel.appendChild(tarjeta);
-    }
-
-    contenedorDias.appendChild(clonDiaWrapper);
   }
 
   console.log("✅ Itinerario renderizado desde objeto.");
