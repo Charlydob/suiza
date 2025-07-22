@@ -560,6 +560,9 @@ const ubicacion = seccion?.querySelector(".titulo-ubicacion")?.textContent?.trim
 
 const diaContenedor = tarjeta.closest(".dia-itinerario");
 const fecha = diaContenedor?.getAttribute("data-fecha");
+console.log("📦 Buscando evento en:", itinerarioData[ubicacion][fecha].eventos);
+console.log("🎯 originalTitulo:", tarjeta.dataset.originalTitulo);
+console.log("🕒 originalHora:", tarjeta.dataset.originalHora);
 
 
 if (fecha && ubicacion && itinerarioData[ubicacion]?.[fecha]) {
