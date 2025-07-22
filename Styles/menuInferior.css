@@ -23,6 +23,7 @@ color: #999;
 transition: color 0.2s ease;
 padding: 5px 0;
 font-family: 'Inter', sans-serif;
+
 }
 #menuInferior img {
 margin-left: 2px;
@@ -41,8 +42,9 @@ transition: filter 0.3s ease;
 }
 
 .nav-btn.activo {
-color: #000;
+  color: #1519ff;
 }
+
 
 .nav-btn.activo img {
 filter: none;
