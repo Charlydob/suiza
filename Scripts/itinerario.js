@@ -874,11 +874,22 @@ function borrarTarjeta(tarjeta) {
   const hora = tarjeta.getAttribute("data-hora");
 
   const seccion = tarjeta.closest(".seccion-ubicacion");
-  const tituloUbicacion = seccion?.querySelector(".titulo-ubicacion")?.textContent;
-  const fecha = tituloUbicacion?.replace("Día ", "").trim();
+  const ubicacion = seccion?.querySelector(".titulo-ubicacion")?.textContent?.trim();
 
-  if (fecha && itinerarioData[fecha]) {
-    itinerarioData[fecha].eventos = itinerarioData[fecha].eventos.filter(e => !(e.titulo === titulo && e.hora === hora));
+  const dia = tarjeta.closest(".dia-itinerario");
+  const fecha = dia?.getAttribute("data-fecha");
+
+  if (
+    ubicacion &&
+    fecha &&
+    itinerarioData[ubicacion] &&
+    itinerarioData[ubicacion][fecha]
+  ) {
+    itinerarioData[ubicacion][fecha].eventos = itinerarioData[ubicacion][fecha].eventos.filter(
+      e => !(e.titulo === titulo && (e.hora || "") === (hora || ""))
+    );
+  } else {
+    console.warn("❌ No se pudo eliminar: estructura no válida", { ubicacion, fecha });
   }
 
   tarjeta.remove();
