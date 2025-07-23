@@ -317,7 +317,7 @@ function cargarItinerarioFirebase() {
     .then(snapshot => {
       const data = snapshot.val();
       if (data) {
-window.itinerarioData = data;
+itinerarioData = data;
 
         console.log("🧩 ItinerarioData cargado desde Firebase:", itinerarioData);
 
