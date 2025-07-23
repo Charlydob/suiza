@@ -541,7 +541,7 @@ if (!tarjeta) {
   if (moneda) tarjeta.setAttribute("data-moneda", moneda);
 
   tarjeta.dataset.originalTitulo = titulo;
-  tarjeta.dataset.originalHora = hora;
+  tarjeta.dataset.originalHora = hora || "";
 
   let claseColor = "";
   switch (etiquetaEvento) {
