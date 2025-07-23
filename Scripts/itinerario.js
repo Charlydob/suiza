@@ -289,19 +289,30 @@ window.guardarFavoritoSeleccionado = function () {
   crearTarjeta(nombre, "favorito", hora, "", etiqueta, precio);
 
   const seccion = document.querySelector(".seccion-ubicacion:last-child");
-  const tituloUbicacion = seccion?.querySelector(".titulo-ubicacion")?.textContent;
-  const fecha = tituloUbicacion?.replace("Día ", "").trim();
+const ubicacion = seccion?.querySelector(".titulo-ubicacion")?.textContent?.trim();
+const fecha = seccion?.querySelector(".dia-itinerario")?.getAttribute("data-fecha");
 
-  if (fecha && itinerarioData[fecha]) {
-    itinerarioData[ubicacion][fecha].eventos.push({
-      titulo: nombre,
-      tipo: "favorito",
-      hora,
-      notas: "",
-      etiquetaEvento: etiqueta,
-      precio
-    });
-  }
+if (
+  ubicacion &&
+  fecha &&
+  itinerarioData[ubicacion] &&
+  itinerarioData[ubicacion][fecha] &&
+  Array.isArray(itinerarioData[ubicacion][fecha].eventos)
+) {
+  itinerarioData[ubicacion][fecha].eventos.push({
+    titulo: nombre,
+    tipo: "favorito",
+    hora,
+    notas: "",
+    etiquetaEvento: etiqueta,
+    precio
+  });
+  console.log("✅ Favorito insertado correctamente en itinerarioData");
+} else {
+  console.warn("⚠️ No se pudo insertar el favorito: estructura no encontrada.", {
+    ubicacion, fecha, itinerarioData
+  });
+}
 
   guardarItinerarioLocal();
   guardarItinerarioFirebase();
