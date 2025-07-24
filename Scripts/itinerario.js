@@ -38,21 +38,29 @@ window.confirmarAccion = function (mensaje, callbackAceptar) {
   window.cerrarModal = cerrarModal;
 function guardarNuevaUbicacion() {
   const input = document.getElementById("input-nueva-ubicacion");
-  const nombre = input.value.trim();
-  if (nombre) {
-    crearUbicacion(nombre);
-    // Inicializamos en itinerarioData con clave segura
-    if (!itinerarioData[nombre]) {
-      itinerarioData[nombre] = { eventos: [] };
-    }
-    guardarItinerarioLocal();
-    guardarItinerarioFirebase();
-    cerrarModal();
-  } else {
+  const nombre = input?.value?.trim();
+
+  if (!nombre) {
     alert("Introduce un nombre válido.");
+    return;
   }
+
+  if (itinerarioData[nombre]) {
+    alert("Ya existe una ubicación con ese nombre.");
+    return;
+  }
+
+  // Crear la ubicación en la interfaz
+  crearUbicacion(nombre);
+
+  // Inicializar en el objeto si no existe
+  itinerarioData[nombre] = {};
+
+  guardarItinerarioLocal();
+  guardarItinerarioFirebase();
+  cerrarModal();
 }
-window.guardarNuevaUbicacion = guardarNuevaUbicacion;
+
 window.guardarNuevaUbicacion = guardarNuevaUbicacion;
   function guardarUbicacionRenombrada() {
   const nuevaUbicacion = document.getElementById("nueva-ubicacion")?.value?.trim();
