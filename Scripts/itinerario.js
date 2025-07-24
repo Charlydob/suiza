@@ -516,6 +516,96 @@ console.log("📅 Fecha:", fecha);
   const [h, m] = hora.split(":").map(Number);
   return h * 60 + m;
 }
+function parseLinks(texto) {
+  const urlRegex = /(https?:\/\/[^\s]+)/g;
+  return texto.replace(urlRegex, url => `<a href="${url}" target="_blank">${url}</a>`);
+}
+function abrirModalEdicionEvento() {
+  const eventoActual = window._eventoEditando;
+  const tipo = "evento";
+
+  if (!eventoActual) {
+    alert("❌ No se pudo cargar la información del evento.");
+    return;
+  }
+
+  mostrarModal(`
+    <div class="modal-formulario-tarjeta">
+      <h3>Editar ${tipo}</h3>
+      <input id="titulo-evento" placeholder="Título" value="${eventoActual.titulo || ""}">
+      
+      <div id="inputs-evento">
+        <input id="hora-evento" type="time" value="${eventoActual.hora || ""}">
+        
+        <select id="etiqueta-evento">
+          <option value="alojamiento" ${eventoActual.etiquetaEvento === "alojamiento" ? "selected" : ""}>Alojamiento</option>
+          <option value="transporte" ${eventoActual.etiquetaEvento === "transporte" ? "selected" : ""}>Transporte</option>
+          <option value="comida" ${eventoActual.etiquetaEvento === "comida" ? "selected" : ""}>Comida</option>
+          <option value="atraccion" ${eventoActual.etiquetaEvento === "atraccion" ? "selected" : ""}>Atracción</option>
+          <option value="otros" ${eventoActual.etiquetaEvento === "otros" ? "selected" : ""}>Otros</option>
+        </select>
+      </div>
+
+      <textarea id="notas-evento" placeholder="Notas">${eventoActual.notas || ""}</textarea>
+      
+      <div id="inputs-evento">
+        <input id="precio-evento" placeholder="Precio" value="${eventoActual.precio || ""}">
+        <select id="moneda-evento">
+          <option value="EUR" ${eventoActual.moneda === "EUR" ? "selected" : ""}>EUR</option>
+          <option value="CHF" ${eventoActual.moneda === "CHF" ? "selected" : ""}>CHF</option>
+          <option value="USD" ${eventoActual.moneda === "USD" ? "selected" : ""}>USD</option>
+        </select>
+      </div>
+
+      <div>
+        <button id="btn-generico" onclick="actualizarTarjeta(this)">Guardar</button>
+        <button id="btn-generico" onclick="borrarTarjeta(window._tarjetaEditando)">Eliminar</button>
+        <button id="btn-generico" onclick="cerrarModal()">Cancelar</button>
+      </div>
+    </div>
+  `);
+
+  // Auto-resize para el textarea
+  const textarea = document.getElementById('notas-evento');
+  if (textarea) {
+    textarea.addEventListener('input', autoResize);
+
+    function autoResize() {
+      this.style.height = 'auto';
+      this.style.height = this.scrollHeight + 'px';
+    }
+
+    autoResize.call(textarea);
+  }
+}
+
+window.abrirModalEdicionEvento = abrirModalEdicionEvento;
+
+
+function mostrarVistaPreviaEvento(eventoActual, tipo) {
+  const notasParseadas = parseLinks(eventoActual.notas || "");
+
+  mostrarModal(`
+    <div class="modal-formulario-tarjeta">
+      <h3>${eventoActual.titulo || "Sin título"}</h3>
+      
+      <div id="inputs-evento">
+        <p><strong>Hora:</strong> ${eventoActual.hora || "—"}</p>
+        <p><strong>Categoría:</strong> ${eventoActual.etiquetaEvento || "—"}</p>
+        <p><strong>Precio:</strong> ${eventoActual.precio || "—"} ${eventoActual.moneda || ""}</p>
+      </div>
+
+      <div class="vista-previa-notas">${notasParseadas}</div>
+
+      <div>
+        <button id="btn-generico" onclick="abrirModalEdicionEvento()">Editar</button>
+        <button id="btn-generico" onclick="borrarTarjeta(window._tarjetaEditando)">Eliminar</button>
+        <button id="btn-generico" onclick="cerrarModal()">Cancelar</button>
+      </div>
+    </div>
+  `);
+}
+
 
 function crearTarjeta(titulo, tipo, hora = null, notas = "", etiquetaEvento = "", precio = "", moneda = "EUR") {
 const template = document.getElementById("template-tarjeta-itinerario");
@@ -625,52 +715,33 @@ if (fecha && ubicacion && itinerarioData[ubicacion]?.[fecha]) {
     return;
   }
 
-  mostrarModal(`
-    <div class="modal-formulario-tarjeta">
-      <h3>Editar ${tipo}</h3>
-      <input id="titulo-evento" placeholder="Título" value="${eventoActual.titulo || ""}">
-      
-      <div id="inputs-evento">
-        <input id="hora-evento" type="time" value="${eventoActual.hora || ""}">
-        
-        <select id="etiqueta-evento">
-          <option value="alojamiento" ${eventoActual.etiquetaEvento === "alojamiento" ? "selected" : ""}>Alojamiento</option>
-          <option value="transporte" ${eventoActual.etiquetaEvento === "transporte" ? "selected" : ""}>Transporte</option>
-          <option value="comida" ${eventoActual.etiquetaEvento === "comida" ? "selected" : ""}>Comida</option>
-          <option value="atraccion" ${eventoActual.etiquetaEvento === "atraccion" ? "selected" : ""}>Atracción</option>
-          <option value="otros" ${eventoActual.etiquetaEvento === "otros" ? "selected" : ""}>Otros</option>
-        </select>
-      </div>
+mostrarVistaPreviaEvento(eventoActual, tipo);
 
-      <textarea id="notas-evento" placeholder="Notas">${eventoActual.notas || ""}</textarea>
-      
-      <div id="inputs-evento">
-        <input id="precio-evento" type="number" inputmode="numeric" placeholder="Precio" value="${eventoActual.precio || ""}">
-        <select id="moneda-evento">
-          <option value="EUR" ${eventoActual.moneda === "EUR" ? "selected" : ""}>EUR</option>
-          <option value="CHF" ${eventoActual.moneda === "CHF" ? "selected" : ""}>CHF</option>
-          <option value="USD" ${eventoActual.moneda === "USD" ? "selected" : ""}>USD</option>
-        </select>
-      </div>
+const textarea = document.getElementById('notas-evento');
+const vistaPrevia = document.getElementById('vista-previa-notas');
 
-      <div>
-        <button id="btn-generico" onclick="actualizarTarjeta(this)">Guardar</button>
-        <button id="btn-generico" onclick="borrarTarjeta(window._tarjetaEditando)">Eliminar</button>
-        <button id="btn-generico" onclick="cerrarModal()">Cancelar</button>
-      </div>
-    </div>
-  `);
-   const textarea = document.getElementById('notas-evento');
-  if (textarea) {
-    textarea.addEventListener('input', autoResize);
 
-    function autoResize() {
-      this.style.height = 'auto';
-      this.style.height = this.scrollHeight + 'px';
-    }
 
+function autoResize() {
+  this.style.height = 'auto';
+  this.style.height = this.scrollHeight + 'px';
+}
+
+function actualizarVistaPrevia() {
+  if (!vistaPrevia || !textarea) return;
+  vistaPrevia.innerHTML = parseLinks(textarea.value);
+}
+
+if (textarea) {
+  textarea.addEventListener('input', () => {
     autoResize.call(textarea);
-  }
+    actualizarVistaPrevia();
+  });
+
+  autoResize.call(textarea);
+  actualizarVistaPrevia(); // Inicializar
+}
+
 });
 
 
@@ -678,9 +749,10 @@ if (fecha && ubicacion && itinerarioData[ubicacion]?.[fecha]) {
 }
 
 window.crearTarjeta = crearTarjeta;
-
-
 })();
+
+
+
 
 let itinerarioData = {};
 
