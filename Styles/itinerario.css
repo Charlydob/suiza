@@ -333,7 +333,7 @@
   padding: 20px 16px;
   width: 90%;
   max-width: 380px;
-  margin: auto;
+  margin-bottom: 20px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
   display: flex;
   flex-direction: column;
@@ -376,7 +376,7 @@
 }
 .modal-formulario-evento-edit textarea#notas-evento {
   resize: none; /* Desactiva el "arrastrar" manual */
-  overflow: hidden; /* Elimina la barra de scroll vertical */
+  overflow: auto; /* Elimina la barra de scroll vertical */
   min-height: 60px; /* Altura mínima para que no sea enano */
   max-height: 300px; /* Por si querés limitarlo */
 }
@@ -391,7 +391,7 @@
   padding: 20px 16px;
   width: 90%;
   max-width: 380px;
-  margin: auto;
+  margin-bottom: 20px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
   display: flex;
   flex-direction: column;
@@ -434,9 +434,10 @@
 }
 .modal-formulario-tarjeta textarea#notas-evento {
   resize: none; /* Desactiva el "arrastrar" manual */
-  overflow: hidden; /* Elimina la barra de scroll vertical */
+   /* Elimina la barra de scroll vertical */
   min-height: 60px; /* Altura mínima para que no sea enano */
   max-height: 300px; /* Por si querés limitarlo */
+  margin-bottom: 40px;
 }
 .modal-formulario-tarjeta input#precio-evento {
   -webkit-appearance: none;
@@ -478,7 +479,7 @@ body, html {
 
 .pagina {
   min-height: 100vh;
-  overflow-y: auto;
+  overflow-y: hidden;
 }
 .color-alojamiento {
   border: 2px solid #25c410 !important;
