@@ -49,19 +49,19 @@ function guardarNuevaUbicacion() {
     alert("Ya existe una ubicación con ese nombre.");
     return;
   }
-
+  // Inicializar en el objeto si no existe
+  itinerarioData[nombre] = {};
   // Crear la ubicación en la interfaz
   crearUbicacion(nombre);
 
-  // Inicializar en el objeto si no existe
-  itinerarioData[nombre] = {};
+
 
   guardarItinerarioLocal();
   guardarItinerarioFirebase();
   cerrarModal();
 }
-
 window.guardarNuevaUbicacion = guardarNuevaUbicacion;
+
   function guardarUbicacionRenombrada() {
   const nuevaUbicacion = document.getElementById("nueva-ubicacion")?.value?.trim();
   const ubicacionAntigua = window._ubicacionEditando;
@@ -133,8 +133,6 @@ return seccionInsertada;
 }
 window.crearUbicacion = crearUbicacion;
 
-
-
   botonNuevaUbicacion.addEventListener("click", () => {
     mostrarModal(`
       <div class="modal-formulario-donde">
@@ -159,10 +157,6 @@ function mostrarModalEditarUbicacion(nombreActual) {
     </div>
   `);
 }
-
-
-
-
 
   function mostrarFormularioDia(contenedorDias) {
     mostrarModal(`

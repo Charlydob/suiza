@@ -71,32 +71,37 @@ function renderizarResumenGastos() {
   let totalGeneral = 0;
   const agrupado = {};
 
-  for (const [ubicacion, fechas] of Object.entries(itinerarioData)) {
-  for (const [fecha, datosDia] of Object.entries(fechas)) {
-    if (!datosDia.eventos || !Array.isArray(datosDia.eventos)) continue;
+  // Agrupar eventos por fecha, sin importar ubicación
+  for (const fechas of Object.values(itinerarioData)) {
+    for (const [fecha, datosDia] of Object.entries(fechas)) {
+      if (!datosDia.eventos || !Array.isArray(datosDia.eventos)) continue;
 
-    if (!agrupado[ubicacion]) agrupado[ubicacion] = {};
+      if (!agrupado[fecha]) agrupado[fecha] = [];
 
-    agrupado[ubicacion][fecha] = datosDia.eventos
-      .filter(e => parseFloat(e.precio))
-      .map(e => {
-        const precio = parseFloat(e.precio.toString().replace(",", "."));
-        const moneda = e.moneda || "EUR";
-        const convertido = convertirMoneda(precio, moneda, monedaDestino);
-        return {
-          tipo: e.tipo,
-          titulo: e.titulo,
-          etiqueta: e.etiquetaEvento,
-          precioOriginal: `${precio.toFixed(2)} ${moneda}`,
-          precioConvertido: `${convertido.toFixed(2)} ${monedaDestino}`,
-          valorNumerico: convertido
-        };
-      });
+      agrupado[fecha].push(...datosDia.eventos
+        .filter(e => parseFloat(e.precio))
+        .map(e => {
+          const precio = parseFloat(e.precio.toString().replace(",", "."));
+          const moneda = e.moneda || "EUR";
+          const convertido = convertirMoneda(precio, moneda, monedaDestino);
+          return {
+            tipo: e.tipo,
+            titulo: e.titulo,
+            etiqueta: e.etiquetaEvento,
+            precioOriginal: `${precio.toFixed(2)} ${moneda}`,
+            precioConvertido: `${convertido.toFixed(2)} ${monedaDestino}`,
+            valorNumerico: convertido
+          };
+        }));
+    }
   }
-}
 
-for (const [ubicacion, fechas] of Object.entries(agrupado)) {
-  for (const [fecha, eventos] of Object.entries(fechas)) {
+  // Ordenar por fecha
+  const fechasOrdenadas = Object.keys(agrupado).sort();
+
+  for (const fecha of fechasOrdenadas) {
+    const eventos = agrupado[fecha];
+
     const manuales = (gastosExtra[fecha] || []).map((g, i) => {
       const convertido = convertirMoneda(g.cantidad, g.moneda, monedaDestino);
       return {
@@ -106,7 +111,7 @@ for (const [ubicacion, fechas] of Object.entries(agrupado)) {
         precioOriginal: `${g.cantidad.toFixed(2)} ${g.moneda}`,
         precioConvertido: `${convertido.toFixed(2)} ${monedaDestino}`,
         valorNumerico: convertido,
-        indice: i // necesario para eliminar luego
+        indice: i
       };
     });
 
@@ -117,7 +122,6 @@ for (const [ubicacion, fechas] of Object.entries(agrupado)) {
     const div = document.createElement("div");
     div.className = "gasto-dia";
     div.innerHTML = `
-      <h3>${ubicacion}</h3>
       <h4>${fecha}</h4>
       <ul>
         ${todos.map((e, i) => `
@@ -141,10 +145,10 @@ for (const [ubicacion, fechas] of Object.entries(agrupado)) {
     `;
     contenedor.appendChild(div);
   }
-}
 
   document.getElementById("gastos-total").textContent = `${totalGeneral.toFixed(2)} ${monedaDestino}`;
 }
+
 function eliminarGastoManual(fecha, indice) {
   if (!gastosExtra[fecha] || !gastosExtra[fecha][indice]) return;
   const eliminado = gastosExtra[fecha].splice(indice, 1)[0];
