@@ -437,7 +437,7 @@
    /* Elimina la barra de scroll vertical */
   min-height: 60px; /* Altura mínima para que no sea enano */
   max-height: 300px; /* Por si querés limitarlo */
-  margin-bottom: 40px;
+  margin-bottom: 0px;
 }
 .modal-formulario-tarjeta input#precio-evento {
   -webkit-appearance: none;
@@ -456,6 +456,12 @@
   text-align: center;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
   transition: border 0.2s ease;
+}
+.modal-formulario-tarjeta button{
+  margin-bottom: 0px;
+}
+#modal-contenido {
+  margin-bottom: 140px;
 }
 
 #modal-fondo {
