@@ -142,6 +142,7 @@ html, body {
 main {
   margin-bottom: 80px;
 }
+
 #sidebar.open {
   transform: translateX(0);
 }
@@ -552,3 +553,6 @@ br {
   justify-content: center;
 }
 
+#pagina-mapa.activa ~ * main {
+  margin-bottom: 0 !important;
+}

@@ -71,10 +71,10 @@ function renderizarResumenGastos() {
   let totalGeneral = 0;
   const agrupado = {};
 
-  for (const [fecha, datosDia] of Object.entries(itinerarioData)) {
+  for (const [ubicacion, fechas] of Object.entries(itinerarioData)) {
+  for (const [fecha, datosDia] of Object.entries(fechas)) {
     if (!datosDia.eventos || !Array.isArray(datosDia.eventos)) continue;
 
-    const ubicacion = datosDia.ubicacion || "Sin ubicación";
     if (!agrupado[ubicacion]) agrupado[ubicacion] = {};
 
     agrupado[ubicacion][fecha] = datosDia.eventos
@@ -93,6 +93,7 @@ function renderizarResumenGastos() {
         };
       });
   }
+}
 
 for (const [ubicacion, fechas] of Object.entries(agrupado)) {
   for (const [fecha, eventos] of Object.entries(fechas)) {
