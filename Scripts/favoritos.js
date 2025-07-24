@@ -263,44 +263,42 @@ function renderizarFavoritosEn(origen) {
   const contenedor = document.getElementById(esLista ? "contenedorFavoritos" : "contenedorFavoritosSidebar");
   contenedor.innerHTML = "";
 
- let listaFinal = favoritos;
+  let listaFinal = favoritos;
 
-const filtroTexto = document.getElementById(esLista ? "buscadorFavoritos" : "buscadorFavoritosSidebar")?.value.toLowerCase() || "";
-const filtroTipo = esLista ? (document.getElementById("filtroTipoFavoritos")?.value || "") : "";
+  if (esLista) {
+    const listaDiv = document.getElementById("listaFavoritos");
+    const filtroTexto = document.getElementById("buscadorFavoritos")?.value.toLowerCase() || "";
+    const filtroTipo = document.getElementById("filtroTipoFavoritos")?.value || "";
+    const orden = document.getElementById("ordenFavoritos")?.value || "distanciaAsc";
 
-listaFinal = favoritos.filter(f => {
-  const texto = `${f.datosPersonalizados?.nombre || ""} ${f.datosPersonalizados?.notas || ""}`.toLowerCase();
-  const coincideTexto = texto.includes(filtroTexto);
-  const coincideTipo = filtroTipo === "" || f.tipo === filtroTipo;
-  return coincideTexto && coincideTipo;
-});
+    if (favoritos.length === 0) {
+      listaDiv.style.display = "none";
+      return;
+    } else {
+      listaDiv.style.display = "block";
+    }
 
-if (esLista) {
-  const listaDiv = document.getElementById("listaFavoritos");
-  const orden = document.getElementById("ordenFavoritos")?.value || "distanciaAsc";
+    const userPos = ubicacionReal || currentCoords;
+    const lat1 = Array.isArray(userPos) ? userPos[0] : userPos.lat;
+    const lon1 = Array.isArray(userPos) ? userPos[1] : userPos.lng;
 
-  if (favoritos.length === 0) {
-    listaDiv.style.display = "none";
-    return;
-  } else {
-    listaDiv.style.display = "block";
+    listaFinal = favoritos
+  .filter(f => f.lat != null && f.lon != null)  // ← ESTA LÍNEA EVITA EL CRASH
+  .map(f => ({ ...f, distanciaKm: calcularDistancia(lat1, lon1, f.lat, f.lon) }))
+  .filter(f => {
+    const texto = `${f.datosPersonalizados?.nombre || ""} ${f.datosPersonalizados?.notas || ""}`.toLowerCase();
+    const coincideTexto = texto.includes(filtroTexto);
+    const coincideTipo = filtroTipo === "" || f.tipo === filtroTipo;
+    return coincideTexto && coincideTipo;
+  });
+
+
+    if (orden === "distanciaAsc") {
+      listaFinal.sort((a, b) => a.distanciaKm - b.distanciaKm);
+    } else if (orden === "distanciaDesc") {
+      listaFinal.sort((a, b) => b.distanciaKm - a.distanciaKm);
+    }
   }
-
-  const userPos = ubicacionReal || currentCoords;
-  const lat1 = Array.isArray(userPos) ? userPos[0] : userPos.lat;
-  const lon1 = Array.isArray(userPos) ? userPos[1] : userPos.lng;
-
-  listaFinal = listaFinal
-    .filter(f => f.lat != null && f.lon != null)
-    .map(f => ({ ...f, distanciaKm: calcularDistancia(lat1, lon1, f.lat, f.lon) }));
-
-  if (orden === "distanciaAsc") {
-    listaFinal.sort((a, b) => a.distanciaKm - b.distanciaKm);
-  } else if (orden === "distanciaDesc") {
-    listaFinal.sort((a, b) => b.distanciaKm - a.distanciaKm);
-  }
-}
-
 
   listaFinal.forEach(f => {
     if (esLista) {
