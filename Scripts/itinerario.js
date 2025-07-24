@@ -61,12 +61,24 @@ function crearUbicacion(nombreUbicacion) {
     });
   }
 
-  contenedorUbicaciones.appendChild(template);
+contenedorUbicaciones.appendChild(template);
 
-  guardarItinerarioLocal();
-  guardarItinerarioFirebase();
+const seccionInsertada = contenedorUbicaciones.lastElementChild;
+const h2 = seccionInsertada.querySelector(".titulo-ubicacion");
 
-  return seccion;
+if (h2) {
+  h2.addEventListener("click", () => {
+    const ubicacionActual = h2.textContent.trim();
+    window._ubicacionEditando = ubicacionActual;
+    mostrarModalEditarUbicacion(ubicacionActual);
+  });
+}
+
+guardarItinerarioLocal();
+guardarItinerarioFirebase();
+
+return seccionInsertada;
+
 }
 window.crearUbicacion = crearUbicacion;
 
@@ -83,24 +95,44 @@ window.crearUbicacion = crearUbicacion;
   </div>
     `);
   });
+function mostrarModalEditarUbicacion(nombreActual) {
+  mostrarModal(`
+    <div class="modal-formulario-tarjeta">
+      <h3>Editar ubicación</h3>
+      <input id="nueva-ubicacion" placeholder="Nuevo nombre" value="${nombreActual}">
+      <div>
+        <button id="btn-generico" onclick="guardarNuevaUbicacion()">Guardar</button>
+        <button id="btn-generico" onclick="cerrarModal()">Cancelar</button>
+      </div>
+    </div>
+  `);
+}
 
 function guardarNuevaUbicacion() {
-  const input = document.getElementById("input-nueva-ubicacion");
-  const nombre = input.value.trim();
-  if (nombre) {
-    crearUbicacion(nombre);
-    // Inicializamos en itinerarioData con clave segura
-    if (!itinerarioData[nombre]) {
-      itinerarioData[nombre] = { eventos: [] };
-    }
-    guardarItinerarioLocal();
-    guardarItinerarioFirebase();
+  const nuevaUbicacion = document.getElementById("nueva-ubicacion")?.value?.trim();
+  const ubicacionAntigua = window._ubicacionEditando;
+
+  if (!nuevaUbicacion || !ubicacionAntigua || nuevaUbicacion === ubicacionAntigua) {
     cerrarModal();
-  } else {
-    alert("Introduce un nombre válido.");
+    return;
   }
+
+  if (itinerarioData[nuevaUbicacion]) {
+    alert("Ya existe una ubicación con ese nombre.");
+    return;
+  }
+
+  itinerarioData[nuevaUbicacion] = itinerarioData[ubicacionAntigua];
+  delete itinerarioData[ubicacionAntigua];
+
+  console.log("✅ Ubicación renombrada:", ubicacionAntigua, "→", nuevaUbicacion);
+
+  cerrarModal();
+  renderizarItinerario(); // <- asegúrate de que existe esta función
+  guardarItinerarioLocal?.();
+  guardarItinerarioFirebase?.();
 }
-window.guardarNuevaUbicacion = guardarNuevaUbicacion;
+
 
 
   function mostrarFormularioDia(contenedorDias) {
@@ -346,7 +378,19 @@ function renderizarItinerario() {
   const contenedorUbicaciones = document.getElementById("contenedor-ubicaciones-itinerario");
   contenedorUbicaciones.innerHTML = "";
 
-  for (const [ubicacion, fechas] of Object.entries(itinerarioData)) {
+const ubicacionesOrdenadas = Object.entries(itinerarioData).sort(([, fechasA], [, fechasB]) => {
+  const fechaMinA = Object.keys(fechasA || {})
+    .filter(f => /^\d{4}-\d{2}-\d{2}$/.test(f))
+    .sort()[0] || "9999-12-31";
+
+  const fechaMinB = Object.keys(fechasB || {})
+    .filter(f => /^\d{4}-\d{2}-\d{2}$/.test(f))
+    .sort()[0] || "9999-12-31";
+
+  return fechaMinA.localeCompare(fechaMinB);
+});
+
+for (const [ubicacion, fechas] of ubicacionesOrdenadas) {
     console.log("Orden de ubicaciones:", Object.keys(itinerarioData));
 
     const seccion = crearUbicacion(`${ubicacion}`);
