@@ -518,8 +518,18 @@ console.log("📅 Fecha:", fecha);
 }
 function parseLinks(texto) {
   const urlRegex = /(https?:\/\/[^\s]+)/g;
-  return texto.replace(urlRegex, url => `<a href="${url}" target="_blank">${url}</a>`);
+
+  return texto.replace(urlRegex, url => {
+    try {
+      const u = new URL(url);
+      const dominio = u.hostname.replace("www.", "");
+      return `<a href="${url}" target="_blank">${dominio}/...</a>`;
+    } catch {
+      return url;
+    }
+  });
 }
+
 function abrirModalEdicionEvento() {
   const eventoActual = window._eventoEditando;
   const tipo = "evento";
