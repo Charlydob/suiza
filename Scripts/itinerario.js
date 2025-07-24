@@ -347,6 +347,8 @@ function renderizarItinerario() {
   contenedorUbicaciones.innerHTML = "";
 
   for (const [ubicacion, fechas] of Object.entries(itinerarioData)) {
+    console.log("Orden de ubicaciones:", Object.keys(itinerarioData));
+
     const seccion = crearUbicacion(`${ubicacion}`);
     const contenedorDias = seccion.querySelector(".contenedor-dias");
 
