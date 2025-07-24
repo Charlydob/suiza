@@ -37,6 +37,9 @@ window.confirmarAccion = function (mensaje, callbackAceptar) {
   }
   window.cerrarModal = cerrarModal;
 function guardarNuevaUbicacion() {
+}
+window.guardarNuevaUbicacion = guardarNuevaUbicacion;
+  function guardarUbicacionRenombrada() {
   const nuevaUbicacion = document.getElementById("nueva-ubicacion")?.value?.trim();
   const ubicacionAntigua = window._ubicacionEditando;
 
@@ -60,7 +63,7 @@ function guardarNuevaUbicacion() {
   guardarItinerarioLocal?.();
   guardarItinerarioFirebase?.();
 }
-window.guardarNuevaUbicacion = guardarNuevaUbicacion;
+window.guardarUbicacionRenombrada = guardarUbicacionRenombrada;
 
 function crearUbicacion(nombreUbicacion) {
   const template = document.getElementById("template-ubicacion").content.cloneNode(true);
@@ -108,6 +111,7 @@ return seccionInsertada;
 window.crearUbicacion = crearUbicacion;
 
 
+
   botonNuevaUbicacion.addEventListener("click", () => {
     mostrarModal(`
       <div class="modal-formulario-donde">
@@ -126,7 +130,7 @@ function mostrarModalEditarUbicacion(nombreActual) {
       <h3>Editar ubicación</h3>
       <input id="nueva-ubicacion" placeholder="Nuevo nombre" value="${nombreActual}">
       <div>
-        <button id="btn-generico" onclick="guardarNuevaUbicacion()">Guardar</button>
+        <button id="btn-generico" onclick="guardarUbicacionRenombrada()">Guardar</button>
         <button id="btn-generico" onclick="cerrarModal()">Cancelar</button>
       </div>
     </div>
