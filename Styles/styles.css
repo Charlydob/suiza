@@ -139,7 +139,9 @@ html, body {
   margin-bottom: 200px;
   padding: 0px;
 }
-
+main {
+  margin-bottom: 80px;
+}
 #sidebar.open {
   transform: translateX(0);
 }
