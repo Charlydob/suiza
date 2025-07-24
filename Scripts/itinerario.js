@@ -645,7 +645,7 @@ if (fecha && ubicacion && itinerarioData[ubicacion]?.[fecha]) {
       <textarea id="notas-evento" placeholder="Notas">${eventoActual.notas || ""}</textarea>
       
       <div id="inputs-evento">
-        <input id="precio-evento" placeholder="Precio" value="${eventoActual.precio || ""}">
+        <input id="precio-evento" type="number" inputmode="numeric" placeholder="Precio" value="${eventoActual.precio || ""}">
         <select id="moneda-evento">
           <option value="EUR" ${eventoActual.moneda === "EUR" ? "selected" : ""}>EUR</option>
           <option value="CHF" ${eventoActual.moneda === "CHF" ? "selected" : ""}>CHF</option>
