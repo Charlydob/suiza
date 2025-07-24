@@ -42,6 +42,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
             // 🔄 Ajustar margen del <main> si es mapa u otra
             actualizarMarginMain();
+            
+            // actualizar gastos al cargarse
+            if (destino === "gastos") {
+            if (typeof window.cargarGastosFirebase === "function") window.cargarGastosFirebase();
+            if (typeof window.renderizarResumenGastos === "function") window.renderizarResumenGastos();
+}
+
 
             // Actualiza clases de los botones
             botones.forEach(b => b.classList.remove("activo"));

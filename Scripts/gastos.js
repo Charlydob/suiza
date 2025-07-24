@@ -197,3 +197,4 @@ window.addEventListener("DOMContentLoaded", () => {
 window.renderizarResumenGastos = renderizarResumenGastos;
 window.cambiarMonedaDestino = cambiarMonedaDestino;
 window.añadirGastoManual = añadirGastoManual;
+window.cargarGastosFirebase = cargarGastosFirebase;
