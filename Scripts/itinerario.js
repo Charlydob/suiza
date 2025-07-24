@@ -36,7 +36,30 @@ window.confirmarAccion = function (mensaje, callbackAceptar) {
     modalContenido.innerHTML = "";
   }
   window.cerrarModal = cerrarModal;
+function guardarNuevaUbicacion() {
+  const nuevaUbicacion = document.getElementById("nueva-ubicacion")?.value?.trim();
+  const ubicacionAntigua = window._ubicacionEditando;
 
+  if (!nuevaUbicacion || !ubicacionAntigua || nuevaUbicacion === ubicacionAntigua) {
+    cerrarModal();
+    return;
+  }
+
+  if (itinerarioData[nuevaUbicacion]) {
+    alert("Ya existe una ubicación con ese nombre.");
+    return;
+  }
+
+  itinerarioData[nuevaUbicacion] = itinerarioData[ubicacionAntigua];
+  delete itinerarioData[ubicacionAntigua];
+
+  console.log("✅ Ubicación renombrada:", ubicacionAntigua, "→", nuevaUbicacion);
+
+  cerrarModal();
+  renderizarItinerario(); // <- asegúrate de que existe esta función
+  guardarItinerarioLocal?.();
+  guardarItinerarioFirebase?.();
+}
 function crearUbicacion(nombreUbicacion) {
   const template = document.getElementById("template-ubicacion").content.cloneNode(true);
   template.querySelector(".titulo-ubicacion").textContent = nombreUbicacion;
@@ -108,30 +131,7 @@ function mostrarModalEditarUbicacion(nombreActual) {
   `);
 }
 
-function guardarNuevaUbicacion() {
-  const nuevaUbicacion = document.getElementById("nueva-ubicacion")?.value?.trim();
-  const ubicacionAntigua = window._ubicacionEditando;
 
-  if (!nuevaUbicacion || !ubicacionAntigua || nuevaUbicacion === ubicacionAntigua) {
-    cerrarModal();
-    return;
-  }
-
-  if (itinerarioData[nuevaUbicacion]) {
-    alert("Ya existe una ubicación con ese nombre.");
-    return;
-  }
-
-  itinerarioData[nuevaUbicacion] = itinerarioData[ubicacionAntigua];
-  delete itinerarioData[ubicacionAntigua];
-
-  console.log("✅ Ubicación renombrada:", ubicacionAntigua, "→", nuevaUbicacion);
-
-  cerrarModal();
-  renderizarItinerario(); // <- asegúrate de que existe esta función
-  guardarItinerarioLocal?.();
-  guardarItinerarioFirebase?.();
-}
 
 
 
