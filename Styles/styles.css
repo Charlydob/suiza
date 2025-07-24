@@ -553,6 +553,3 @@ br {
   justify-content: center;
 }
 
-#pagina-mapa.activa ~ * main {
-  margin-bottom: 0 !important;
-}

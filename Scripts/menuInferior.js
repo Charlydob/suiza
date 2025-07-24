@@ -22,21 +22,26 @@ document.addEventListener("DOMContentLoaded", () => {
             const destino = btn.getAttribute("data-page");
             if (!destino) throw new Error("Botón sin atributo 'data-page'");
 
-       // Oculta todas las páginas y bloquea scroll
-paginas.forEach(p => {
-  p.style.display = "none";
-  p.style.overflow = "hidden"; // ⛔ bloquea scroll en todas
-});
+            // Oculta todas las páginas y elimina clase activa
+            paginas.forEach(p => {
+              p.style.display = "none";
+              p.classList.remove("activa");
+              p.style.overflow = "hidden";
+            });
 
-
-            // Muestra la página correspondiente
+            // Muestra la página correspondiente y la marca como activa
             const paginaDestino = document.getElementById("pagina-" + destino);
             if (!paginaDestino) throw new Error(`No se encontró la página: pagina-${destino}`);
             paginaDestino.style.display = "block";
-// ✅ Solo permitir scroll en el itinerario
-if (destino === "itinerario") {
-  paginaDestino.style.overflowY = "auto";
-}
+            paginaDestino.classList.add("activa");
+
+            // ✅ Solo permitir scroll en el itinerario
+            if (destino === "itinerario") {
+              paginaDestino.style.overflowY = "auto";
+            }
+
+            // 🔄 Ajustar margen del <main> si es mapa u otra
+            actualizarMarginMain();
 
             // Actualiza clases de los botones
             botones.forEach(b => b.classList.remove("activo"));
@@ -56,6 +61,8 @@ if (destino === "itinerario") {
       const defaultPage = document.getElementById("pagina-mapa");
       if (!defaultPage) throw new Error("Página por defecto 'pagina-mapa' no encontrada");
       defaultPage.style.display = "block";
+      defaultPage.classList.add("activa"); // ✅ Clase activa al cargar
+      actualizarMarginMain(); // ✅ Ajuste inicial del margen
     } catch (errDefault) {
       reportarError(errDefault);
     }
@@ -64,3 +71,14 @@ if (destino === "itinerario") {
     reportarError(errGlobal);
   }
 });
+
+function actualizarMarginMain() {
+  const main = document.querySelector("main");
+  const paginaMapa = document.getElementById("pagina-mapa");
+
+  if (paginaMapa.classList.contains("activa")) {
+    main.style.marginBottom = "0";
+  } else {
+    main.style.marginBottom = "80px";
+  }
+}
