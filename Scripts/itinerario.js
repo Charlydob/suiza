@@ -60,6 +60,8 @@ function guardarNuevaUbicacion() {
   guardarItinerarioLocal?.();
   guardarItinerarioFirebase?.();
 }
+window.guardarNuevaUbicacion = guardarNuevaUbicacion;
+
 function crearUbicacion(nombreUbicacion) {
   const template = document.getElementById("template-ubicacion").content.cloneNode(true);
   template.querySelector(".titulo-ubicacion").textContent = nombreUbicacion;
