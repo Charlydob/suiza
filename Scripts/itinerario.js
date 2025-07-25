@@ -965,13 +965,35 @@ tarjeta.addEventListener("touchmove", (e) => {
   const diaDestino = elementoDebajo?.closest(".dia-itinerario");
 
   if (diaDestino && diaDestino !== tarjeta.closest(".dia-itinerario")) {
-    crearPlaceholderSiNoExiste(diaDestino);
+    const contenedor = diaDestino.querySelector(".carousel-dia");
+    if (!contenedor) return;
+
+    let placeholder = document.querySelector(".tarjeta-placeholder");
+    if (!placeholder) {
+      placeholder = document.createElement("div");
+      placeholder.classList.add("tarjeta", "tarjeta-placeholder");
+      placeholder.innerHTML = "<em>📍 Aquí se soltará</em>";
+    }
+
+    const tarjetas = contenedor.querySelectorAll(".tarjeta-itinerario:not(.tarjeta-placeholder)");
+    let insertado = false;
+    for (const t of tarjetas) {
+      const rect = t.getBoundingClientRect();
+      if (touch.clientY < rect.top + rect.height / 2) {
+        contenedor.insertBefore(placeholder, t);
+        insertado = true;
+        break;
+      }
+    }
+
+    if (!insertado) contenedor.appendChild(placeholder);
   } else {
     eliminarPlaceholder();
   }
 
   e.preventDefault();
 }, { passive: false });
+
 
 tarjeta.addEventListener("touchend", (e) => {
   clearTimeout(longPressTimer);
