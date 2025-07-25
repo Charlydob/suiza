@@ -4,6 +4,7 @@ window.rutaItinerario = `itinerario/${usuarioId}`;
 let tarjetaArrastrando = null;
 let origenFecha = null;
 let origenUbicacion = null;
+let tarjetaClon = null;
 
 (function() {
   const contenedorUbicaciones = document.getElementById("contenedor-ubicaciones-itinerario");
@@ -915,7 +916,12 @@ tarjeta.addEventListener("touchend", () => {
 });
 
   // Evento de clic para editar
- tarjeta.addEventListener("click", () => {
+tarjeta.addEventListener("click", (e) => {
+  if (tarjeta.classList.contains("arrastrando")) {
+    // Estamos en modo arrastre, no ejecutar click
+    return;
+  }
+
   window._tarjetaEditando = tarjeta;
 
 const seccion = tarjeta.closest(".seccion-ubicacion");
@@ -980,32 +986,7 @@ if (textarea) {
 }
 
 });
-let longPressTimer;
 
-tarjeta.addEventListener("mousedown", (e) => {
-  longPressTimer = setTimeout(() => {
-    tarjeta.classList.add("arrastrando");
-    tarjetaArrastrando = tarjeta;
-
-    const seccion = tarjeta.closest(".seccion-ubicacion");
-    const ubicacion = seccion?.querySelector(".titulo-ubicacion")?.textContent?.trim();
-    const dia = tarjeta.closest(".dia-itinerario");
-    const fecha = dia?.getAttribute("data-fecha");
-
-    origenUbicacion = ubicacion;
-    origenFecha = fecha;
-
-    console.log("🚚 Arrastrando desde:", origenUbicacion, origenFecha);
-  }, 400); // 400ms para activar modo arrastre
-});
-
-tarjeta.addEventListener("mouseup", () => {
-  clearTimeout(longPressTimer);
-});
-
-tarjeta.addEventListener("mouseleave", () => {
-  clearTimeout(longPressTimer);
-});
 
 
   return tarjeta;
