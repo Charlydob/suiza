@@ -893,28 +893,95 @@ if (!tarjeta) {
   }
   if (!insertado) contenedor.appendChild(tarjeta);
 
-  let longPressTimeout;
+// 🚀 DRAG & DROP TÁCTIL PERSONALIZADO
+let touchStartX = 0;
+let touchStartY = 0;
+let desplazamientoActivo = false;
+let tarjetaClon = null;
+let tarjetaArrastrando = null;
+let origenUbicacion = null;
+let origenFecha = null;
+let longPressTimer = null;
+
 
 tarjeta.addEventListener("touchstart", (e) => {
-  e.preventDefault(); // 👈 Esto bloquea la selección de texto y menú contextual
-  longPressTimeout = setTimeout(() => {
-    tarjeta.classList.add("arrastrando");
+  const touch = e.touches[0];
+  touchStartX = touch.clientX;
+  touchStartY = touch.clientY;
+  desplazamientoActivo = false;
+
+  longPressTimer = setTimeout(() => {
     tarjetaArrastrando = tarjeta;
+    tarjeta.classList.add("arrastrando");
 
     const seccion = tarjeta.closest(".seccion-ubicacion");
-    origenUbicacion = seccion?.querySelector(".titulo-ubicacion")?.textContent?.trim();
-
+    const ubicacion = seccion?.querySelector(".titulo-ubicacion")?.textContent?.trim();
     const dia = tarjeta.closest(".dia-itinerario");
-    origenFecha = dia?.getAttribute("data-fecha");
+    const fecha = dia?.getAttribute("data-fecha");
 
-    console.log("📦 Modo arrastre activado desde:", origenUbicacion, origenFecha);
+    origenUbicacion = ubicacion;
+    origenFecha = fecha;
+
+    // Crear el clon visual
+    tarjetaClon = tarjeta.cloneNode(true);
+    tarjetaClon.classList.add("clon-arrastrado");
+    tarjetaClon.style.position = "absolute";
+    tarjetaClon.style.pointerEvents = "none";
+    tarjetaClon.style.zIndex = "9999";
+    tarjetaClon.style.width = tarjeta.offsetWidth + "px";
+    tarjetaClon.style.height = tarjeta.offsetHeight + "px";
+    document.body.appendChild(tarjetaClon);
+
+    desplazamientoActivo = true;
   }, 400);
 });
 
-tarjeta.addEventListener("touchend", () => {
-  clearTimeout(longPressTimeout);
-});
+tarjeta.addEventListener("touchmove", (e) => {
+  if (!desplazamientoActivo || !tarjetaClon) return;
+  const touch = e.touches[0];
+  tarjetaClon.style.left = `${touch.clientX - tarjetaClon.offsetWidth / 2}px`;
+  tarjetaClon.style.top = `${touch.clientY - tarjetaClon.offsetHeight / 2}px`;
 
+  // Evita el scroll horizontal
+  e.preventDefault();
+}, { passive: false });
+
+tarjeta.addEventListener("touchend", (e) => {
+  clearTimeout(longPressTimer);
+
+  if (tarjetaClon) {
+    tarjetaClon.remove();
+    tarjetaClon = null;
+  }
+
+  if (!desplazamientoActivo) return;
+
+  const touch = e.changedTouches[0];
+  const destino = document.elementFromPoint(touch.clientX, touch.clientY);
+  const contenedorDestino = destino?.closest(".carousel-dia");
+  const diaDestino = destino?.closest(".dia-itinerario");
+  const ubicacionDestino = destino?.closest(".seccion-ubicacion")?.querySelector(".titulo-ubicacion")?.textContent?.trim();
+  const fechaDestino = diaDestino?.getAttribute("data-fecha");
+
+  if (contenedorDestino && fechaDestino && ubicacionDestino && tarjetaArrastrando) {
+    const evento = obtenerEventoDesdeTarjeta(tarjetaArrastrando);
+
+    // Elimina del origen
+    itinerarioData[origenUbicacion][origenFecha].eventos = itinerarioData[origenUbicacion][origenFecha].eventos.filter(e =>
+      e.titulo !== evento.titulo || (e.hora || "") !== (evento.hora || "")
+    );
+
+    // Añade al destino
+    itinerarioData[ubicacionDestino][fechaDestino].eventos.push(evento);
+
+    renderizarItinerario();
+    guardarItinerarioLocal();
+    guardarItinerarioFirebase();
+  }
+
+  tarjetaArrastrando = null;
+  desplazamientoActivo = false;
+});
   // Evento de clic para editar
 tarjeta.addEventListener("click", (e) => {
   if (tarjeta.classList.contains("arrastrando")) {
@@ -986,12 +1053,8 @@ if (textarea) {
 }
 
 });
-
-
-
   return tarjeta;
 }
-
 window.crearTarjeta = crearTarjeta;
 })();
 
@@ -1372,3 +1435,16 @@ document.addEventListener("touchend", (e) => {
   tarjetaArrastrando.classList.remove("arrastrando");
   tarjetaArrastrando = null;
 });
+function obtenerEventoDesdeTarjeta(tarjeta) {
+  return {
+    titulo: tarjeta.dataset.originalTitulo || "",
+    tipo: tarjeta.dataset.tipo || "evento",
+    hora: tarjeta.dataset.originalHora || "",
+    notas: tarjeta.dataset.notas || "",
+    etiquetaEvento: tarjeta.dataset.etiqueta || "otros",
+    precio: tarjeta.dataset.precio || "",
+    moneda: tarjeta.dataset.moneda || "EUR"
+  };
+}
+
+window.obtenerEventoDesdeTarjeta = obtenerEventoDesdeTarjeta;
