@@ -1,6 +1,9 @@
 // JS DE ITINERARIO
 const usuarioId = "charlyylaura"; // en el futuro esto podría ser un usuario real
 window.rutaItinerario = `itinerario/${usuarioId}`;
+let tarjetaArrastrando = null;
+let origenFecha = null;
+let origenUbicacion = null;
 
 (function() {
   const contenedorUbicaciones = document.getElementById("contenedor-ubicaciones-itinerario");
@@ -182,6 +185,39 @@ function formatearFechaBonita(fechaISO) {
 
   return `${diaSemana} ${dia} ${mes}`;
 }
+function activarEdicionFecha(h3TituloDia, ubicacion, fechaAntigua) {
+  h3TituloDia.addEventListener("click", () => {
+    mostrarModal(`
+      <div class="modal-formulario-cuando">
+        <h3>Editar fecha</h3>
+        <input type="date" id="input-editar-fecha" value="${fechaAntigua}">
+        <div>
+          <button id="btn-generico" onclick="guardarFechaEditada('${ubicacion}', '${fechaAntigua}')">Guardar</button>
+          <button id="btn-generico" onclick="cerrarModal()">Cancelar</button>
+        </div>
+      </div>
+    `);
+  });
+}
+
+window.guardarFechaEditada = function (ubicacion, fechaAntigua) {
+  const nuevaFecha = document.getElementById("input-editar-fecha").value;
+  if (!nuevaFecha || nuevaFecha === fechaAntigua) return cerrarModal();
+
+  if (itinerarioData[ubicacion][nuevaFecha]) {
+    alert("Ya hay un día con esa fecha.");
+    return;
+  }
+
+  // Mover los eventos
+  itinerarioData[ubicacion][nuevaFecha] = itinerarioData[ubicacion][fechaAntigua];
+  delete itinerarioData[ubicacion][fechaAntigua];
+
+  guardarItinerarioLocal();
+  guardarItinerarioFirebase();
+  cerrarModal();
+  renderizarItinerario();
+};
 
 
 function guardarNuevoDia() {
@@ -193,23 +229,67 @@ function guardarNuevoDia() {
 
   const contenedor = window._contenedorDiasActual;
 
-  // Clonamos el template del día
   const template = document.getElementById("template-dia").content.cloneNode(true);
   const diaItinerario = template.querySelector(".dia-itinerario");
-  diaItinerario.setAttribute("data-fecha", fecha); // ← Guardamos la fecha ISO en el DOM
+  diaItinerario.setAttribute("data-fecha", fecha);
 
-  // Mostramos la fecha formateada
   const fechaFormateada = formatearFechaBonita(fecha);
-  template.querySelector(".titulo-dia").textContent = fechaFormateada;
+  const h3TituloDia = template.querySelector(".titulo-dia");
+  h3TituloDia.textContent = fechaFormateada;
 
   const btnAgregarEvento = template.querySelector(".btn-agregar-evento");
   const btnEliminarDia = template.querySelector(".btn-cerrar-dia");
   const carousel = template.querySelector(".carousel-dia");
+// Habilitar soltar tarjetas arrastradas en este contenedor
+carousel.addEventListener("mouseup", (e) => {
+  if (!tarjetaArrastrando) return;
 
-  // Asociamos el botón para añadir evento
+  e.currentTarget.appendChild(tarjetaArrastrando);
+
+  const nuevaSeccion = tarjetaArrastrando.closest(".seccion-ubicacion");
+  const nuevaUbicacion = nuevaSeccion?.querySelector(".titulo-ubicacion")?.textContent?.trim();
+  const nuevaDia = e.currentTarget.closest(".dia-itinerario");
+  const nuevaFecha = nuevaDia?.getAttribute("data-fecha");
+
+  if (!origenUbicacion || !origenFecha || !nuevaUbicacion || !nuevaFecha) {
+    console.warn("❌ No se pudo determinar origen o destino");
+    return;
+  }
+
+  const titulo = tarjetaArrastrando.querySelector(".titulo-evento")?.textContent;
+  const hora = tarjetaArrastrando.getAttribute("data-hora");
+
+  const evento = itinerarioData[origenUbicacion]?.[origenFecha]?.eventos?.find(
+    e => e.titulo === titulo && (e.hora || "") === (hora || "")
+  );
+
+  if (!evento) {
+    console.warn("❌ No se encontró el evento original.");
+    return;
+  }
+
+  // Eliminar de origen
+  itinerarioData[origenUbicacion][origenFecha].eventos = itinerarioData[origenUbicacion][origenFecha].eventos.filter(
+    e => e !== evento
+  );
+
+  // Insertar en destino
+  if (!itinerarioData[nuevaUbicacion][nuevaFecha]) {
+    itinerarioData[nuevaUbicacion][nuevaFecha] = { eventos: [] };
+  }
+  itinerarioData[nuevaUbicacion][nuevaFecha].eventos.push(evento);
+
+  console.log("📦 Evento movido de", origenUbicacion, origenFecha, "→", nuevaUbicacion, nuevaFecha);
+
+  guardarItinerarioLocal();
+  guardarItinerarioFirebase();
+
+  tarjetaArrastrando.classList.remove("arrastrando");
+  tarjetaArrastrando = null;
+});
+
   btnAgregarEvento.addEventListener("click", () => mostrarFormularioEvento(carousel));
 
-  // Asociamos el botón para eliminar día
   if (btnEliminarDia) {
     btnEliminarDia.addEventListener("click", () => {
       confirmarAccion(`¿Eliminar el día "${fechaFormateada}" y todos sus eventos?`, () => {
@@ -226,10 +306,8 @@ function guardarNuevoDia() {
     });
   }
 
-  // Insertamos el clon directamente en el contenedor
   contenedor.appendChild(template);
 
-  // Creamos la estructura en itinerarioData
   const seccion = contenedor.closest(".seccion-ubicacion");
   const ubicacion = seccion?.querySelector(".titulo-ubicacion")?.textContent?.trim();
 
@@ -242,6 +320,9 @@ function guardarNuevoDia() {
     }
   }
 
+  // ⬇️ ACTIVAR EDICIÓN DE FECHA ⬇️
+  activarEdicionFecha(h3TituloDia, ubicacion, fecha);
+
   guardarItinerarioLocal();
   guardarItinerarioFirebase();
   cerrarModal();
@@ -249,6 +330,7 @@ function guardarNuevoDia() {
   console.log("📅 Día creado:", fecha);
 }
 window.guardarNuevoDia = guardarNuevoDia;
+
 
 
 
@@ -425,57 +507,111 @@ for (const [ubicacion, fechas] of ubicacionesOrdenadas) {
       continue;
     }
 
-    for (const [fecha, entrada] of Object.entries(fechas)) {
-      const clonDia = templateDia.content.cloneNode(true);
-      const fechaFormateada = formatearFechaBonita(fecha);
-        clonDia.querySelector(".dia-itinerario")?.setAttribute("data-fecha", fecha);
-      clonDia.querySelector(".titulo-dia").textContent = `${fechaFormateada}`;
+ for (const [fecha, entrada] of Object.entries(fechas)) {
+  const clonDia = templateDia.content.cloneNode(true);
+  const fechaFormateada = formatearFechaBonita(fecha);
 
-      const carousel = clonDia.querySelector(".carousel-dia");
-      const btnAgregarEvento = clonDia.querySelector(".btn-agregar-evento");
-      const btnCerrarDia = clonDia.querySelector(".btn-cerrar-dia");
+  const diaItinerario = clonDia.querySelector(".dia-itinerario");
+  diaItinerario?.setAttribute("data-fecha", fecha);
 
-      if (!carousel) {
-        console.error("❌ No se encontró .carousel-dia en el template clonado.");
-        continue;
+  const h3TituloDia = clonDia.querySelector(".titulo-dia");
+  h3TituloDia.textContent = `${fechaFormateada}`;
+  activarEdicionFecha(h3TituloDia, ubicacion, fecha); // 👈 aquí se activa la edición de fecha
+
+  const carousel = clonDia.querySelector(".carousel-dia");
+  const btnAgregarEvento = clonDia.querySelector(".btn-agregar-evento");
+  const btnCerrarDia = clonDia.querySelector(".btn-cerrar-dia");
+
+  if (!carousel) {
+    console.error("❌ No se encontró .carousel-dia en el template clonado.");
+    continue;
+  }
+
+  window._carouselActual = carousel;
+carousel.addEventListener("mouseup", (e) => {
+  if (!tarjetaArrastrando) return;
+
+  // Mover visualmente
+  e.currentTarget.appendChild(tarjetaArrastrando);
+
+  const nuevaSeccion = tarjetaArrastrando.closest(".seccion-ubicacion");
+  const nuevaUbicacion = nuevaSeccion?.querySelector(".titulo-ubicacion")?.textContent?.trim();
+  const nuevaDia = e.currentTarget.closest(".dia-itinerario");
+  const nuevaFecha = nuevaDia?.getAttribute("data-fecha");
+
+  if (!origenUbicacion || !origenFecha || !nuevaUbicacion || !nuevaFecha) {
+    console.warn("❌ No se pudo determinar origen o destino");
+    return;
+  }
+
+  // Mover evento en itinerarioData
+  const titulo = tarjetaArrastrando.querySelector(".titulo-evento")?.textContent;
+  const hora = tarjetaArrastrando.getAttribute("data-hora");
+
+  const evento = itinerarioData[origenUbicacion]?.[origenFecha]?.eventos?.find(
+    e => e.titulo === titulo && (e.hora || "") === (hora || "")
+  );
+
+  if (!evento) {
+    console.warn("❌ No se encontró el evento original.");
+    return;
+  }
+
+  // Eliminar de origen
+  itinerarioData[origenUbicacion][origenFecha].eventos = itinerarioData[origenUbicacion][origenFecha].eventos.filter(
+    e => e !== evento
+  );
+
+  // Insertar en destino
+  if (!itinerarioData[nuevaUbicacion][nuevaFecha]) {
+    itinerarioData[nuevaUbicacion][nuevaFecha] = { eventos: [] };
+  }
+  itinerarioData[nuevaUbicacion][nuevaFecha].eventos.push(evento);
+
+  console.log("📦 Evento movido de", origenUbicacion, origenFecha, "→", nuevaUbicacion, nuevaFecha);
+
+  guardarItinerarioLocal();
+  guardarItinerarioFirebase();
+
+  tarjetaArrastrando.classList.remove("arrastrando");
+  tarjetaArrastrando = null;
+});
+
+  btnAgregarEvento.addEventListener("click", () => mostrarFormularioEvento(carousel));
+
+  const clonDiaWrapper = document.createElement("div");
+  clonDiaWrapper.appendChild(clonDia);
+
+  if (btnCerrarDia) {
+    btnCerrarDia.addEventListener("click", () => {
+      if (confirm(`¿Eliminar el día "${fechaFormateada}" y todos sus eventos?`)) {
+        delete itinerarioData[ubicacion][fecha];
+        clonDiaWrapper.remove();
+        guardarItinerarioLocal();
+        guardarItinerarioFirebase();
+        console.log("🗑️ Día eliminado:", fecha);
+        console.log("🧠 Estado actual itinerarioData:", itinerarioData);
       }
+    });
+  }
 
-      window._carouselActual = carousel;
+  for (const evento of entrada.eventos || []) {
+    const tarjeta = crearTarjeta(
+      evento.titulo,
+      evento.tipo,
+      evento.hora,
+      evento.notas,
+      evento.etiquetaEvento,
+      evento.precio,
+      evento.moneda
+    );
 
-      btnAgregarEvento.addEventListener("click", () => mostrarFormularioEvento(carousel));
+    if (tarjeta) carousel.appendChild(tarjeta);
+  }
 
-      const clonDiaWrapper = document.createElement("div");
-      clonDiaWrapper.appendChild(clonDia);
+  contenedorDias.appendChild(clonDiaWrapper);
+}
 
-      if (btnCerrarDia) {
-        btnCerrarDia.addEventListener("click", () => {
-          if (confirm(`¿Eliminar el día "${fechaFormateada}" y todos sus eventos?`)) {
-            delete itinerarioData[ubicacion][fecha];
-            clonDiaWrapper.remove();
-            guardarItinerarioLocal();
-            guardarItinerarioFirebase();
-            console.log("🗑️ Día eliminado:", fecha);
-            console.log("🧠 Estado actual itinerarioData:", itinerarioData);
-          }
-        });
-      }
-
-      for (const evento of entrada.eventos || []) {
-        const tarjeta = crearTarjeta(
-          evento.titulo,
-          evento.tipo,
-          evento.hora,
-          evento.notas,
-          evento.etiquetaEvento,
-          evento.precio,
-          evento.moneda
-        );
-
-        if (tarjeta) carousel.appendChild(tarjeta);
-      }
-
-      contenedorDias.appendChild(clonDiaWrapper);
-    }
   }
 
   console.log("✅ Itinerario renderizado desde objeto.");
@@ -756,6 +892,28 @@ if (!tarjeta) {
   }
   if (!insertado) contenedor.appendChild(tarjeta);
 
+  let longPressTimeout;
+
+tarjeta.addEventListener("touchstart", (e) => {
+  e.preventDefault(); // 👈 Esto bloquea la selección de texto y menú contextual
+  longPressTimeout = setTimeout(() => {
+    tarjeta.classList.add("arrastrando");
+    tarjetaArrastrando = tarjeta;
+
+    const seccion = tarjeta.closest(".seccion-ubicacion");
+    origenUbicacion = seccion?.querySelector(".titulo-ubicacion")?.textContent?.trim();
+
+    const dia = tarjeta.closest(".dia-itinerario");
+    origenFecha = dia?.getAttribute("data-fecha");
+
+    console.log("📦 Modo arrastre activado desde:", origenUbicacion, origenFecha);
+  }, 400);
+});
+
+tarjeta.addEventListener("touchend", () => {
+  clearTimeout(longPressTimeout);
+});
+
   // Evento de clic para editar
  tarjeta.addEventListener("click", () => {
   window._tarjetaEditando = tarjeta;
@@ -821,6 +979,32 @@ if (textarea) {
   actualizarVistaPrevia(); // Inicializar
 }
 
+});
+let longPressTimer;
+
+tarjeta.addEventListener("mousedown", (e) => {
+  longPressTimer = setTimeout(() => {
+    tarjeta.classList.add("arrastrando");
+    tarjetaArrastrando = tarjeta;
+
+    const seccion = tarjeta.closest(".seccion-ubicacion");
+    const ubicacion = seccion?.querySelector(".titulo-ubicacion")?.textContent?.trim();
+    const dia = tarjeta.closest(".dia-itinerario");
+    const fecha = dia?.getAttribute("data-fecha");
+
+    origenUbicacion = ubicacion;
+    origenFecha = fecha;
+
+    console.log("🚚 Arrastrando desde:", origenUbicacion, origenFecha);
+  }, 400); // 400ms para activar modo arrastre
+});
+
+tarjeta.addEventListener("mouseup", () => {
+  clearTimeout(longPressTimer);
+});
+
+tarjeta.addEventListener("mouseleave", () => {
+  clearTimeout(longPressTimer);
 });
 
 
@@ -1154,3 +1338,56 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 window.itinerarioData = itinerarioData;
+
+
+document.addEventListener("touchend", (e) => {
+  if (!tarjetaArrastrando) return;
+
+  const touch = e.changedTouches[0];
+  const dropTarget = document.elementFromPoint(touch.clientX, touch.clientY);
+  const carouselDestino = dropTarget?.closest(".carousel-dia");
+
+  if (!carouselDestino) {
+    tarjetaArrastrando.classList.remove("arrastrando");
+    tarjetaArrastrando = null;
+    return;
+  }
+
+  carouselDestino.appendChild(tarjetaArrastrando);
+
+  const nuevaSeccion = tarjetaArrastrando.closest(".seccion-ubicacion");
+  const nuevaUbicacion = nuevaSeccion?.querySelector(".titulo-ubicacion")?.textContent?.trim();
+  const nuevaDia = carouselDestino.closest(".dia-itinerario");
+  const nuevaFecha = nuevaDia?.getAttribute("data-fecha");
+
+  const titulo = tarjetaArrastrando.querySelector(".titulo-evento")?.textContent;
+  const hora = tarjetaArrastrando.getAttribute("data-hora");
+
+  const evento = itinerarioData[origenUbicacion]?.[origenFecha]?.eventos?.find(
+    e => e.titulo === titulo && (e.hora || "") === (hora || "")
+  );
+
+  if (!evento) {
+    console.warn("❌ Evento no encontrado al soltar.");
+    tarjetaArrastrando.classList.remove("arrastrando");
+    tarjetaArrastrando = null;
+    return;
+  }
+
+  // Actualiza data
+  itinerarioData[origenUbicacion][origenFecha].eventos = itinerarioData[origenUbicacion][origenFecha].eventos.filter(
+    e => e !== evento
+  );
+  if (!itinerarioData[nuevaUbicacion][nuevaFecha]) {
+    itinerarioData[nuevaUbicacion][nuevaFecha] = { eventos: [] };
+  }
+  itinerarioData[nuevaUbicacion][nuevaFecha].eventos.push(evento);
+
+  guardarItinerarioLocal();
+  guardarItinerarioFirebase();
+
+  console.log("✅ Evento movido a:", nuevaUbicacion, nuevaFecha);
+
+  tarjetaArrastrando.classList.remove("arrastrando");
+  tarjetaArrastrando = null;
+});

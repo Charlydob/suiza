@@ -569,3 +569,9 @@ button#btn-generico {
     box-shadow: #333 0px 2px 4px;
 }
 
+
+.arrastrando {
+  opacity: 0.7;
+  transform: scale(1.05);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
+}
