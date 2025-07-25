@@ -822,6 +822,22 @@ function mostrarVistaPreviaEvento(eventoActual, tipo) {
   `);
 }
 
+function crearPlaceholderSiNoExiste(diaDestino) {
+  if (!document.querySelector(".tarjeta-placeholder")) {
+    const placeholder = document.createElement("div");
+    placeholder.classList.add("tarjeta", "tarjeta-placeholder");
+    placeholder.innerHTML = "<em>📍 Aquí se soltará</em>";
+
+    const contenedor = diaDestino.querySelector(".carousel-dia");
+    if (contenedor) contenedor.appendChild(placeholder);
+  }
+}
+
+
+function eliminarPlaceholder() {
+  document.querySelector(".tarjeta-placeholder")?.remove();
+}
+
 
 function crearTarjeta(titulo, tipo, hora = null, notas = "", etiquetaEvento = "", precio = "", moneda = "EUR") {
 const template = document.getElementById("template-tarjeta-itinerario");
@@ -922,7 +938,9 @@ tarjeta.addEventListener("touchstart", (e) => {
     origenUbicacion = ubicacion;
     origenFecha = fecha;
 
-    // Crear el clon visual
+    // Vibra al activar
+    if (navigator.vibrate) navigator.vibrate(60);
+
     tarjetaClon = tarjeta.cloneNode(true);
     tarjetaClon.classList.add("clon-arrastrado");
     tarjetaClon.style.position = "absolute";
@@ -933,16 +951,25 @@ tarjeta.addEventListener("touchstart", (e) => {
     document.body.appendChild(tarjetaClon);
 
     desplazamientoActivo = true;
-  }, 400);
+  }, 600);
 });
 
 tarjeta.addEventListener("touchmove", (e) => {
   if (!desplazamientoActivo || !tarjetaClon) return;
+
   const touch = e.touches[0];
   tarjetaClon.style.left = `${touch.clientX - tarjetaClon.offsetWidth / 2}px`;
   tarjetaClon.style.top = `${touch.clientY - tarjetaClon.offsetHeight / 2}px`;
 
-  // Evita el scroll horizontal
+  const elementoDebajo = document.elementFromPoint(touch.clientX, touch.clientY);
+  const diaDestino = elementoDebajo?.closest(".dia-itinerario");
+
+  if (diaDestino && diaDestino !== tarjeta.closest(".dia-itinerario")) {
+    crearPlaceholderSiNoExiste(diaDestino);
+  } else {
+    eliminarPlaceholder();
+  }
+
   e.preventDefault();
 }, { passive: false });
 
@@ -953,6 +980,8 @@ tarjeta.addEventListener("touchend", (e) => {
     tarjetaClon.remove();
     tarjetaClon = null;
   }
+
+  eliminarPlaceholder();
 
   if (!desplazamientoActivo) return;
 
@@ -966,12 +995,10 @@ tarjeta.addEventListener("touchend", (e) => {
   if (contenedorDestino && fechaDestino && ubicacionDestino && tarjetaArrastrando) {
     const evento = obtenerEventoDesdeTarjeta(tarjetaArrastrando);
 
-    // Elimina del origen
     itinerarioData[origenUbicacion][origenFecha].eventos = itinerarioData[origenUbicacion][origenFecha].eventos.filter(e =>
       e.titulo !== evento.titulo || (e.hora || "") !== (evento.hora || "")
     );
 
-    // Añade al destino
     itinerarioData[ubicacionDestino][fechaDestino].eventos.push(evento);
 
     renderizarItinerario();
@@ -982,6 +1009,8 @@ tarjeta.addEventListener("touchend", (e) => {
   tarjetaArrastrando = null;
   desplazamientoActivo = false;
 });
+
+
   // Evento de clic para editar
 tarjeta.addEventListener("click", (e) => {
   if (tarjeta.classList.contains("arrastrando")) {

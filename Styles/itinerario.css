@@ -598,3 +598,16 @@ button#btn-generico {
   user-select: none;
   -webkit-user-select: none; /* Para Safari */
 }
+.tarjeta-placeholder {
+  height: 70px;
+  border: 2px dashed #aaa;
+  border-radius: 10px;
+  margin: 6px 0;
+  background-color: #f5f5f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-style: italic;
+  color: #666;
+  pointer-events: none;
+}
