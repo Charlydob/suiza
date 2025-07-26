@@ -70,15 +70,17 @@ function renderizarResumenGastos() {
   console.log("🧩 Renderizando gastos con moneda:", monedaDestino);
   let totalGeneral = 0;
   const agrupado = {};
+  const fechasUbicacion = [];
 
-  // Agrupar eventos por fecha, sin importar ubicación
-  for (const fechas of Object.values(itinerarioData)) {
+  // Agrupar por ubicación → fechas → eventos
+  for (const [ubicacion, fechas] of Object.entries(itinerarioData)) {
     for (const [fecha, datosDia] of Object.entries(fechas)) {
       if (!datosDia.eventos || !Array.isArray(datosDia.eventos)) continue;
 
-      if (!agrupado[fecha]) agrupado[fecha] = [];
+      if (!agrupado[ubicacion]) agrupado[ubicacion] = {};
+      if (!agrupado[ubicacion][fecha]) agrupado[ubicacion][fecha] = [];
 
-      agrupado[fecha].push(...datosDia.eventos
+      agrupado[ubicacion][fecha].push(...datosDia.eventos
         .filter(e => parseFloat(e.precio))
         .map(e => {
           const precio = parseFloat(e.precio.toString().replace(",", "."));
@@ -94,60 +96,81 @@ function renderizarResumenGastos() {
           };
         }));
     }
+
+    // Guardar la primera fecha de esta ubicación
+    const fechasOrdenadas = Object.keys(fechas).sort();
+    if (fechasOrdenadas.length > 0) {
+      fechasUbicacion.push({ ubicacion, fecha: fechasOrdenadas[0] });
+    }
   }
 
-  // Ordenar por fecha
-  const fechasOrdenadas = Object.keys(agrupado).sort();
+  // Ordenar ubicaciones según la fecha más temprana asociada
+  fechasUbicacion.sort((a, b) => a.fecha.localeCompare(b.fecha));
 
-  for (const fecha of fechasOrdenadas) {
-    const eventos = agrupado[fecha];
+  for (const { ubicacion } of fechasUbicacion) {
+    const fechas = agrupado[ubicacion];
+    const divUbicacion = document.createElement("div");
+    divUbicacion.className = "gasto-ubicacion";
+    let totalUbicacion = 0;
+    let html = `<h3>${ubicacion}</h3>`;
 
-    const manuales = (gastosExtra[fecha] || []).map((g, i) => {
-      const convertido = convertirMoneda(g.cantidad, g.moneda, monedaDestino);
-      return {
-        tipo: "manual",
-        titulo: g.concepto,
-        etiqueta: "Manual",
-        precioOriginal: `${g.cantidad.toFixed(2)} ${g.moneda}`,
-        precioConvertido: `${convertido.toFixed(2)} ${monedaDestino}`,
-        valorNumerico: convertido,
-        indice: i
-      };
-    });
+    const fechasOrdenadas = Object.keys(fechas).sort();
+    for (const fecha of fechasOrdenadas) {
+      const eventos = fechas[fecha];
+      let subtotal = 0;
 
-    const todos = [...eventos, ...manuales];
-    const totalDia = todos.reduce((s, e) => s + e.valorNumerico, 0);
-    totalGeneral += totalDia;
+      html += `<h4>${fecha}</h4><ul>`;
 
-    const div = document.createElement("div");
-    div.className = "gasto-dia";
-    div.innerHTML = `
-      <h4>${fecha}</h4>
-      <ul>
-        ${todos.map((e, i) => `
+      for (const e of eventos) {
+        html += `
           <li>
             <strong>${e.titulo}</strong> – ${e.etiqueta} – ${e.precioOriginal} → <strong>${e.precioConvertido}</strong>
-            ${e.tipo === "manual" ? `<button onclick="eliminarGastoManual('${fecha}', ${e.indice})">❌</button>` : ""}
-          </li>
-        `).join("")}
-      </ul>
-      <div class="gasto-extra">
-        <input type="text" placeholder="Nuevo gasto">
-        <input type="number" placeholder="Cantidad">
-        <select>
-          <option value="EUR">EUR</option>
-          <option value="CHF">CHF</option>
-          <option value="USD">USD</option>
-        </select>
-        <button onclick="añadirGastoManual('${fecha}', this)">＋ Añadir</button>
-      </div>
-      <p class="total-dia">Total: ${totalDia.toFixed(2)} ${monedaDestino}</p>
-    `;
-    contenedor.appendChild(div);
+          </li>`;
+        subtotal += e.valorNumerico;
+      }
+
+      // Gastos manuales (por fecha)
+      const manuales = (gastosExtra[fecha] || []).map((g, i) => {
+        const convertido = convertirMoneda(g.cantidad, g.moneda, monedaDestino);
+        subtotal += convertido;
+        return `
+          <li>
+            <strong>${g.concepto}</strong> – Manual – ${g.cantidad.toFixed(2)} ${g.moneda} → <strong>${convertido.toFixed(2)} ${monedaDestino}</strong>
+            <button onclick="eliminarGastoManual('${fecha}', ${i})">❌</button>
+          </li>`;
+      }).join("");
+
+      if (manuales) {
+        html += manuales;
+      }
+
+      html += `</ul>
+        <div class="gasto-extra">
+          <input type="text" placeholder="Nuevo gasto">
+          <input type="number" placeholder="Cantidad">
+          <select>
+            <option value="EUR">EUR</option>
+            <option value="CHF">CHF</option>
+            <option value="USD">USD</option>
+          </select>
+          <button onclick="añadirGastoManual('${fecha}', this)">＋ Añadir</button>
+        </div>
+        <p class="total-dia">Subtotal día ${fecha}: ${subtotal.toFixed(2)} ${monedaDestino}</p>`;
+
+      totalUbicacion += subtotal;
+    }
+
+    html += `<p class="total-ubicacion">Total ${ubicacion}: ${totalUbicacion.toFixed(2)} ${monedaDestino}</p>`;
+
+    divUbicacion.innerHTML = html;
+    contenedor.appendChild(divUbicacion);
+    totalGeneral += totalUbicacion;
   }
 
   document.getElementById("gastos-total").textContent = `${totalGeneral.toFixed(2)} ${monedaDestino}`;
 }
+
+
 
 function eliminarGastoManual(fecha, indice) {
   if (!gastosExtra[fecha] || !gastosExtra[fecha][indice]) return;

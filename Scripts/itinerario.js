@@ -968,6 +968,7 @@ tarjeta.addEventListener("touchmove", (e) => {
     const contenedor = diaDestino.querySelector(".carousel-dia");
     if (!contenedor) return;
 
+    // Obtener o crear placeholder
     let placeholder = document.querySelector(".tarjeta-placeholder");
     if (!placeholder) {
       placeholder = document.createElement("div");
@@ -975,24 +976,23 @@ tarjeta.addEventListener("touchmove", (e) => {
       placeholder.innerHTML = "<em>📍 Aquí se soltará</em>";
     }
 
-    const tarjetas = contenedor.querySelectorAll(".tarjeta-itinerario:not(.tarjeta-placeholder)");
-    let insertado = false;
-    for (const t of tarjetas) {
-      const rect = t.getBoundingClientRect();
-      if (touch.clientY < rect.top + rect.height / 2) {
-        contenedor.insertBefore(placeholder, t);
-        insertado = true;
-        break;
-      }
-    }
+    const rectContenedor = contenedor.getBoundingClientRect();
+    const posicionY = touch.clientY;
 
-    if (!insertado) contenedor.appendChild(placeholder);
+    if (posicionY < rectContenedor.top + rectContenedor.height / 2) {
+      // Parte superior → insertar al principio
+      contenedor.insertBefore(placeholder, contenedor.firstChild);
+    } else {
+      // Parte inferior → al final
+      contenedor.appendChild(placeholder);
+    }
   } else {
     eliminarPlaceholder();
   }
 
   e.preventDefault();
 }, { passive: false });
+
 
 
 tarjeta.addEventListener("touchend", (e) => {

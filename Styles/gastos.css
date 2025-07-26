@@ -6,54 +6,66 @@
 #pagina-gastos h2 {
   text-align: center;
   color: #007BFF;
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
 }
 
-.gasto-dia {
-  background-color: white;
+/* 🔷 Bloque de cada ubicación */
+.gasto-ubicacion {
+  background-color: #fff;
   border-radius: 12px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-  padding: 16px;
-  margin-bottom: 20px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
+  padding: 1rem;
+  margin-bottom: 24px;
+  border-left: 5px solid #007BFF;
 }
 
-.gasto-dia h3 {
-  font-size: 18px;
-  font-weight: 600;
-  margin-bottom: 0.3rem;
-  color: #333;
-}
-
-.gasto-dia h4 {
-  font-size: 16px;
-  font-weight: 500;
-  margin-top: 0;
+.gasto-ubicacion h3 {
+  font-size: 20px;
   margin-bottom: 0.5rem;
-  color: #666;
+  color: #007BFF;
 }
 
-.gasto-dia ul {
+/* 🔹 Bloque de cada día dentro de una ubicación */
+.gasto-ubicacion h4 {
+  font-size: 16px;
+  margin-top: 1rem;
+  margin-bottom: 0.3rem;
+  color: #444;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 2px;
+}
+
+/* 🔸 Lista de eventos */
+.gasto-ubicacion ul {
   list-style: none;
-  padding: 0;
+  padding-left: 0;
   margin: 0 0 0.5rem 0;
 }
 
-.gasto-dia li {
-  margin-bottom: 6px;
+.gasto-ubicacion li {
   font-size: 14px;
   color: #333;
+  margin-bottom: 6px;
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
 }
 
-.gasto-dia .gasto-extra {
+.gasto-ubicacion li strong {
+  font-weight: 600;
+}
+
+/* 📝 Inputs para gasto manual */
+.gasto-extra {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  margin-top: 8px;
+  margin-top: 10px;
 }
 
-.gasto-dia input[type="text"],
-.gasto-dia input[type="number"],
-.gasto-dia select {
+.gasto-extra input[type="text"],
+.gasto-extra input[type="number"],
+.gasto-extra select {
   padding: 8px;
   border: 1px solid #ccc;
   border-radius: 10px;
@@ -62,7 +74,7 @@
   background: #fff;
 }
 
-.gasto-dia button {
+.gasto-extra button {
   background-color: #007BFF;
   color: white;
   border: none;
@@ -74,29 +86,37 @@
   transition: background-color 0.2s ease;
 }
 
-.gasto-dia button:hover {
+.gasto-extra button:hover {
   background-color: #0056b3;
 }
 
-.gasto-dia .total-dia {
-  font-weight: bold;
-  margin-top: 12px;
-  font-size: 15px;
+/* 💰 Subtotales por día */
+.total-dia {
+  font-weight: 500;
+  margin-top: 10px;
+  font-size: 14px;
   color: #000;
 }
 
-.boton-eliminar {
-  background-color: #ff5c5c;
-  color: white;
-  border: none;
-  border-radius: 10px;
-  padding: 6px 10px;
-  font-size: 12px;
-  margin-left: 8px;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
+/* 📊 Totales por ubicación */
+.total-ubicacion {
+  font-weight: bold;
+  font-size: 16px;
+  color: #000;
+  margin-top: 1rem;
+  text-align: right;
+  border-top: 1px solid #ddd;
+  padding-top: 6px;
 }
 
-.boton-eliminar:hover {
-  background-color: #e03232;
+/* ❌ Botón de eliminar */
+.gasto-ubicacion button[onclick*="eliminarGastoManual"] {
+  background-color: transparent;
+  font-size: 13px;
+  padding: 6px 10px;
+  margin-left: 6px;
+}
+
+.gasto-ubicacion button[onclick*="eliminarGastoManual"]:hover {
+  background-color: transparent;
 }
