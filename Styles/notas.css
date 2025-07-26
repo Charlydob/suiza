@@ -1,0 +1,86 @@
+#pagina-notas {
+  padding: 1rem;
+  font-family: 'Inter', sans-serif;
+}
+
+#pagina-notas h2 {
+  text-align: center;
+  margin-bottom: 0.5rem;
+  color: #333;
+}
+
+.filtros-notas {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.filtros-notas input,
+.filtros-notas select,
+.formulario-nota select {
+  padding: 8px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+  flex: 1 1 150px;
+}
+
+.formulario-nota {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 1.5rem;
+}
+
+.formulario-nota textarea {
+  flex: 1 1 100%;
+  min-height: 80px;
+  padding: 8px;
+  font-size: 14px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+.formulario-nota button {
+  padding: 8px 14px;
+  border: none;
+  border-radius: 8px;
+  background-color: #007BFF;
+  color: white;
+  cursor: pointer;
+}
+
+#lista-notas .nota {
+  background: #fff;
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin-bottom: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  position: relative;
+}
+
+#lista-notas .nota p {
+  margin: 0;
+  font-size: 14px;
+  color: #333;
+}
+
+#lista-notas .nota small {
+  color: #666;
+  font-size: 12px;
+  display: block;
+  margin-top: 4px;
+}
+
+#lista-notas .nota button {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  padding: 4px 8px;
+  color: white;
+  cursor: pointer;
+}

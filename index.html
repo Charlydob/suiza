@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="Styles/itinerario.css" />
   <link rel="stylesheet" href="Styles/favoritos.css" />
   <link rel="stylesheet" href="Styles/gastos.css" />
+  <link rel="stylesheet" href="Styles/notas.css" />
 
   <link rel="apple-touch-icon" href="Recursos/icono.png" />
 </head>
@@ -335,10 +336,29 @@
 </section>
 
 <!--🟨🟨🟨🟨 NOTAS 🟨🟨🟨🟨-->
-    <section id="pagina-notas" class="pagina-app" style="display: none;">
-      <h2>📝 Notas</h2>
-      <p>Guarda ideas, fotos de reservas, números importantes…</p>
-    </section>
+<section id="pagina-notas" class="pagina-app" style="display: none;">
+  <h2>📝 Notas</h2>
+  <p>Guarda ideas, fotos de reservas, números importantes…</p>
+
+  <!-- 🔍 Barra de búsqueda y filtro -->
+  <div class="filtros-notas">
+    <input type="text" id="buscadorNotas" placeholder="Buscar notas...">
+    <select id="filtroEtiquetaNotas">
+      <option value="">Todas las ubicaciones</option>
+    </select>
+  </div>
+
+  <!-- 📝 Formulario nueva nota -->
+  <div class="formulario-nota">
+    <textarea id="nuevaNotaTexto" placeholder="Escribe una nota..."></textarea>
+    <select id="nuevaNotaEtiqueta"></select>
+    <button onclick="guardarNota()">＋ Guardar nota</button>
+  </div>
+
+  <!-- 📋 Lista de notas -->
+  <div id="lista-notas"></div>
+</section>
+
 <!-- 🌟 MENÚ INFERIOR -->
 <div id="menuInferior">
   <button class="nav-btn" data-page="itinerario">
@@ -415,5 +435,7 @@
 <script src="Scripts/itinerario.js"></script>
 <!-- Lógica de la ventana gastos -->
 <script src="Scripts/gastos.js"></script>
+<!-- Lógica de la ventana notas -->
+<script src="Scripts/notas.js"></script>
 </body>
 </html>
