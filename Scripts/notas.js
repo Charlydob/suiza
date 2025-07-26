@@ -10,19 +10,25 @@ function cargarNotasFirebase() {
     .catch(err => console.error("❌ Error al cargar notas:", err));
 }
 
-function guardarNota() {
+async function guardarNota() {
   const texto = document.getElementById("nuevaNotaTexto").value.trim();
   const etiqueta = document.getElementById("nuevaNotaEtiqueta").value;
-  if (!texto) return;
+  const urlImagen = document.getElementById("nuevaNotaURL").value;
+
+  if (!texto && !urlImagen) return;
 
   const id = Date.now().toString();
-  notas[id] = { texto, etiqueta };
-  db.ref("notas").set(notas)
-    .then(() => {
-      document.getElementById("nuevaNotaTexto").value = "";
-      renderizarNotas();
-    });
+  notas[id] = { texto, etiqueta, imagen: urlImagen || "" };
+
+  await db.ref("notas").set(notas);
+
+  document.getElementById("nuevaNotaTexto").value = "";
+  document.getElementById("nuevaNotaImagen").value = "";
+  document.getElementById("nuevaNotaURL").value = "";
+
+  renderizarNotas();
 }
+
 
 function eliminarNota(id) {
   delete notas[id];
@@ -43,11 +49,13 @@ function renderizarNotas() {
     .forEach(([id, nota]) => {
       const div = document.createElement("div");
       div.className = "nota";
-      div.innerHTML = `
+        div.innerHTML = `
+        ${nota.imagen ? `<img src="${nota.imagen}" class="img-nota">` : ""}
         <p>${nota.texto}</p>
         <small>${nota.etiqueta || "Sin ubicación"}</small>
         <button onclick="eliminarNota('${id}')">❌</button>
-      `;
+        `;
+
       contenedor.appendChild(div);
     });
 }
@@ -86,3 +94,34 @@ window.addEventListener("DOMContentLoaded", () => {
     }
   }, 500);
 });
+
+function subirImagenNota(input) {
+  const archivo = input.files[0];
+  if (!archivo) return;
+
+  const cloudName = "dgdavibcx";
+  const uploadPreset = "publico";
+
+  const formData = new FormData();
+  formData.append("file", archivo);
+  formData.append("upload_preset", uploadPreset);
+
+  fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
+    method: "POST",
+    body: formData
+  })
+    .then(res => res.json())
+    .then(data => {
+      if (data.secure_url) {
+        console.log("✅ Imagen subida:", data.secure_url);
+        document.getElementById("nuevaNotaURL").value = data.secure_url;
+      } else {
+        console.error("❌ Fallo en subida:", data);
+        alert("Error al subir la imagen.");
+      }
+    })
+    .catch(err => {
+      console.error("❌ Error al conectar con Cloudinary:", err);
+      alert("Error al subir la imagen.");
+    });
+}

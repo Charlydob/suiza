@@ -84,3 +84,10 @@
   color: white;
   cursor: pointer;
 }
+.img-nota {
+  max-width: 100%;
+  border-radius: 8px;
+  margin-bottom: 6px;
+  display: block;
+}
+

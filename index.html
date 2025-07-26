@@ -348,12 +348,16 @@
     </select>
   </div>
 
-  <!-- 📝 Formulario nueva nota -->
-  <div class="formulario-nota">
-    <textarea id="nuevaNotaTexto" placeholder="Escribe una nota..."></textarea>
-    <select id="nuevaNotaEtiqueta"></select>
-    <button onclick="guardarNota()">＋ Guardar nota</button>
-  </div>
+<!-- 📝 Formulario nueva nota -->
+<div class="formulario-nota">
+  <textarea id="nuevaNotaTexto" placeholder="Escribe una nota..."></textarea>
+  <select id="nuevaNotaEtiqueta"></select>
+  <input type="file" id="nuevaNotaImagen" accept="image/*" onchange="subirImagenNota(this)">
+  <input type="hidden" id="nuevaNotaURL">
+  <button onclick="guardarNota()">＋ Guardar nota</button>
+</div>
+
+
 
   <!-- 📋 Lista de notas -->
   <div id="lista-notas"></div>
