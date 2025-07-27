@@ -2,6 +2,9 @@
 
 window.initDashboard = function () {
   // Iniciar mapa en el contenedor exclusivo del dashboard
+  console.log("🔍 Dashboard activo:", document.getElementById("mapa-dashboard"));
+console.log("📏 Altura mapa-dashboard:", document.getElementById("mapa-dashboard").offsetHeight);
+
   initMap(46.8182, 8.2275, "mapa-dashboard");
   
   renderizarRutaYEventos();
