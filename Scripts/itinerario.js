@@ -438,13 +438,15 @@ if (
   Array.isArray(itinerarioData[ubicacion][fecha].eventos)
 ) {
   itinerarioData[ubicacion][fecha].eventos.push({
-    titulo: nombre,
-    tipo: "favorito",
-    hora,
-    notas: "",
-    etiquetaEvento: etiqueta,
-    precio
-  });
+  titulo: nombre,
+  tipo: "favorito",
+  hora,
+  notas: "",
+  etiquetaEvento: etiqueta,
+  precio,
+  coordenadas: favorito.coordenadas || favorito.coord || null
+});
+
   console.log("✅ Favorito insertado correctamente en itinerarioData");
 } else {
   console.warn("⚠️ No se pudo insertar el favorito: estructura no encontrada.", {

@@ -16,14 +16,17 @@ window.initDashboard = function () {
 
     console.log("✅ itinerarioData cargado y contenedor visible");
 
-    // Esperar al siguiente ciclo de render
+    const primerPunto = obtenerPrimerPuntoDelItinerario();
+    const lat = primerPunto?.lat || 46.8182;
+    const lng = primerPunto?.lng || 8.2275;
+
     requestAnimationFrame(() => {
-      initMap(46.8182, 8.2275, "mapa-dashboard");
+      initMap(lat, lng, "mapa-dashboard");
 
       setTimeout(() => {
         console.log("🔄 Forzando resize y centrado del mapa");
         google.maps.event.trigger(map, "resize");
-        map.setCenter({ lat: 46.8182, lng: 8.2275 });
+        map.setCenter({ lat, lng });
       }, 250);
 
       renderizarRutaYEventos();
@@ -33,6 +36,22 @@ window.initDashboard = function () {
 
   esperarItinerarioYContenedor();
 };
+
+function obtenerPrimerPuntoDelItinerario() {
+  for (const [ubicacion, fechas] of Object.entries(itinerarioData)) {
+    for (const [fecha, entrada] of Object.entries(fechas)) {
+      for (const evento of entrada.eventos || []) {
+        const coords = evento.coordenadas || evento.coord;
+        if (coords && coords.lat && coords.lng) {
+          console.log("📍 Primer punto encontrado:", evento.titulo, coords);
+          return coords;
+        }
+      }
+    }
+  }
+  return null;
+}
+
 
 
 
