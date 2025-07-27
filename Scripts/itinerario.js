@@ -1078,7 +1078,7 @@ if (fecha && ubicacion && itinerarioData[ubicacion]?.[fecha]) {
     return;
   }
 
-mostrarVistaPreviaEvento(eventoActual, tipo);
+mostrarVistaPreviaEvento(eventoActual, eventoActual.tipo || "evento");
 
 const textarea = document.getElementById('notas-evento');
 const vistaPrevia = document.getElementById('vista-previa-notas');
