@@ -424,9 +424,16 @@ window.guardarFavoritoSeleccionado = function () {
   const nombre = favorito?.datosPersonalizados?.nombre || "Favorito sin nombre";
   const precio = favorito?.datosPersonalizados?.precio || "";
 
-  crearTarjeta(nombre, "favorito", hora, "", etiqueta, precio);
+const seccion = document.querySelector(".seccion-ubicacion:last-child");
+const carousel = seccion?.querySelector(".carousel-dia");
 
-  const seccion = document.querySelector(".seccion-ubicacion:last-child");
+if (!carousel) {
+  console.error("❌ No se encontró carousel para insertar favorito.");
+  return;
+}
+
+window._carouselActual = carousel;
+
 const ubicacion = seccion?.querySelector(".titulo-ubicacion")?.textContent?.trim();
 const fecha = seccion?.querySelector(".dia-itinerario")?.getAttribute("data-fecha");
 
@@ -1055,10 +1062,28 @@ if (fecha && ubicacion && itinerarioData[ubicacion]?.[fecha]) {
   console.log("🎯 originalTitulo:", tarjeta.dataset.originalTitulo);
   console.log("🕒 originalHora:", tarjeta.dataset.originalHora);
 
-  const evento = itinerarioData[ubicacion][fecha].eventos.find(
-    e => e.titulo === tarjeta.dataset.originalTitulo &&
-         (e.hora || "") === (tarjeta.dataset.originalHora || "")
-  );
+let evento = itinerarioData[ubicacion][fecha].eventos.find(
+  e => e.titulo === tarjeta.dataset.originalTitulo &&
+       (e.hora || "") === (tarjeta.dataset.originalHora || "")
+);
+
+// 🔁 Si no lo encuentra localmente, búscalo en todo el itinerario
+if (!evento) {
+  for (const [ubi, dias] of Object.entries(itinerarioData)) {
+    for (const [dia, datos] of Object.entries(dias)) {
+      const encontrado = datos.eventos.find(e =>
+        e.titulo === tarjeta.dataset.originalTitulo &&
+        (e.hora || "") === (tarjeta.dataset.originalHora || "")
+      );
+      if (encontrado) {
+        evento = encontrado;
+        break;
+      }
+    }
+    if (evento) break;
+  }
+}
+
 
   if (evento) {
     window._eventoEditando = evento;
