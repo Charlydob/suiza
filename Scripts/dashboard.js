@@ -53,6 +53,99 @@ function obtenerPrimerPuntoDelItinerario() {
 }
 
 
+const ciudadCoordsCache = {}; // Se puede persistir también en localStorage si quieres
+
+async function renderizarRutaGeneralPorCiudades() {
+  try {
+    if (!window.itinerarioData || typeof window.itinerarioData !== "object") {
+      console.error("❌ itinerarioData no está disponible o es inválido");
+      return;
+    }
+
+    const ciudades = Object.keys(itinerarioData);
+    const coordenadas = [];
+
+    for (const ciudad of ciudades) {
+      const coords = await obtenerCoordenadasCiudadConCache(ciudad);
+      if (coords) {
+        coordenadas.push({ nombre: ciudad, lat: coords.lat, lng: coords.lng });
+      } else {
+        console.warn(`⚠️ No se pudieron obtener coordenadas para ${ciudad}`);
+      }
+    }
+
+    if (!window.map) {
+      console.error("❌ El objeto 'map' aún no está definido. Espera a que se cargue Google Maps antes de trazar rutas.");
+      return;
+    }
+
+    // Marcar ciudades
+    coordenadas.forEach(c => {
+      new google.maps.Marker({
+        position: { lat: c.lat, lng: c.lng },
+        map,
+        title: c.nombre,
+      });
+    });
+
+    // Trazar ruta entre ellas usando Directions API
+    if (coordenadas.length >= 2) {
+      const waypoints = coordenadas.slice(1, -1).map(c => ({ location: { lat: c.lat, lng: c.lng }, stopover: true }));
+
+      const directionsService = new google.maps.DirectionsService();
+      const directionsRenderer = new google.maps.DirectionsRenderer({ suppressMarkers: true });
+      directionsRenderer.setMap(map);
+
+      directionsService.route({
+        origin: { lat: coordenadas[0].lat, lng: coordenadas[0].lng },
+        destination: { lat: coordenadas[coordenadas.length - 1].lat, lng: coordenadas[coordenadas.length - 1].lng },
+        waypoints,
+        travelMode: google.maps.TravelMode.DRIVING
+      }, (result, status) => {
+        if (status === google.maps.DirectionsStatus.OK) {
+          directionsRenderer.setDirections(result);
+        } else {
+          console.error("Error al trazar ruta:", status);
+        }
+      });
+    }
+  } catch (error) {
+    console.error("💥 Error inesperado al renderizar ruta general:", error);
+  }
+}
+
+async function obtenerCoordenadasCiudadConCache(ciudad) {
+  if (ciudadCoordsCache[ciudad]) return ciudadCoordsCache[ciudad];
+
+  try {
+    const snapshot = await firebase.database().ref("ciudadesCoords/" + ciudad).once("value");
+    const data = snapshot.val();
+    if (data && data.lat && data.lng) {
+      ciudadCoordsCache[ciudad] = data;
+      return data;
+    }
+  } catch (err) {
+    console.warn("Firebase no respondió para:", ciudad);
+  }
+
+  try {
+    const response = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(ciudad + ", Suiza")}&key=TU_API_KEY`);
+    const result = await response.json();
+
+    if (result.status === "OK") {
+      const loc = result.results[0].geometry.location;
+      ciudadCoordsCache[ciudad] = loc;
+      await firebase.database().ref("ciudadesCoords/" + ciudad).set(loc);
+      return loc;
+    } else {
+      console.warn("🛑 Geocoding falló para", ciudad, "con status:", result.status);
+    }
+  } catch (e) {
+    console.error("Error geocodificando:", ciudad, e);
+  }
+
+  return null;
+}
 
 
 
