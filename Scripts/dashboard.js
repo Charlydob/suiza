@@ -1,17 +1,13 @@
 // 📍 DASHBOARD.JS - PANTALLA INICIAL CON MAPA + RESUMEN
 
 window.initDashboard = function () {
-  // Iniciar mapa centrado en Suiza (por defecto)
-  // Antes de llamar a initMap desde el dashboard
-const originalMapDiv = document.getElementById("map");
-if (!originalMapDiv && document.getElementById("mapa-dashboard")) {
-  document.getElementById("mapa-dashboard").id = "map";
-}
-
-  initMap(46.8182, 8.2275);
+  // Iniciar mapa en el contenedor exclusivo del dashboard
+  initMap(46.8182, 8.2275, "mapa-dashboard");
+  
   renderizarRutaYEventos();
   renderizarResumenDashboard();
 };
+
 
 function renderizarRutaYEventos() {
   const puntos = [];

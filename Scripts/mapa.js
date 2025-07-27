@@ -37,13 +37,13 @@ function actualizarCirculo() {
 
 //================= INICIALIZACIÓN DEL MAPA Y MARCADOR DEL USUARIO 👇 =================//
 
-function initMap(lat = 46.8182, lon = 8.2275) {
+function initMap(lat = 46.8182, lon = 8.2275, elementId = "map") {
   try {
     const posicionInicial = { lat: lat, lng: lon };
     currentCoords = [lat, lon];
 
-    // Crear el mapa centrado
-    map = new google.maps.Map(document.getElementById("map"), {
+    // Crear el mapa centrado en el contenedor indicado
+    map = new google.maps.Map(document.getElementById(elementId), {
       center: posicionInicial,
       zoom: 14,
       mapTypeControl: false,
@@ -75,13 +75,17 @@ function initMap(lat = 46.8182, lon = 8.2275) {
       actualizarBusquedaActiva();
     });
 
-    // Actualizar mensaje en la UI
-    document.getElementById("status").innerText = "Ubicación cargada";
+    // Actualizar mensaje si existe el status
+    const statusEl = document.getElementById("status");
+    if (statusEl) statusEl.innerText = "Ubicación cargada";
+
   } catch (error) {
     reportarError(error);
   }
+
   agregarBotonUbicacionAlMapa();
 }
+
 
 //================= INICIALIZACIÓN DEL MAPA Y MARCADOR DEL USUARIO 👆 =================//
 //================= ACTUALIZACIÓN EN TIEMPO REAL Y UBICACIÓN GPS 👇 =================//
