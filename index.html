@@ -11,12 +11,13 @@
   <link rel="stylesheet" href="Styles/favoritos.css" />
   <link rel="stylesheet" href="Styles/gastos.css" />
   <link rel="stylesheet" href="Styles/notas.css" />
+  <link rel="stylesheet" href="Styles/dashboard.css" />
 
   <link rel="apple-touch-icon" href="Recursos/icono.png" />
 </head>
 
 
-<body>
+<body onload="initDashboard()">
 
 
   <main id="contenedor-paginas">
@@ -362,9 +363,33 @@
   <!-- 📋 Lista de notas -->
   <div id="lista-notas"></div>
 </section>
+<!--🟨🟨🟨🟨 DASHBOARD 🟨🟨🟨🟨-->
+<section id="dashboard" class="pagina-app" style="display: block">
+  <div id="mapa-dashboard"></div>
+
+  <div id="resumen-dashboard">
+    <div class="resumen-info">
+      <span id="resumen-dias">Días: 0</span>
+      <span id="resumen-km">Distancia total: 0 km</span>
+      <span id="resumen-actividades">Actividades: 0</span>
+      <span id="resumen-hoteles">Hoteles: 0</span>
+      <span id="resumen-restaurantes">Restaurantes: 0</span>
+    </div>
+
+    <div id="proximo-evento">
+      <h3>Próximo evento</h3>
+      <div id="tarjeta-proximo-evento"></div>
+    </div>
+  </div>
+</section>
+
 
 <!-- 🌟 MENÚ INFERIOR -->
 <div id="menuInferior">
+  <button class="nav-btn" data-page="dashboard">
+    <img src="Recursos/img/dashboard.png" alt="dashboard">
+    <span>Dashboard</span>
+  </button>
   <button class="nav-btn" data-page="itinerario">
     <img src="Recursos/img/itinerario.png" alt="Itinerario">
     <span>Itinerario</span>
@@ -441,5 +466,7 @@
 <script src="Scripts/gastos.js"></script>
 <!-- Lógica de la ventana notas -->
 <script src="Scripts/notas.js"></script>
+<!-- Lógica del dashboard -->
+<script src="Scripts/dashboard.js"></script>
 </body>
 </html>
