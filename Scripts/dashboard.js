@@ -57,8 +57,6 @@ function obtenerPrimerPuntoDelItinerario() {
 }
 
 
-const ciudadCoordsCache = {}; // Se puede persistir también en localStorage si quieres
-
 async function renderizarRutaGeneralPorCiudades() {
   try {
     if (!window.itinerarioData || typeof window.itinerarioData !== "object") {
@@ -67,56 +65,46 @@ async function renderizarRutaGeneralPorCiudades() {
     }
 
     const ciudades = Object.keys(itinerarioData);
-    const coordenadas = [];
-
-    for (const ciudad of ciudades) {
-      const coords = await obtenerCoordenadasCiudadConCache(ciudad);
-      if (coords) {
-        coordenadas.push({ nombre: ciudad, lat: coords.lat, lng: coords.lng });
-      } else {
-        console.warn(`⚠️ No se pudieron obtener coordenadas para ${ciudad}`);
-      }
-    }
-
-    if (!window.map) {
-      console.error("❌ El objeto 'map' aún no está definido. Espera a que se cargue Google Maps antes de trazar rutas.");
+    if (ciudades.length < 2) {
+      console.warn("⚠️ Se necesitan al menos dos ciudades para trazar una ruta");
       return;
     }
 
-    // Marcar ciudades
-    coordenadas.forEach(c => {
-      new google.maps.Marker({
-        position: { lat: c.lat, lng: c.lng },
-        map,
-        title: c.nombre,
-      });
+    const origin = ciudades[0] + ", Suiza";
+    const destination = ciudades[ciudades.length - 1] + ", Suiza";
+    const waypoints = ciudades.slice(1, -1).map(c => ({
+      location: c + ", Suiza",
+      stopover: true
+    }));
+
+    const directionsService = new google.maps.DirectionsService();
+    const directionsRenderer = new google.maps.DirectionsRenderer({ suppressMarkers: false });
+    directionsRenderer.setMap(map);
+
+    directionsService.route({
+      origin,
+      destination,
+      waypoints,
+      travelMode: google.maps.TravelMode.DRIVING
+    }, (result, status) => {
+      if (status === google.maps.DirectionsStatus.OK) {
+        directionsRenderer.setDirections(result);
+
+        // Calcular distancia total
+        const legs = result.routes[0].legs;
+        distanciaTotalKm = legs.reduce((acc, leg) => acc + leg.distance.value, 0) / 1000;
+
+        const distElem = document.getElementById("resumen-km");
+        if (distElem) distElem.textContent = `Distancia total: ~${Math.round(distanciaTotalKm)} km`;
+      } else {
+        console.error("❌ Error al trazar ruta:", status);
+      }
     });
-
-    // Trazar ruta entre ellas usando Directions API
-    if (coordenadas.length >= 2) {
-      const waypoints = coordenadas.slice(1, -1).map(c => ({ location: { lat: c.lat, lng: c.lng }, stopover: true }));
-
-      const directionsService = new google.maps.DirectionsService();
-      const directionsRenderer = new google.maps.DirectionsRenderer({ suppressMarkers: true });
-      directionsRenderer.setMap(map);
-
-      directionsService.route({
-        origin: { lat: coordenadas[0].lat, lng: coordenadas[0].lng },
-        destination: { lat: coordenadas[coordenadas.length - 1].lat, lng: coordenadas[coordenadas.length - 1].lng },
-        waypoints,
-        travelMode: google.maps.TravelMode.DRIVING
-      }, (result, status) => {
-        if (status === google.maps.DirectionsStatus.OK) {
-          directionsRenderer.setDirections(result);
-        } else {
-          console.error("Error al trazar ruta:", status);
-        }
-      });
-    }
   } catch (error) {
     console.error("💥 Error inesperado al renderizar ruta general:", error);
   }
 }
+
 
 async function obtenerCoordenadasCiudadConCache(ciudad) {
   if (ciudadCoordsCache[ciudad]) return ciudadCoordsCache[ciudad];
