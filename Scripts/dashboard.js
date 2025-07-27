@@ -1,4 +1,3 @@
-// 📍 DASHBOARD.JS - PANTALLA INICIAL CON MAPA + RESUMEN
 window.initDashboard = function () {
   console.log("🚦 initDashboard llamado");
 
@@ -30,12 +29,17 @@ window.initDashboard = function () {
       }, 250);
 
       renderizarRutaYEventos();
-      renderizarResumenDashboard();
+
+      // 🔁 Esperar a que se trace la ruta general para mostrar el resumen con km reales
+      renderizarRutaGeneralPorCiudades().then(() => {
+        renderizarResumenDashboard();
+      });
     });
   };
 
   esperarItinerarioYContenedor();
 };
+
 
 function obtenerPrimerPuntoDelItinerario() {
   for (const [ubicacion, fechas] of Object.entries(itinerarioData)) {
@@ -207,8 +211,8 @@ console.log("📍 Punto con coords:", coords);
 
 function renderizarResumenDashboard() {
   const ubicaciones = Object.keys(itinerarioData);
-  document.getElementById("resumen-dias").textContent = `Días: ${ubicaciones.length}`;
-
+  const totalCiudades = ubicaciones.length;
+  let totalDias = 0;
   let totalActividades = 0;
   let totalHoteles = 0;
   let totalRestaurantes = 0;
@@ -216,21 +220,30 @@ function renderizarResumenDashboard() {
 
   ubicaciones.forEach(ubicacion => {
     const fechas = Object.keys(itinerarioData[ubicacion] || {});
+    totalDias += fechas.length;
+
     fechas.forEach(fecha => {
       const eventosDia = itinerarioData[ubicacion][fecha]?.eventos || [];
       eventosDia.forEach(e => {
         eventos.push({ ...e, fecha, ubicacion });
-        totalActividades++;
+        if (e.etiquetaEvento === "actividad") totalActividades++;
         if (e.etiquetaEvento === "alojamiento") totalHoteles++;
         if (e.etiquetaEvento === "comida") totalRestaurantes++;
       });
     });
   });
 
+  document.getElementById("resumen-dias").textContent = `Días: ${totalDias}`;
+  document.getElementById("resumen-ciudades").textContent = `Ciudades: ${totalCiudades}`;
   document.getElementById("resumen-actividades").textContent = `Actividades: ${totalActividades}`;
   document.getElementById("resumen-hoteles").textContent = `Hoteles: ${totalHoteles}`;
   document.getElementById("resumen-restaurantes").textContent = `Restaurantes: ${totalRestaurantes}`;
-  document.getElementById("resumen-km").textContent = `Distancia total: ~${ubicaciones.length * 15} km`;
+
+  // Solo se actualiza si renderizarRutaGeneralPorCiudades ya la calculó
+  const kmElemento = document.getElementById("resumen-km");
+  if (typeof distanciaTotalKm === "number") {
+    kmElemento.textContent = `Distancia total: ~${Math.round(distanciaTotalKm)} km`;
+  }
 
   const eventosPendientes = eventos.filter(e => !e.realizado && e.hora);
   eventosPendientes.sort((a, b) => new Date(`${a.fecha}T${a.hora}`) - new Date(`${b.fecha}T${b.hora}`));
@@ -238,6 +251,7 @@ function renderizarResumenDashboard() {
   const siguiente = eventosPendientes[0];
   if (siguiente) mostrarProximoEvento(siguiente);
 }
+
 
 function mostrarProximoEvento(e) {
   const cont = document.getElementById("tarjeta-proximo-evento");
