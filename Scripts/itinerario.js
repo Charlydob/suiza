@@ -424,47 +424,50 @@ window.guardarFavoritoSeleccionado = function () {
   const nombre = favorito?.datosPersonalizados?.nombre || "Favorito sin nombre";
   const precio = favorito?.datosPersonalizados?.precio || "";
 
-const seccion = document.querySelector(".seccion-ubicacion:last-child");
-const carousel = seccion?.querySelector(".carousel-dia");
+  const seccion = document.querySelector(".seccion-ubicacion:last-child");
+  const dia = seccion?.querySelector(".dia-itinerario:last-child");
+  const carousel = dia?.querySelector(".carousel-dia");
 
-if (!carousel) {
-  console.error("❌ No se encontró carousel para insertar favorito.");
-  return;
-}
+  if (!seccion || !dia || !carousel) {
+    console.error("❌ No se pudo obtener seccion, día o carousel para insertar favorito.");
+    return;
+  }
 
-window._carouselActual = carousel;
+  const ubicacion = seccion.querySelector(".titulo-ubicacion")?.textContent?.trim();
+  const fecha = dia.getAttribute("data-fecha");
 
-const ubicacion = seccion?.querySelector(".titulo-ubicacion")?.textContent?.trim();
-const fecha = seccion?.querySelector(".dia-itinerario")?.getAttribute("data-fecha");
+  if (!ubicacion || !fecha) {
+    console.warn("⚠️ Faltan datos para guardar el favorito.");
+    return;
+  }
 
-if (
-  ubicacion &&
-  fecha &&
-  itinerarioData[ubicacion] &&
-  itinerarioData[ubicacion][fecha] &&
-  Array.isArray(itinerarioData[ubicacion][fecha].eventos)
-) {
+  // Asegurar contexto correcto para inserción visual
+  window._carouselActual = carousel;
+
+  // Crear tarjeta visual
+  crearTarjeta(nombre, "favorito", hora, "", etiqueta, precio);
+
+  // Insertar en estructura de datos
+  if (!itinerarioData[ubicacion]) itinerarioData[ubicacion] = {};
+  if (!itinerarioData[ubicacion][fecha]) itinerarioData[ubicacion][fecha] = { eventos: [] };
+
   itinerarioData[ubicacion][fecha].eventos.push({
-  titulo: nombre,
-  tipo: "favorito",
-  hora,
-  notas: "",
-  etiquetaEvento: etiqueta,
-  precio,
-  coordenadas: favorito.coordenadas || favorito.coord || null
-});
-
-  console.log("✅ Favorito insertado correctamente en itinerarioData");
-} else {
-  console.warn("⚠️ No se pudo insertar el favorito: estructura no encontrada.", {
-    ubicacion, fecha, itinerarioData
+    titulo: nombre,
+    tipo: "favorito",
+    hora,
+    notas: "",
+    etiquetaEvento: etiqueta,
+    precio,
+    coordenadas: favorito.coordenadas || favorito.coord || null
   });
-}
+
+  console.log("✅ Favorito insertado correctamente en itinerarioData y visualmente.");
 
   guardarItinerarioLocal();
   guardarItinerarioFirebase();
   cerrarModal();
 };
+
 function cargarItinerarioFirebase() {
   if (!navigator.onLine || typeof db === "undefined") {
     console.warn("📴 Sin conexión, no se carga de Firebase.");
