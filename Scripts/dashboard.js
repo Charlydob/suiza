@@ -129,7 +129,7 @@ async function obtenerCoordenadasCiudadConCache(ciudad) {
   }
 
   try {
-    const response = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(ciudad + ", Suiza")}&key=TU_API_KEY`);
+    const response = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(ciudad + ", Suiza")}&key=AIzaSyA8KhfGc61uBT3DHS1hiCEl7HgnFYaWySI`);
     const result = await response.json();
 
     if (result.status === "OK") {
