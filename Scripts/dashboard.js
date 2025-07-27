@@ -85,6 +85,7 @@ async function renderizarRutaGeneralPorCiudades() {
       origin,
       destination,
       waypoints,
+        optimizeWaypoints: false,
       travelMode: google.maps.TravelMode.DRIVING
     }, (result, status) => {
       if (status === google.maps.DirectionsStatus.OK) {
