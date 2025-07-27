@@ -55,6 +55,14 @@ function obtenerPrimerPuntoDelItinerario() {
   }
   return null;
 }
+function limpiarNombreCiudad(ciudad) {
+  // Elimina palabras como "vuelta", "glacier", etc.
+  return ciudad
+    .replace(/vuelta/gi, "")
+    .replace(/glacier\s*\d+/gi, "")
+    .replace(/[^\w\s]/gi, "")
+    .trim();
+}
 
 
 async function renderizarRutaGeneralPorCiudades() {
@@ -64,7 +72,8 @@ async function renderizarRutaGeneralPorCiudades() {
       return;
     }
 
-    const ciudades = Object.keys(itinerarioData);
+const ciudadesCrudas = Object.keys(itinerarioData);
+const ciudades = ciudadesCrudas.map(limpiarNombreCiudad);
     if (ciudades.length < 2) {
       console.warn("⚠️ Se necesitan al menos dos ciudades para trazar una ruta");
       return;
