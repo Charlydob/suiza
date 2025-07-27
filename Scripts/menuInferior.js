@@ -35,6 +35,13 @@ document.addEventListener("DOMContentLoaded", () => {
             paginaDestino.style.display = "block";
             paginaDestino.classList.add("activa");
 
+            // ⏯️ Ejecutar lógica específica por página
+if (destino === "dashboard" && typeof initDashboard === "function") {
+  console.log("🚀 Lanzando initDashboard desde menú");
+  initDashboard();
+}
+
+
             // ✅ Solo permitir scroll en el itinerario
             if (destino === "itinerario") {
               paginaDestino.style.overflowY = "auto";

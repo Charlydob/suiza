@@ -1,24 +1,39 @@
 // 📍 DASHBOARD.JS - PANTALLA INICIAL CON MAPA + RESUMEN
-
 window.initDashboard = function () {
   console.log("🚦 initDashboard llamado");
 
-  // Esperar hasta que itinerarioData tenga contenido real
-  const intentarCargarDashboard = () => {
-    if (!itinerarioData || Object.keys(itinerarioData).length === 0) {
-      console.log("⏳ Esperando itinerarioData...");
-      setTimeout(intentarCargarDashboard, 300); // reintenta en 300ms
+  const esperarItinerarioYContenedor = () => {
+    const mapaDiv = document.getElementById("mapa-dashboard");
+
+    const dataLista = itinerarioData && Object.keys(itinerarioData).length > 0;
+    const contenedorVisible = mapaDiv && mapaDiv.offsetHeight > 0;
+
+    if (!dataLista || !contenedorVisible) {
+      console.log("⏳ Esperando data o visibilidad del div...");
+      setTimeout(esperarItinerarioYContenedor, 300);
       return;
     }
 
-    console.log("✅ itinerarioData cargado:", itinerarioData);
-    initMap(46.8182, 8.2275, "mapa-dashboard");
-    renderizarRutaYEventos();
-    renderizarResumenDashboard();
+    console.log("✅ itinerarioData cargado y contenedor visible");
+
+    // Esperar al siguiente ciclo de render
+    requestAnimationFrame(() => {
+      initMap(46.8182, 8.2275, "mapa-dashboard");
+
+      setTimeout(() => {
+        console.log("🔄 Forzando resize y centrado del mapa");
+        google.maps.event.trigger(map, "resize");
+        map.setCenter({ lat: 46.8182, lng: 8.2275 });
+      }, 250);
+
+      renderizarRutaYEventos();
+      renderizarResumenDashboard();
+    });
   };
 
-  intentarCargarDashboard();
+  esperarItinerarioYContenedor();
 };
+
 
 
 
