@@ -424,50 +424,41 @@ window.guardarFavoritoSeleccionado = function () {
   const nombre = favorito?.datosPersonalizados?.nombre || "Favorito sin nombre";
   const precio = favorito?.datosPersonalizados?.precio || "";
 
-  const seccion = document.querySelector(".seccion-ubicacion:last-child");
-  const dia = seccion?.querySelector(".dia-itinerario:last-child");
-  const carousel = dia?.querySelector(".carousel-dia");
-
-  if (!seccion || !dia || !carousel) {
-    console.error("❌ No se pudo obtener seccion, día o carousel para insertar favorito.");
-    return;
-  }
-
-  const ubicacion = seccion.querySelector(".titulo-ubicacion")?.textContent?.trim();
-  const fecha = dia.getAttribute("data-fecha");
-
-  if (!ubicacion || !fecha) {
-    console.warn("⚠️ Faltan datos para guardar el favorito.");
-    return;
-  }
-
-  // Asegurar contexto correcto para inserción visual
-  window._carouselActual = carousel;
-
-  // Crear tarjeta visual
   crearTarjeta(nombre, "favorito", hora, "", etiqueta, precio);
 
-  // Insertar en estructura de datos
-  if (!itinerarioData[ubicacion]) itinerarioData[ubicacion] = {};
-  if (!itinerarioData[ubicacion][fecha]) itinerarioData[ubicacion][fecha] = { eventos: [] };
+const ubicacion = window.ubicacionEventoActual;
+const fecha = window.fechaEventoActual;
+if (!itinerarioData[ubicacion]) itinerarioData[ubicacion] = {};
+if (!itinerarioData[ubicacion][fecha]) itinerarioData[ubicacion][fecha] = { eventos: [] };
 
+if (
+  ubicacion &&
+  fecha &&
+  itinerarioData[ubicacion] &&
+  itinerarioData[ubicacion][fecha] &&
+  Array.isArray(itinerarioData[ubicacion][fecha].eventos)
+) {
   itinerarioData[ubicacion][fecha].eventos.push({
-    titulo: nombre,
-    tipo: "favorito",
-    hora,
-    notas: "",
-    etiquetaEvento: etiqueta,
-    precio,
-    coordenadas: favorito.coordenadas || favorito.coord || null
-  });
+  titulo: nombre,
+  tipo: "favorito",
+  hora,
+  notas: "",
+  etiquetaEvento: etiqueta,
+  precio,
+  coordenadas: favorito.coordenadas || favorito.coord || null
+});
 
-  console.log("✅ Favorito insertado correctamente en itinerarioData y visualmente.");
+  console.log("✅ Favorito insertado correctamente en itinerarioData");
+} else {
+  console.warn("⚠️ No se pudo insertar el favorito: estructura no encontrada.", {
+    ubicacion, fecha, itinerarioData
+  });
+}
 
   guardarItinerarioLocal();
   guardarItinerarioFirebase();
   cerrarModal();
 };
-
 function cargarItinerarioFirebase() {
   if (!navigator.onLine || typeof db === "undefined") {
     console.warn("📴 Sin conexión, no se carga de Firebase.");
@@ -852,7 +843,8 @@ function eliminarPlaceholder() {
 
 
 function crearTarjeta(titulo, tipo, hora = null, notas = "", etiquetaEvento = "", precio = "", moneda = "EUR") {
-const template = document.getElementById("template-tarjeta-itinerario");
+
+  const template = document.getElementById("template-tarjeta-itinerario");
 if (!template) {
   console.error("❌ No se encontró el template-tarjeta-itinerario en el DOM");
   return;
@@ -864,7 +856,7 @@ if (!tarjeta) {
   console.error("❌ El clon no contiene .tarjeta-itinerario");
   return;
 }
-
+tarjeta.dataset.tipo = tipo;
   const etiqueta = tarjeta.querySelector(".etiqueta-evento");
   const strong = tarjeta.querySelector(".titulo-evento");
 
@@ -955,16 +947,23 @@ tarjeta.addEventListener("touchstart", (e) => {
 
     tarjetaClon = tarjeta.cloneNode(true);
     tarjetaClon.classList.add("clon-arrastrado");
+    tarjetaClon.classList.remove("arrastrando"); // 👈 Esto sí, pero del clon
+
     tarjetaClon.style.position = "absolute";
     tarjetaClon.style.pointerEvents = "none";
     tarjetaClon.style.zIndex = "9999";
     tarjetaClon.style.width = tarjeta.offsetWidth + "px";
     tarjetaClon.style.height = tarjeta.offsetHeight + "px";
+
+    tarjetaClon.style.left = `${touch.clientX - tarjeta.offsetWidth / 2}px`;
+    tarjetaClon.style.top = `${touch.clientY - tarjeta.offsetHeight / 2}px`;
+
     document.body.appendChild(tarjetaClon);
 
     desplazamientoActivo = true;
   }, 600);
 });
+
 
 tarjeta.addEventListener("touchmove", (e) => {
   if (!desplazamientoActivo || !tarjetaClon) return;
@@ -1065,28 +1064,10 @@ if (fecha && ubicacion && itinerarioData[ubicacion]?.[fecha]) {
   console.log("🎯 originalTitulo:", tarjeta.dataset.originalTitulo);
   console.log("🕒 originalHora:", tarjeta.dataset.originalHora);
 
-let evento = itinerarioData[ubicacion][fecha].eventos.find(
-  e => e.titulo === tarjeta.dataset.originalTitulo &&
-       (e.hora || "") === (tarjeta.dataset.originalHora || "")
-);
-
-// 🔁 Si no lo encuentra localmente, búscalo en todo el itinerario
-if (!evento) {
-  for (const [ubi, dias] of Object.entries(itinerarioData)) {
-    for (const [dia, datos] of Object.entries(dias)) {
-      const encontrado = datos.eventos.find(e =>
-        e.titulo === tarjeta.dataset.originalTitulo &&
-        (e.hora || "") === (tarjeta.dataset.originalHora || "")
-      );
-      if (encontrado) {
-        evento = encontrado;
-        break;
-      }
-    }
-    if (evento) break;
-  }
-}
-
+  const evento = itinerarioData[ubicacion][fecha].eventos.find(
+    e => e.titulo === tarjeta.dataset.originalTitulo &&
+         (e.hora || "") === (tarjeta.dataset.originalHora || "")
+  );
 
   if (evento) {
     window._eventoEditando = evento;
@@ -1106,7 +1087,7 @@ if (!evento) {
     return;
   }
 
-mostrarVistaPreviaEvento(eventoActual, eventoActual.tipo || "evento");
+mostrarVistaPreviaEvento(eventoActual, tipo);
 
 const textarea = document.getElementById('notas-evento');
 const vistaPrevia = document.getElementById('vista-previa-notas');

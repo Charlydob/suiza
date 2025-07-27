@@ -600,7 +600,6 @@ button#btn-generico {
 }
 .tarjeta-placeholder {
   height: 70px;
-  border: 2px dashed #aaa;
   border-radius: 10px;
   margin: 6px 0;
   background-color: #f5f5f5;
