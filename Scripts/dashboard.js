@@ -1,15 +1,25 @@
 // 📍 DASHBOARD.JS - PANTALLA INICIAL CON MAPA + RESUMEN
 
 window.initDashboard = function () {
-  // Iniciar mapa en el contenedor exclusivo del dashboard
-  console.log("🔍 Dashboard activo:", document.getElementById("mapa-dashboard"));
-console.log("📏 Altura mapa-dashboard:", document.getElementById("mapa-dashboard").offsetHeight);
+  console.log("🚦 initDashboard llamado");
 
-  initMap(46.8182, 8.2275, "mapa-dashboard");
-  
-  renderizarRutaYEventos();
-  renderizarResumenDashboard();
+  // Esperar hasta que itinerarioData tenga contenido real
+  const intentarCargarDashboard = () => {
+    if (!itinerarioData || Object.keys(itinerarioData).length === 0) {
+      console.log("⏳ Esperando itinerarioData...");
+      setTimeout(intentarCargarDashboard, 300); // reintenta en 300ms
+      return;
+    }
+
+    console.log("✅ itinerarioData cargado:", itinerarioData);
+    initMap(46.8182, 8.2275, "mapa-dashboard");
+    renderizarRutaYEventos();
+    renderizarResumenDashboard();
+  };
+
+  intentarCargarDashboard();
 };
+
 
 
 function renderizarRutaYEventos() {
