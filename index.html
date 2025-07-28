@@ -14,8 +14,17 @@
   <link rel="stylesheet" href="Styles/dashboard.css" />
 
   <link rel="apple-touch-icon" href="Recursos/icono.png" />
-</head>
+  <link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#007bff">
 
+</head>
+<script>
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("service-worker.js")
+      .then(() => console.log("✅ Service Worker registrado"))
+      .catch(err => console.error("❌ Error al registrar el SW", err));
+  }
+</script>
 
 <body>
 
