@@ -1,62 +1,50 @@
 #menuInferior {
-position: fixed;
-bottom: 0;
-width: 100%;
-display: flex;
-justify-content: space-evenly;
-background: transparent;
-backdrop-filter: blur(5px);
-  border-top: 2px solid rgba(0, 0, 0, 0.1);
-box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
-z-index: 9999;
-padding: 4px 0;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  display: flex;
+  justify-content: space-evenly;
+  background: linear-gradient(180deg, rgba(18,20,26,0.35), rgba(18,20,26,0.75));
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-top: 1px solid rgba(255,255,255,0.06);
+  box-shadow: 0 -10px 30px rgba(0,0,0,0.4), 0 0 24px rgba(122,162,255,.12);
+  z-index: 9999;
+  padding: 6px 6px env(safe-area-inset-bottom, 6px);
 }
 
 .nav-btn {
-display: grid;
-border: none;
-background: none;
-text-align: center;
-justify-content: center;
-font-size: 11px;
-color: #999;
-transition: color 0.2s ease;
-padding: 5px 0;
-font-family: 'Inter', sans-serif;
+  display: grid;
+  border: none;
+  background: none;
+  text-align: center;
+  justify-content: center;
+  font-size: 11px;
+  color: #a9afbe;
+  transition: transform .08s ease, color .2s ease, filter .2s ease;
+  padding: 6px 0;
+  font-family: 'Inter', system-ui, sans-serif;
+}
+.nav-btn:active { transform: translateY(1px) scale(.98); }
 
-}
-#menuInferior img {
-margin-left: 2px;
-width: 24px;
-height: 24px;
-margin-bottom: 3px;
-filter: grayscale(100%) brightness(1.5);
-transition: filter 0.3s ease;
-}
+#menuInferior img,
 .nav-btn img {
-width: 24px;
-height: 24px;
-margin-bottom: 3px;
-filter: grayscale(100%) brightness(1.5);
-transition: filter 0.3s ease;
+  width: 24px;
+  height: 24px;
+  margin: 0 auto 3px auto;
+  filter: grayscale(100%) brightness(.95) drop-shadow(0 2px 6px rgba(0,0,0,.5));
+  transition: filter .2s ease, transform .08s ease;
 }
-
-.nav-btn.activo {
-  color: #1519ff;
-}
-
-
+.nav-btn.activo { color: #cfd7ff; }
 .nav-btn.activo img {
-filter: none;
+  filter: drop-shadow(0 0 10px rgba(122,162,255,.35));
+  transform: translateY(-1px);
 }
 
 /* 📱 Páginas internas */
 .pagina-app {
-padding: 15px;
-margin-bottom: 60px; /* espacio para el menú */
+  padding: 15px;
+  margin-bottom: 68px; /* espacio para el menú */
 }
 
-
-#menuInferior span {
-margin-right: 12px;
-}
+#menuInferior span { margin-right: 12px; }

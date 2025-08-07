@@ -1,122 +1,104 @@
 #pagina-gastos {
   padding: 1rem;
   font-family: 'Inter', system-ui, sans-serif;
+  color: var(--text, #e7e9ee);
 }
 
 #pagina-gastos h2 {
   text-align: center;
-  color: #007BFF;
+  color: var(--primary, #7aa2ff);
   margin-bottom: 1.5rem;
 }
 
 /* 🔷 Bloque de cada ubicación */
 .gasto-ubicacion {
-  background-color: #fff;
-  border-radius: 12px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
+  background: var(--card, rgba(20,22,28,0.72));
+  color: var(--text, #e7e9ee);
+  border-radius: 14px;
+  box-shadow: 0 8px 28px rgba(0,0,0,.45);
   padding: 1rem;
   margin-bottom: 24px;
-  border-left: 5px solid #007BFF;
+  border: 1px solid rgba(255,255,255,0.06);
+  outline: 1px solid rgba(122,162,255,.15);
 }
 
+/* Titulares */
 .gasto-ubicacion h3 {
   font-size: 20px;
   margin-bottom: 0.5rem;
-  color: #007BFF;
+  color: var(--primary, #7aa2ff);
 }
-
-/* 🔹 Bloque de cada día dentro de una ubicación */
 .gasto-ubicacion h4 {
   font-size: 16px;
-  margin-top: 1rem;
-  margin-bottom: 0.3rem;
-  color: #444;
-  border-bottom: 1px solid #eee;
+  margin: 1rem 0 .3rem 0;
+  color: #c6ccda;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
   padding-bottom: 2px;
 }
 
-/* 🔸 Lista de eventos */
-.gasto-ubicacion ul {
-  list-style: none;
-  padding-left: 0;
-  margin: 0 0 0.5rem 0;
-}
-
+/* Lista de eventos */
+.gasto-ubicacion ul { list-style: none; padding-left: 0; margin: 0 0 .5rem 0; }
 .gasto-ubicacion li {
-  font-size: 14px;
-  color: #333;
-  margin-bottom: 6px;
-  display: flex;
-  justify-content: space-between;
-  gap: 8px;
+  font-size: 14px; color: #d6d9e2; margin-bottom: 6px;
+  display: flex; justify-content: space-between; gap: 8px;
 }
+.gasto-ubicacion li strong { font-weight: 700; color: #eef2ff; }
 
-.gasto-ubicacion li strong {
-  font-weight: 600;
-}
-
-/* 📝 Inputs para gasto manual */
+/* Inputs gasto manual */
 .gasto-extra {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 10px;
+  display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px;
 }
-
 .gasto-extra input[type="text"],
 .gasto-extra input[type="number"],
 .gasto-extra select {
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 10px;
+  padding: 10px;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 12px;
   font-size: 14px;
   flex: 1 1 100px;
-  background: #fff;
+  background: rgba(26,30,40,.9);
+  color: var(--text, #e7e9ee);
 }
+.gasto-extra input::placeholder { color: #8e95a9; }
 
 .gasto-extra button {
-  background-color: #007BFF;
+  background: linear-gradient(180deg, var(--primary-600, #5c86ff), var(--primary-700, #3c6bff));
   color: white;
-  border: none;
-  border-radius: 10px;
-  padding: 8px 14px;
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 12px;
+  padding: 10px 14px;
   cursor: pointer;
   font-size: 14px;
   flex: 0 0 auto;
-  transition: background-color 0.2s ease;
+  transition: transform .05s ease, filter .2s ease, box-shadow .2s ease;
+  box-shadow: 0 0 22px rgba(122,162,255,.18);
 }
+.gasto-extra button:active { transform: translateY(1px); }
 
-.gasto-extra button:hover {
-  background-color: #0056b3;
-}
-
-/* 💰 Subtotales por día */
+/* Totales */
 .total-dia {
-  font-weight: 500;
+  font-weight: 600;
   margin-top: 10px;
   font-size: 14px;
-  color: #000;
+  color: #e9edf7;
 }
-
-/* 📊 Totales por ubicación */
 .total-ubicacion {
-  font-weight: bold;
+  font-weight: 700;
   font-size: 16px;
-  color: #000;
+  color: #ffffff;
   margin-top: 1rem;
   text-align: right;
-  border-top: 1px solid #ddd;
+  border-top: 1px solid rgba(255,255,255,0.08);
   padding-top: 6px;
 }
 
-/* ❌ Botón de eliminar */
+/* Botón eliminar (transparente) */
 .gasto-ubicacion button[onclick*="eliminarGastoManual"] {
-  background-color: transparent;
+  background: transparent;
   font-size: 13px;
   padding: 6px 10px;
   margin-left: 6px;
+  color: #ff9c9c;
+  border: none;
 }
-
-.gasto-ubicacion button[onclick*="eliminarGastoManual"]:hover {
-  background-color: transparent;
-}
+.gasto-ubicacion button[onclick*="eliminarGastoManual"]:hover { text-decoration: underline; }

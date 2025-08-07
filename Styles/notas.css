@@ -1,93 +1,79 @@
 #pagina-notas {
   padding: 1rem;
-  font-family: 'Inter', sans-serif;
+  font-family: 'Inter', system-ui, sans-serif;
+  color: var(--text, #e7e9ee);
 }
 
 #pagina-notas h2 {
   text-align: center;
   margin-bottom: 0.5rem;
-  color: #333;
+  color: var(--primary, #7aa2ff);
 }
 
+/* Filtros */
 .filtros-notas {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 1rem;
-  flex-wrap: wrap;
+  display: flex; gap: 10px; margin-bottom: 1rem; flex-wrap: wrap;
 }
-
 .filtros-notas input,
 .filtros-notas select,
 .formulario-nota select {
-  padding: 8px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
+  padding: 10px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.08);
   font-size: 14px;
   flex: 1 1 150px;
+  background: rgba(26,30,40,.9);
+  color: var(--text, #e7e9ee);
 }
+.filtros-notas input::placeholder { color: #8e95a9; }
 
+/* Formulario nueva nota */
 .formulario-nota {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-bottom: 1.5rem;
+  display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 1.5rem;
 }
-
 .formulario-nota textarea {
   flex: 1 1 100%;
   min-height: 80px;
-  padding: 8px;
+  padding: 10px;
   font-size: 14px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(26,30,40,.9);
+  color: var(--text, #e7e9ee);
 }
-
 .formulario-nota button {
-  padding: 8px 14px;
-  border: none;
-  border-radius: 8px;
-  background-color: #007BFF;
+  padding: 10px 14px;
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 12px;
+  background: linear-gradient(180deg, var(--primary-600, #5c86ff), var(--primary-700, #3c6bff));
   color: white;
   cursor: pointer;
+  box-shadow: 0 0 22px rgba(122,162,255,.18);
 }
 
+/* Lista */
 #lista-notas .nota {
-  background: #fff;
-  border-radius: 10px;
+  background: rgba(20,22,28,0.8);
+  color: var(--text, #e7e9ee);
+  border-radius: 12px;
   padding: 10px 12px;
   margin-bottom: 10px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  box-shadow: 0 8px 22px rgba(0,0,0,.45);
+  border: 1px solid rgba(255,255,255,0.06);
   position: relative;
 }
-
-#lista-notas .nota p {
-  margin: 0;
-  font-size: 14px;
-  color: #333;
-}
-
-#lista-notas .nota small {
-  color: #666;
-  font-size: 12px;
-  display: block;
-  margin-top: 4px;
-}
+#lista-notas .nota p { margin: 0; font-size: 14px; color: #e0e3eb; }
+#lista-notas .nota small { color: #9aa3b5; font-size: 12px; display: block; margin-top: 4px; }
 
 #lista-notas .nota button {
-  position: absolute;
-  top: 8px;
-  right: 10px;
-  background: transparent;
-  border: none;
-  border-radius: 6px;
-  padding: 4px 8px;
-  color: white;
-  cursor: pointer;
+  position: absolute; top: 8px; right: 10px;
+  background: transparent; border: none; border-radius: 8px;
+  padding: 4px 8px; color: #ff9c9c; cursor: pointer;
 }
 .img-nota {
   max-width: 100%;
-  border-radius: 8px;
+  border-radius: 10px;
   margin-bottom: 6px;
   display: block;
+  border: 1px solid rgba(255,255,255,0.06);
 }
-

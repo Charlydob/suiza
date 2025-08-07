@@ -1,50 +1,56 @@
 #pagina-itinerario {
   padding: 1rem;
-  font-family: 'Arial', sans-serif;
-  
+  font-family: 'Inter', system-ui, sans-serif;
+  color: var(--text, #e7e9ee);
 }
 
+/* Títulos */
 #pagina-itinerario .titulo-itinerario,
 #pagina-itinerario .subtitulo-itinerario {
   text-align: center;
   margin: 0.5rem 0;
+  color: var(--text, #e7e9ee);
+  opacity: .9;
 }
 
+/* FAB */
 #pagina-itinerario .boton-flotante {
   position: fixed;
   bottom: 80px;
   right: 16px;
-  background-color: #007aff;
+  background: linear-gradient(180deg, var(--primary-600, #5c86ff), var(--primary-700, #3c6bff));
   color: white;
-  border: none;
+  border: 1px solid rgba(255,255,255,.08);
   border-radius: 50%;
   width: 56px;
   height: 56px;
   font-size: 28px;
   line-height: 56px;
   text-align: center;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 12px 30px rgba(0,0,0,.5), 0 0 22px rgba(122,162,255,.18);
   cursor: pointer;
   z-index: 10;
 }
 
 #pagina-itinerario .seccion-ubicacion {
-  background-color: white;
-  border-radius: 12px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+  background: var(--card, rgba(20,22,28,0.72));
+  color: var(--text, #e7e9ee);
+  border-radius: 14px;
+  box-shadow: 0 8px 28px rgba(0,0,0,.45);
+  border: 1px solid rgba(255,255,255,0.06);
   margin-bottom: 20px;
   padding: 16px;
 }
 
 #pagina-itinerario .header-ubicacion {
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
   margin-bottom: 12px;
 }
-
 #pagina-itinerario .titulo-ubicacion {
   font-size: 18px;
-  font-weight: bold;
+  font-weight: 700;
   margin: 0;
+  color: var(--primary, #7aa2ff);
 }
 
 #pagina-itinerario .btn-agregar-dia,
@@ -53,30 +59,27 @@
   margin: 8px auto 0;
   width: 40%;
   height: 40px;
-  padding: 0px;;
+  padding: 0;
   font-size: 16px;
-  color: #007aff;
-  background-color: #f4f6f8;
-  border: 1px dashed #0059be71;
+  color: var(--primary, #7aa2ff);
+  background: rgba(32,36,48,.6);
+  border: 1px dashed rgba(122,162,255,.45);
   border-radius: 12px;
-  transition: all 0.2s ease;
+  transition: filter .2s ease, transform .05s ease, box-shadow .2s ease;
+  box-shadow: 0 0 0 rgba(0,0,0,0);
 }
-
 #pagina-itinerario .btn-agregar-dia:hover,
 #pagina-itinerario .btn-agregar-evento:hover {
-  border-color: #007aff;
-  color: #007aff;
+  filter: brightness(1.08);
+  box-shadow: 0 0 20px rgba(122,162,255,.15);
 }
+#pagina-itinerario .btn-agregar-dia:active,
+#pagina-itinerario .btn-agregar-evento:active { transform: translateY(1px); }
 
-#pagina-itinerario .dia-itinerario {
-  margin-top: 0.2rem;
-}
+#pagina-itinerario .dia-itinerario { margin-top: 0.2rem; }
+#pagina-itinerario .titulo-dia { font-size: 16px; margin: 0.5rem 0; color: var(--text, #e7e9ee); }
 
-#pagina-itinerario .titulo-dia {
-  font-size: 16px;
-  margin: 0.5rem 0;
-}
-
+/* Carrusel */
 #pagina-itinerario .carousel-dia {
   display: flex;
   overflow-x: auto;
@@ -84,529 +87,144 @@
   scroll-snap-type: x mandatory;
   gap: 12px;
   padding-bottom: 12px;
-  scrollbar-width: none; 
+  scrollbar-width: none;
 }
+#pagina-itinerario .carousel-dia::-webkit-scrollbar { display: none; }
 
+/* Tarjetas */
 #pagina-itinerario .tarjeta-itinerario {
   min-width: 100px;
-  scroll-snap-align: start;
   max-width: 100px;
   height: 80px;
-  background: white;
+  scroll-snap-align: start;
+  background: rgba(26,30,40,0.75);
+  color: var(--text, #e7e9ee);
   border-radius: 12px;
-  box-shadow: 2px 2px 2px 2px rgba(0.1,0.1,0.1,0.1);
+  box-shadow: 0 6px 18px rgba(0,0,0,.45);
+  border: 1px solid rgba(255,255,255,0.06);
   position: relative;
   padding: 0.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  flex-direction: column;
+  display: flex; align-items: center; justify-content: center; text-align: center; flex-direction: column;
 }
-
-#pagina-itinerario .etiqueta-evento {
-  font-size: 12px;
-  line-height: 1.2;
-  color: #999;
-}
-
+#pagina-itinerario .etiqueta-evento { font-size: 12px; line-height: 1.2; color: #9aa3b5; }
 #pagina-itinerario .checkbox-itinerario {
-  position: absolute;
-  top: 5px;
-  right: 5px;
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  border: 2px solid #aaa;
-  background: white;
-  cursor: pointer;
+  position: absolute; top: 5px; right: 5px;
+  width: 14px; height: 14px; border-radius: 50%;
+  border: 2px solid #7b85a0; background: transparent; cursor: pointer;
 }
 
- .modal-formulario-eliminar {
-  background: white;
-  border-radius: 12px;
-  padding: 15px;
-  width: 60%;
-  max-width: 360px;
-  margin: auto;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.25);
-  display: flex;
-  flex-direction: column;
-  gap: 0px;
-  text-align: center;
-}
- .modal-formulario-tarjeta {
-  background: white;
-  border-radius: 12px;
-  padding: 15px;
-  width: 60%;
-  max-width: 360px;
-  margin: auto;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.25);
-  display: flex;
-  flex-direction: column;
-  gap: 0px;
-}
-
-/* MODAL PARA CUANDO */
-
-.modal-formulario-cuando {
-  background: #ffffffa6;
-  backdrop-filter: blur(3px);
-  border-radius: 16px;
-  padding: 20px 16px;
-  width: 90%;
-  max-width: 380px;
-  margin: auto;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  font-family: 'Arial', sans-serif;
-  text-align: center;
-}
-
-.modal-formulario-cuando h3 {
-  font-size: 18px;
-  margin: 0;
-  color: #333;
-}
-
-.modal-formulario-cuando input {
-  -webkit-appearance: none;
-  position: relative;
-  appearance: none;
-  margin-left: 12px;
-  margin-top: 0px;
-  background: rgba(96, 205, 255, 0.075);
-  backdrop-filter: blur(6px);
-  border: 1.5px solid #ccc;
-  border-radius: 12px;
-  padding: 3px;
-  font-size: 15px;
-  color: #333;
-  height: 18px;
-  width: 80%;
-    text-align: center;
-
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-  transition: border 0.2s ease;
-}
-
-/* MODAL DEL DONDE */
-
-.modal-formulario-donde {
-  background: #ffffffa6;
-  backdrop-filter: blur(3px);
-  border-radius: 16px;
-  padding: 20px 16px;
-  width: 90%;
-  max-width: 380px;
-  margin: auto;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  font-family: 'Arial', sans-serif;
-  text-align: center;
-}
-
-.modal-formulario-donde h3 {
-  font-size: 18px;
-  margin: 0;
-  color: #333;
-}
-
-.modal-formulario-donde input {
-  -webkit-appearance: none;
-  position: relative;
-  appearance: none;
-  margin-left: 15px;
-  background: rgba(96, 205, 255, 0.075);
-  backdrop-filter: blur(6px);
-  border: 1.5px solid #ccc;
-  border-radius: 12px;
-  padding: 3px;
-  font-size: 15px;
-  color: #333;
-  height: 28px;
-  width: 80%;
-    text-align: center;
-
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-  transition: border 0.2s ease;
-}
-
-
-/* MODAL DEL evento */
-
-.modal-formulario-evento {
-  background: #ffffffa6;
-  backdrop-filter: blur(3px);
-  border-radius: 16px;
-  padding: 20px 16px;
-  width: 90%;
-  max-width: 380px;
-  margin: auto;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  font-family: 'Arial', sans-serif;
-  text-align: center;
-}
-
-.modal-formulario-evento h3 {
-  font-size: 18px;
-  margin: 0;
-  color: #333;
-}
-
-.modal-formulario-evento input {
-  -webkit-appearance: none;
-  position: relative;
-  appearance: none;
-  margin-left: 15px;
-  background: rgba(96, 205, 255, 0.075);
-  backdrop-filter: blur(6px);
-  border: 1.5px solid #ccc;
-  border-radius: 12px;
-  padding: 3px;
-  font-size: 15px;
-  color: #333;
-  height: 28px;
-    text-align: center;
-
-  width: 80%;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-  transition: border 0.2s ease;
-}
-
-/* MODAL DEL favoritos */
-
-.modal-formulario-favoritos {
-  background: #ffffffa6;
-  backdrop-filter: blur(3px);
-  border-radius: 16px;
-  padding: 20px 16px;
-  width: 90%;
-  max-width: 380px;
-  margin: auto;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  font-family: 'Arial', sans-serif;
-  text-align: center;
-}
-
-.modal-formulario-favoritos h3 {
-  font-size: 18px;
-  margin: 0;
-  color: #333;
-}
-
-.modal-formulario-favoritos input {
-  -webkit-appearance: none;
-  position: relative;
-  appearance: none;
-  margin-left: 72px;
-  background: rgba(96, 205, 255, 0.075);
-  backdrop-filter: blur(6px);
-  border: 1.5px solid #ccc;
-  border-radius: 12px;
-  padding: 3px;
-  font-size: 15px;
-  color: #333;
-  height: 18px;
-  width: 25%;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-  transition: border 0.2s ease;
-}
-
-/* MODAL DEL EVENTO EDIT */
-
-.modal-formulario-evento-edit {
-  background: #ffffffa6;
-  backdrop-filter: blur(3px);
-  border-radius: 16px;
-  padding: 20px 16px;
-  width: 90%;
-  max-width: 380px;
-  margin-bottom: 20px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  font-family: 'Arial', sans-serif;
-  text-align: center;
-}
-
-.modal-formulario-evento-edit h3 {
-  font-size: 18px;
-  margin: 0;
-  color: #333;
-}
-
-.modal-formulario-evento-edit input#titulo-evento {
-  -webkit-appearance: none;
-  position: relative;
-  appearance: none;
-  margin-left: 5px;
-  background: rgba(255, 255, 255, 0.075);
-  backdrop-filter: blur(6px);
-  border: 1.5px solid #ccc;
-  border-radius: 8px;
-  padding: 3px;
-  font-size: 15px;
-  color: #333;
-  height: 18px;
-    text-align: center;
-
-  width: 90%;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-  transition: border 0.2s ease;
-}
-.modal-formulario-evento-edit div.inputs-evento {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-}
-.modal-formulario-evento-edit textarea#notas-evento {
-  resize: none; /* Desactiva el "arrastrar" manual */
-  overflow: auto; /* Elimina la barra de scroll vertical */
-  min-height: 60px; /* Altura mínima para que no sea enano */
-  max-height: 300px; /* Por si querés limitarlo */
-}
-
-
-/* MODAL DEL editar tarjeta */
-
+/* Modales (cuando/donde/evento/editar) */
+.modal-formulario-eliminar,
+.modal-formulario-tarjeta,
+.modal-formulario-cuando,
+.modal-formulario-donde,
+.modal-formulario-evento,
+.modal-formulario-evento-edit,
 .modal-formulario-tarjeta {
-  background: #ffffffa6;
-  backdrop-filter: blur(3px);
+  background: rgba(20,22,28,0.85);
+  color: var(--text, #e7e9ee);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   border-radius: 16px;
   padding: 20px 16px;
   width: 90%;
   max-width: 380px;
-  margin-bottom: 20px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  font-family: 'Arial', sans-serif;
+  margin: auto;
+  box-shadow: 0 12px 32px rgba(0,0,0,.55);
+  border: 1px solid rgba(255,255,255,0.06);
+  display: flex; flex-direction: column; gap: 8px;
   text-align: center;
 }
+.modal-formulario-cuando h3,
+.modal-formulario-donde h3,
+.modal-formulario-evento h3,
+.modal-formulario-evento-edit h3,
+.modal-formulario-tarjeta h3 { font-size: 18px; margin: 0; color: var(--primary, #7aa2ff); }
 
-.modal-formulario-tarjeta h3 {
-  font-size: 18px;
-  margin: 0;
-  color: #333;
-}
-
-.modal-formulario-tarjeta input#titulo-evento {
-  -webkit-appearance: none;
-  position: relative;
-  appearance: none;
-  margin-left: 5px;
-  background: rgba(255, 255, 255, 0.075);
-  backdrop-filter: blur(6px);
-  border: 1.5px solid #ccc;
-  border-radius: 8px;
-  padding: 3px;
+.modal-formulario-cuando input,
+.modal-formulario-donde input,
+.modal-formulario-evento input,
+.modal-formulario-evento-edit input#titulo-evento,
+.modal-formulario-tarjeta input#titulo-evento,
+.modal-formulario-tarjeta input#precio-evento,
+.modal-formulario-tarjeta textarea#notas-evento,
+.modal-formulario-evento-edit textarea#notas-evento {
+  appearance: none; -webkit-appearance: none;
+  background: rgba(26,30,40,0.9);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 12px;
+  padding: 8px;
   font-size: 15px;
-  color: #333;
-  height: 18px;
-  width: 90%;
-    text-align: center;
-
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-  transition: border 0.2s ease;
+  color: var(--text, #e7e9ee);
+  width: 80%;
+  margin: 0 auto;
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,.2);
 }
+.modal-formulario-evento-edit div.inputs-evento,
 .modal-formulario-tarjeta div.inputs-evento {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
+  display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 8px;
 }
-.modal-formulario-tarjeta textarea#notas-evento {
-  resize: none; /* Desactiva el "arrastrar" manual */
-   /* Elimina la barra de scroll vertical */
-  min-height: 60px; /* Altura mínima para que no sea enano */
-  max-height: 300px; /* Por si querés limitarlo */
-  margin-bottom: 0px;
-}
-.modal-formulario-tarjeta input#precio-evento {
-  -webkit-appearance: none;
-  position: relative;
-  appearance: none;
-  margin-left: 5px;
-  background: rgba(255, 255, 255, 0.075);
-  backdrop-filter: blur(6px);
-  border: 1.5px solid #ccc;
-  border-radius: 8px;
-  padding: 3px;
-  font-size: 15px;
-  color: #333;
-  height: 18px;
-  width: 20%;
-  text-align: center;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-  transition: border 0.2s ease;
-}
-.modal-formulario-tarjeta button{
-  margin-bottom: 0px;
-}
-#modal-contenido {
-  margin-bottom: 140px;
-}
+.modal-formulario-tarjeta textarea#notas-evento { resize: none; min-height: 60px; max-height: 300px; }
+#modal-contenido { margin-bottom: 140px; }
 
+/* Fondo modal */
 #modal-fondo {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  padding: 0px;
-  background-color: rgba(0, 0, 0, 0.233);
-  backdrop-filter: blur(4px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  position: fixed; inset: 0;
+  padding: 0;
+  background: rgba(0,0,0,.45);
+  backdrop-filter: blur(6px);
+  display: flex; align-items: center; justify-content: center;
   z-index: 100;
 }
-body, html {
-  overflow-y: auto !important;
-  height: auto !important;
+body, html { overflow-y: auto !important; height: auto !important; }
+.pagina { min-height: 100vh; overflow-y: hidden; }
+
+/* Colores de categoría con “neon border” */
+.color-alojamiento { border: 2px solid #2ee75a !important; box-shadow: 0 0 12px rgba(46,231,90,.25) inset; }
+.color-transporte { border: 2px solid #1d8b9e !important; box-shadow: 0 0 12px rgba(29,139,158,.25) inset; }
+.color-comida     { border: 2px solid #f59a12 !important; box-shadow: 0 0 12px rgba(245,154,18,.25) inset; }
+.color-atraccion  { border: 2px solid #8a11a0 !important; box-shadow: 0 0 12px rgba(138,17,160,.25) inset; }
+.color-otros      { border: 2px solid #dd0707 !important; box-shadow: 0 0 12px rgba(221,7,7,.25) inset; }
+
+/* Botones utilitarios */
+#pagina-itinerario .dia-itinerario, .seccion-ubicacion { position: relative; }
+button.btn-cerrar-ubicacion,
+button.btn-cerrar-dia {
+  position: absolute; top: 6px; right: 6px;
+  background: transparent; border: none; font-size: 18px; color: #bfc6d8; cursor: pointer;
 }
 
-.pagina {
-  min-height: 100vh;
-  overflow-y: hidden;
-}
-.color-alojamiento {
-  border: 2px solid #25c410 !important;
-}
+/* Tipografías */
+div.info-tarjeta { font-size: 16px; color: var(--text, #e7e9ee); }
+h3.titulo-dia { font-size: 24px; margin: 0; text-align: start; color: var(--text, #e7e9ee); }
 
-.color-transporte {
-  border: 2px solid #1d8b9eb9 !important;
-
-}
-
-.color-comida {
-  border: 2px solid #f59a12d2 !important;
-
-}
-
-.color-atraccion {
-  border: 2px solid #8a11a0ad !important;
-
-}
-
-.color-otros {      
-  border: 2px solid #dd07077c !important;
-
-}
-#pagina-itinerario .dia-itinerario, .seccion-ubicacion {
-  position: relative;
-}
-button.btn-cerrar-ubicacion {
-  position: absolute;
-  top: 5px;
-  right: 1px;
-  background-color: transparent;
-  border: none;
-  font-size: 24px;
-  color: #333;
-  cursor: pointer;
-}
-
-
-button.btn-cerrar-dia{
-  position: absolute;
-  top: 0px;
-  right: 2px;
-  background-color: transparent;
-  border: none;
-  font-size: 16px;
-  color: #333;
-  cursor: pointer;
-}
-div.info-tarjeta {
-  font-size: 16px;
-}
-h3.titulo-dia{
-  font-size: 24px;
-  margin:0;
-  text-align: start;
-}
-
-
+/* Botones genéricos de modales */
 .modal-formulario button#btn-confirmar-aceptar {
-  background-color: #ff1b1b;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  padding: 8px 16px;
-  font-size: 16px;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-  box-shadow: #333 0px 2px 4px;
+  background: linear-gradient(180deg, #ff5b5b, #ff3030);
+  color: white; border: 1px solid rgba(255,255,255,.08);
+  border-radius: 10px; padding: 8px 16px; font-size: 16px; cursor: pointer;
+  box-shadow: 0 0 22px rgba(255,80,80,.18);
 }
 button#btn-generico {
-  background-color: #007aff;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  padding: 8px 16px;
-  font-size: 14px;
-  padding: 5px;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-    box-shadow: #333 0px 2px 4px;
+  background: linear-gradient(180deg, var(--primary-600, #5c86ff), var(--primary-700, #3c6bff));
+  color: white; border: 1px solid rgba(255,255,255,.08);
+  border-radius: 10px; padding: 5px 16px; font-size: 14px; cursor: pointer;
+  box-shadow: 0 0 22px rgba(122,162,255,.18);
 }
 
-
-
-.arrastrando {
-  opacity: 0.6;
-  transform: scale(1.03);
-  z-index: 10;
+/* Drag & Drop feedback */
+.arrastrando { opacity: 0.7; transform: scale(1.03); z-index: 10; }
+.clon-visual, .clon-arrastrado {
+  border-radius: 8px; box-shadow: 0 8px 18px rgba(0,0,0,.45);
 }
-
-.clon-visual {
-  border-radius: 6px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-  transform: scale(1.05);
-}
-
 .clon-arrastrado {
-  position: absolute;
-  pointer-events: none;
-  opacity: 0.85;
-  transform: scale(1.05);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
-  transition: none !important;
-  z-index: 9999;
-  border-radius: 8px;
+  position: absolute; pointer-events: none; opacity: 0.9;
+  transform: scale(1.05); transition: none !important; z-index: 9999;
+  background: rgba(26,30,40,.95); border: 1px solid rgba(255,255,255,.06);
 }
-.tarjeta-itinerario, 
-.tarjeta-itinerario * {
-  user-select: none;
-  -webkit-user-select: none; /* Para Safari */
-}
+.tarjeta-itinerario, .tarjeta-itinerario * { user-select: none; -webkit-user-select: none; }
 .tarjeta-placeholder {
-  height: 70px;
-  border-radius: 10px;
-  margin: 6px 0;
-  background-color: #f5f5f5;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-style: italic;
-  color: #666;
-  pointer-events: none;
+  height: 70px; border-radius: 10px; margin: 6px 0;
+  background: rgba(255,255,255,.05); display: flex; align-items: center; justify-content: center;
+  font-style: italic; color: #9aa3b5; pointer-events: none;
 }

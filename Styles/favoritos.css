@@ -1,28 +1,20 @@
-.favorito-tarjeta img {
-  display: none;
-}
-#pagina-favoritos h2 {
-  font-size: 28px;
-  font-weight: bold;
-  color: #333;
-  justify-content: center;
-  text-align: center;
-  margin-top: 20px;
-}
+.favorito-tarjeta img { display: none; }
+
+#pagina-favoritos h2,
 #pagina-favoritos p#texto-fav {
-  font-size: 18px;
-  font-weight: bold;
-  color: #333;
-  justify-content: center;
-  text-align: center;
-  margin-top: 20px;
+  justify-content: center; text-align: center; margin-top: 20px;
+  color: var(--text, #e7e9ee);
 }
+#pagina-favoritos h2 { font-size: 28px; font-weight: 800; }
+#pagina-favoritos p#texto-fav { font-size: 18px; font-weight: 600; color: #cfd5e6; }
 
 .favorito-tarjeta {
-  background: #ffffffcc;
-  backdrop-filter: blur(4px);
-  border-radius: 12px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+  background: rgba(20,22,28,0.8);
+  color: var(--text, #e7e9ee);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 14px;
+  box-shadow: 0 10px 28px rgba(0,0,0,.5);
   padding: 12px;
   margin: 10px;
   display: flex;
@@ -31,219 +23,116 @@
   gap: 12px;
   position: relative;
   overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.06);
 }
 
-.favorito-detalles {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  flex: 1;
-}
-
-.nombre-favorito {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
+.favorito-detalles { display: flex; flex-direction: column; gap: 6px; flex: 1; }
+.nombre-favorito { display: flex; justify-content: space-between; align-items: center; }
 
 .favorito-nombre {
-  font-size: 16px;
-  font-weight: bold;
-  color: #333;
-  margin: 0;
+  font-size: 16px; font-weight: 800; color: #f1f4ff; margin: 0;
 }
+.favorito-visitado { transform: scale(1.2); accent-color: var(--primary, #7aa2ff); }
 
-.favorito-visitado {
-  transform: scale(1.2);
-  accent-color: #007aff;
+.detalles-ubicacion p, .detalles-añadidos p {
+  font-size: 12px; margin: 0; color: #bfc6d8; line-height: 1.3;
 }
-
-.detalles-ubicacion p,
-.detalles-añadidos p {
-  font-size: 12px;
-  margin: 0;
-  color: #444;
-  line-height: 1.3;
-}
-
-.detalles-ubicacion {
-  color: #007aff;
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
+.detalles-ubicacion { color: var(--primary, #7aa2ff); display: flex; gap: 8px; flex-wrap: wrap; }
 
 .favorito-botones {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  flex-shrink: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; flex-shrink: 0;
 }
-
 .favorito-botones button {
-  background-color: #f4f6f8;
-  border: 1px dashed #007aff;
-  border-radius: 10px;
-  padding: 4px 6px;
-  font-size: 12px;
-  color: #007aff;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  width: 60px;
-  height: 28px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  background: rgba(32,36,48,.6);
+  border: 1px dashed rgba(122,162,255,.45);
+  border-radius: 12px;
+  padding: 6px 8px;
+  font-size: 12px; color: var(--primary, #7aa2ff);
+  cursor: pointer; transition: filter .2s ease, transform .05s ease, box-shadow .2s ease;
+  width: 60px; height: 28px; display: flex; align-items: center; justify-content: center;
 }
-
-.favorito-botones button:hover {
-  background-color: #e6f0ff;
-  border-color: #007aff;
-}
-.favorito-botones button.btn-ver {
-  display: none;}
+.favorito-botones button:hover { filter: brightness(1.08); box-shadow: 0 0 16px rgba(122,162,255,.18); }
+.favorito-botones button:active { transform: translateY(1px); }
+.favorito-botones button.btn-ver { display: none; }
 
 @media (max-width: 420px) {
-  .favorito-tarjeta {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .favorito-botones {
-    flex-direction: row;
-    justify-content: space-around;
-    margin-top: 8px;
-  }
-
-  .favorito-botones button {
-    width: 50%;
-    height: 32px;
-  }
+  .favorito-tarjeta { flex-direction: column; align-items: stretch; }
+  .favorito-botones { flex-direction: row; justify-content: space-around; margin-top: 8px; }
+  .favorito-botones button { width: 50%; height: 32px; }
 }
 
-
-
-/* MODAL EDICION */
+/* ==== MODAL EDICIÓN ==== */
 #modal-fondo-editor {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background-color: rgba(0, 0, 0, 0.25);
-  backdrop-filter: blur(4px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.35);
+  backdrop-filter: blur(6px);
+  display: flex; align-items: center; justify-content: center;
   z-index: 2000;
 }
+
+/* Contenedor del editor */
 #modal-fondo-editor div#editorFavoritoLista {
-  background: rgba(255, 255, 255, 0.781);
-  border-radius: 15px;
+  background: rgba(20,22,28,0.9);
+  color: var(--text, #e7e9ee);
+  border-radius: 16px;
   padding: 10px;
-  margin-top: 60px;
-  margin-left: 50px;
-  width: 70%;
-  max-width: 360px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.25);
-  display: flex;
-  flex-direction: column;
-  gap: 0px;
-  text-align: center;
+  margin-top: 60px; margin-left: 50px;
+  width: 70%; max-width: 360px;
+  box-shadow: 0 12px 32px rgba(0,0,0,.55);
+  border: 1px solid rgba(255,255,255,0.06);
+  display: flex; flex-direction: column; gap: 8px; text-align: center;
 }
+
 #modal-fondo-editor div.fila-botones-editor {
-  background: transparent;
-  border-radius: 15px;
-  padding: 0px;
-  margin-top: 15px;
-  margin-left: 68px;
-  width: 70%;
-  max-width: 360px;
-  display: flex;
-  flex-direction: row;
-  gap: 8px;
-  text-align: center;
+  background: transparent; border-radius: 15px; padding: 0;
+  margin-top: 15px; margin-left: 68px;
+  width: 70%; max-width: 360px;
+  display: flex; flex-direction: row; gap: 8px; text-align: center;
 }
+
 #modal-fondo-editor button{
-  background-color: transparent;
+  background: linear-gradient(180deg, var(--primary-600, #5c86ff), var(--primary-700, #3c6bff));
   color: white;
-  border: none;
-  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 12px;
   padding: 10px;
   font-size: 15px;
-  margin-top: 0px;
+  margin-top: 0;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: filter .2s ease, transform .05s ease;
+  box-shadow: 0 0 22px rgba(122,162,255,.18);
 }
-#modal-fondo-editor input{
-  -webkit-appearance: none;
-  position: relative;
-  appearance: none;
-  margin-left: 12px;
-  margin-top: 0px;
-  background: rgba(96, 205, 255, 0.075);
-  backdrop-filter: blur(6px);
-  border: 1.5px solid #ccc;
-  border-radius: 12px;
-  padding: 3px;
-  font-size: 15px;
-  color: #333;
-  height: 18px;
-  width: 80%;
-  text-align: center;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-  transition: border 0.2s ease;
-  
-}
-#modal-fondo-editor select{
--webkit-appearance: none;
-  position: relative;
-  appearance: none;
-  margin-left: 12px;
-  margin-top: 0px;
-  background: rgba(96, 205, 255, 0.075);
-  backdrop-filter: blur(6px);
-  border: 1.5px solid #ccc;
-  border-radius: 12px;
-  padding: 3px;
-  font-size: 15px;
-  color: #333;
-  height: 28px;
-  width: 20%;
-  text-align: center;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-  transition: border 0.2s ease;
+#modal-fondo-editor button:active { transform: translateY(1px); }
 
-}
-#modal-fondo-editor div.selectores{
-  display: flex;
-  flex-direction: row;
-  gap: 8px;
-  margin-top: 10px;
-}
-
-div.selectores input#editPrecioLista, div.selectores select#editMonedaLista, div.selectores input#editHorarioLista {
-  background: rgba(96, 205, 255, 0.075);
-  backdrop-filter: blur(6px);
-  border: 1.5px solid #d1d1d1 !important;
+#modal-fondo-editor input,
+#modal-fondo-editor select {
+  appearance: none; -webkit-appearance: none;
+  background: rgba(26,30,40,.95);
+  border: 1.5px solid #2a2f3b;
   border-radius: 12px;
-  padding: 3px;
+  padding: 8px;
   font-size: 15px;
-  color: #333;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  color: var(--text, #e7e9ee);
+  height: 32px;
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,.25);
+}
+#modal-fondo-editor div.selectores {
+  display: flex; flex-direction: row; gap: 8px; margin-top: 10px;
+}
+div.selectores input#editPrecioLista,
+div.selectores select#editMonedaLista,
+div.selectores input#editHorarioLista {
+  background: rgba(26,30,40,.95);
+  border: 1.5px solid #2a2f3b !important;
+  border-radius: 12px;
+  padding: 8px;
+  font-size: 15px;
+  color: var(--text, #e7e9ee);
   width: 40%;
 }
-
-#modal-fondo-editor #editNombreLista {
-  align-items: center;
-  margin-left: 22px;
-}
-
-#modal-fondo-editor #editNotasLista{
-  margin-left: 22px;
-  width: 80%;
-  height: 200px;
-  resize: none;
+#modal-fondo-editor #editNombreLista { align-items: center; margin-left: 22px; }
+#modal-fondo-editor #editNotasLista {
+  margin-left: 22px; width: 80%; height: 200px; resize: none;
+  background: rgba(26,30,40,.95);
+  border: 1.5px solid #2a2f3b; border-radius: 12px; color: var(--text, #e7e9ee);
 }
