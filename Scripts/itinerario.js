@@ -431,59 +431,51 @@ window.guardarFavoritoSeleccionado = function () {
   const hora = document.getElementById("hora-favorito").value;
   const etiqueta = document.getElementById("etiqueta-favorito").value;
 
-  // Buscar el favorito por ID
   const favorito = favoritos.find(f => f.id === idFavorito);
   const nombre = favorito?.datosPersonalizados?.nombre || "Favorito sin nombre";
   const precio = favorito?.datosPersonalizados?.precio || "";
+  const moneda = "EUR";
 
-const id = generarIdEvento();
-crearTarjeta(nombre, "favorito", hora, "", etiqueta, precio, "EUR", id);
+  const ubicacion = window.ubicacionEventoActual;
+  const fecha = window.fechaEventoActual;
+  const carousel = window._carouselActual;
 
-// Y muy IMPORTANTE: guarda también el id en el objeto que empujas al itinerario:
-itinerarioData[ubicacion][fecha].eventos.push({
-  id,
-  titulo: nombre,
-  tipo: "favorito",
-  hora: hora || "",
-  notas: "",
-  etiquetaEvento: etiqueta || "",
-  precio: precio || "",
-  moneda: "EUR",
-  createdAt: new Date().toISOString()
-});
-const ubicacion = window.ubicacionEventoActual;
-const fecha = window.fechaEventoActual;
-if (!itinerarioData[ubicacion]) itinerarioData[ubicacion] = {};
-if (!itinerarioData[ubicacion][fecha]) itinerarioData[ubicacion][fecha] = { eventos: [] };
+  if (!ubicacion || !fecha || !carousel) {
+    alert("Error: faltan datos de ubicación/fecha.");
+    return;
+  }
 
-if (
-  ubicacion &&
-  fecha &&
-  itinerarioData[ubicacion] &&
-  itinerarioData[ubicacion][fecha] &&
-  Array.isArray(itinerarioData[ubicacion][fecha].eventos)
-) {
-  itinerarioData[ubicacion][fecha].eventos.push({
-  titulo: nombre,
-  tipo: "favorito",
-  hora,
-  notas: "",
-  etiquetaEvento: etiqueta,
-  precio,
-  coordenadas: favorito.coordenadas || favorito.coord || null
-});
+  // Estructura de datos garantizada
+  if (!itinerarioData[ubicacion]) itinerarioData[ubicacion] = {};
+  if (!itinerarioData[ubicacion][fecha]) itinerarioData[ubicacion][fecha] = { eventos: [] };
 
-  console.log("✅ Favorito insertado correctamente en itinerarioData");
-} else {
-  console.warn("⚠️ No se pudo insertar el favorito: estructura no encontrada.", {
-    ubicacion, fecha, itinerarioData
-  });
-}
+  const id = generarIdEvento();
+  const eventoObj = {
+    id,
+    titulo: nombre,
+    tipo: "favorito",
+    hora: hora || "",
+    notas: "",
+    etiquetaEvento: etiqueta || "",
+    precio: precio || "",
+    moneda,
+    coordenadas: favorito?.coordenadas || favorito?.coord || null,
+    createdAt: new Date().toISOString()
+  };
+
+  // Guardar en datos
+  itinerarioData[ubicacion][fecha].eventos.push(eventoObj);
+
+  // Pintar tarjeta
+  window._carouselActual = carousel;
+  crearTarjeta(nombre, "favorito", hora, "", etiqueta, precio, moneda, id);
 
   guardarItinerarioLocal();
   guardarItinerarioFirebase();
   cerrarModal();
 };
+
+
 function cargarItinerarioFirebase() {
   if (!navigator.onLine || typeof db === "undefined") {
     console.warn("📴 Sin conexión, no se carga de Firebase.");
@@ -704,55 +696,45 @@ window.guardarNuevoEvento = function () {
   const hora = document.getElementById("hora-evento").value.trim();
   const notas = document.getElementById("notas-evento").value.trim();
   const etiqueta = document.getElementById("etiqueta-evento").value;
-const id = generarIdEvento();
-const nuevoEvento = {
-  id,
-  titulo,
-  tipo: "evento",
-  hora: hora || "",
-  notas: notas || "",
-  etiquetaEvento: etiqueta || "",
-  precio: precio || "",
-  moneda: moneda || "EUR",
-  createdAt: new Date().toISOString()
-};
+
   if (!titulo) {
     alert("El título del evento es obligatorio.");
     return;
   }
 
   const fecha = window.fechaEventoActual;
-
-  // 🔧 Obtener ubicación actual desde la tarjeta activa
   const seccion = window._carouselActual?.closest(".seccion-ubicacion");
   const ubicacion = seccion?.querySelector(".titulo-ubicacion")?.textContent?.trim();
-
   if (!fecha || !ubicacion) {
-    console.warn("❌ No se pudo determinar la fecha o ubicación del evento.");
     alert("Error: faltan datos para guardar el evento.");
     return;
   }
-  console.log("🌍 Ubicación:", ubicacion);
-console.log("📅 Fecha:", fecha);
 
+  if (!itinerarioData[ubicacion]) itinerarioData[ubicacion] = {};
+  if (!itinerarioData[ubicacion][fecha]) itinerarioData[ubicacion][fecha] = { eventos: [] };
 
-  if (!itinerarioData[ubicacion]) {
-    itinerarioData[ubicacion] = {};
-  }
-  if (!itinerarioData[ubicacion][fecha]) {
-    itinerarioData[ubicacion][fecha] = { eventos: [] };
-  }
+  const id = generarIdEvento();
+  const nuevoEvento = {
+    id,
+    titulo,
+    tipo: "evento",
+    hora: hora || "",
+    notas: notas || "",
+    etiquetaEvento: etiqueta || "",
+    precio: "",         // no hay inputs de precio aquí
+    moneda: "EUR",      // por defecto
+    createdAt: new Date().toISOString()
+  };
 
-
-crearTarjeta(titulo, "evento", hora, notas, etiqueta, precio, moneda, id);
+  // Guardar y pintar
   itinerarioData[ubicacion][fecha].eventos.push(nuevoEvento);
+  crearTarjeta(titulo, "evento", hora, notas, etiqueta, "", "EUR", id);
 
   guardarItinerarioLocal();
   guardarItinerarioFirebase();
   cerrarModal();
-
-  console.log(`✅ Evento añadido a ${ubicacion} - ${fecha}:`, nuevoEvento);
 };
+
 
 
 
@@ -1139,79 +1121,87 @@ tarjeta.addEventListener("touchend", (e) => {
 
   // Evento de clic para editar
 tarjeta.addEventListener("click", (e) => {
-  if (tarjeta.classList.contains("arrastrando")) {
-    // Estamos en modo arrastre, no ejecutar click
-    return;
-  }
+  if (tarjeta.classList.contains("arrastrando")) return;
 
   window._tarjetaEditando = tarjeta;
 
-const seccion = tarjeta.closest(".seccion-ubicacion");
-const ubicacion = seccion?.querySelector(".titulo-ubicacion")?.textContent?.trim();
+  // Ubicación y fecha
+  const seccion = tarjeta.closest(".seccion-ubicacion");
+  const ubicacion = seccion?.querySelector(".titulo-ubicacion")?.textContent?.trim() || "";
+  const diaContenedor = tarjeta.closest(".dia-itinerario");
+  const fecha = diaContenedor?.getAttribute("data-fecha") || "";
 
-const diaContenedor = tarjeta.closest(".dia-itinerario");
-const fecha = diaContenedor?.getAttribute("data-fecha");
+  // Metadatos de la tarjeta
+  const idCard = tarjeta.dataset.id || tarjeta.getAttribute("data-id") || "";
+  const originalTitulo =
+    tarjeta.dataset.originalTitulo ||
+    tarjeta.dataset.titulo ||
+    tarjeta.querySelector(".titulo")?.textContent?.trim() ||
+    "";
+  const originalHora = tarjeta.dataset.originalHora || tarjeta.dataset.hora || "";
 
-if (fecha && ubicacion && itinerarioData[ubicacion]?.[fecha]) {
-  console.log("📦 Buscando evento en:", itinerarioData[ubicacion][fecha].eventos);
-  console.log("🎯 originalTitulo:", tarjeta.dataset.originalTitulo);
-  console.log("🕒 originalHora:", tarjeta.dataset.originalHora);
+  let evento = null;
 
-  const evento = itinerarioData[ubicacion][fecha].eventos.find(
-    e => e.titulo === tarjeta.dataset.originalTitulo &&
-         (e.hora || "") === (tarjeta.dataset.originalHora || "")
-  );
+  // Buscar primero por ID, luego por (titulo+hora)
+  if (fecha && ubicacion && itinerarioData?.[ubicacion]?.[fecha]?.eventos) {
+    const lista = itinerarioData[ubicacion][fecha].eventos;
 
-  if (evento) {
-    window._eventoEditando = evento;
+    if (idCard) evento = lista.find(e => e.id === idCard) || null;
+
+    if (!evento) {
+      evento = lista.find(e =>
+        (e.titulo || "") === originalTitulo &&
+        (e.hora || "") === originalHora
+      ) || null;
+    }
   } else {
-    console.warn("⚠️ No se encontró el evento al hacer clic en la tarjeta.");
-    window._eventoEditando = null;
+    console.warn("⚠️ No se pudo determinar la fecha o ubicación de la tarjeta.");
   }
-} else {
-  console.warn("⚠️ No se pudo determinar la fecha o ubicación de la tarjeta.");
-  window._eventoEditando = null;
-}
 
-  const eventoActual = window._eventoEditando;
+  window._eventoEditando = evento;
 
-  if (!eventoActual) {
+  if (!evento) {
+    console.warn("⚠️ No se encontró el evento al hacer clic en la tarjeta.", { idCard, originalTitulo, originalHora, ubicacion, fecha });
     alert("❌ No se pudo cargar la información del evento.");
     return;
   }
 
-mostrarVistaPreviaEvento(eventoActual, tipo);
+  // Asegurar tipo
+  const tipoFinal = evento.tipo || tarjeta.dataset.tipo || tarjeta.getAttribute("data-tipo") || "evento";
 
-const textarea = document.getElementById('notas-evento');
-const vistaPrevia = document.getElementById('vista-previa-notas');
+  // Abrir vista previa
+  mostrarVistaPreviaEvento(evento, tipoFinal);
 
+  // Notas: auto-resize + vista previa
+  const textarea = document.getElementById("notas-evento");
+  const vistaPrevia = document.getElementById("vista-previa-notas");
 
+  function autoResize(el) {
+    if (!el) return;
+    el.style.height = "auto";
+    el.style.height = el.scrollHeight + "px";
+  }
 
-function autoResize() {
-  this.style.height = 'auto';
-  this.style.height = this.scrollHeight + 'px';
-}
+  function actualizarVistaPrevia() {
+    if (!vistaPrevia || !textarea) return;
+    vistaPrevia.innerHTML = parseLinks(textarea.value || "");
+  }
 
-function actualizarVistaPrevia() {
-  if (!vistaPrevia || !textarea) return;
-  vistaPrevia.innerHTML = parseLinks(textarea.value);
-}
+  if (textarea) {
+    textarea.addEventListener("input", () => {
+      autoResize(textarea);
+      actualizarVistaPrevia();
+    }, { passive: true });
 
-if (textarea) {
-  textarea.addEventListener('input', () => {
-    autoResize.call(textarea);
-    actualizarVistaPrevia();
-  });
-
-  autoResize.call(textarea);
-  actualizarVistaPrevia(); // Inicializar
-}
-
+    autoResize(textarea);
+    actualizarVistaPrevia(); // inicial
+  }
 });
-  return tarjeta;
+return tarjeta;
 }
 window.crearTarjeta = crearTarjeta;
 })();
+
 
 
 
