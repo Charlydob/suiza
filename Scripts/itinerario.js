@@ -981,13 +981,15 @@ let anchorDY = 0; // distancia dedo → parte superior de la tarjeta
       z-index: 9999 !important;
       pointer-events: none !important;
       opacity: .96;
-      transform: none !important; /* anclamos por delta, no centramos */
+      transform: none !important;
       touch-action: none;
     }
-    .tarjeta-itinerario { touch-action: none; } /* evita scroll durante drag */
+    /* 👇 quitamos el touch-action fijo de todas las tarjetas */
+    .tarjeta-itinerario { touch-action: pan-x pan-y; }
   `;
   document.head.appendChild(s);
 })();
+
 tarjeta.addEventListener("touchstart", (e) => {
   const touch = e.touches[0];
   touchStartX = touch.clientX;
