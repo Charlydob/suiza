@@ -997,9 +997,12 @@ tarjeta.addEventListener("touchstart", (e) => {
   desplazamientoActivo = false;
 
   clearTimeout(longPressTimer);
-  longPressTimer = setTimeout(() => {
-    tarjetaArrastrando = tarjeta;
-    tarjeta.classList.add("arrastrando");
+longPressTimer = setTimeout(() => {
+  tarjetaArrastrando = tarjeta;
+  tarjeta.classList.add("arrastrando");
+
+  // ⬇️ ahora sí bloqueamos scroll
+  tarjeta.style.touchAction = "none";
 
     const seccion = tarjeta.closest(".seccion-ubicacion");
     const ubicacion = seccion?.querySelector(".titulo-ubicacion")?.textContent?.trim();
@@ -1114,6 +1117,8 @@ tarjeta.addEventListener("touchend", (e) => {
     tarjetaArrastrando?.classList.remove("arrastrando");
     tarjetaArrastrando = null;
     desplazamientoActivo = false;
+    tarjeta.style.touchAction = "pan-x pan-y";
+
     eliminarPlaceholder();
   }
 });
